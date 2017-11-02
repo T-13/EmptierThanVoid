@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Copyright (C) Team13. All rights reserved.
 
 #include "ETV.h"
 #include "Modules/ModuleManager.h"

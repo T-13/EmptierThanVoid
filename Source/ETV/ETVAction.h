@@ -65,7 +65,7 @@ public:
 	virtual bool CanPerform();
 
     UFUNCTION()
-	virtual void Perform() {}
+	virtual void Perform();
 
     UFUNCTION()
 	virtual void ApplyEffectsSelf() {}

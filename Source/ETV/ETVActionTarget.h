@@ -14,18 +14,17 @@ class ETV_API UETVActionTarget : public UETVAction
 {
 	GENERATED_BODY()
 	
-	// TODO When AETVShip is implemented
-	//TSubclassOf<AETVShip> SelectedTarget;
 	
 public:
 	// Sets default values for this actor's properties
 	UETVActionTarget();
 
 protected:
+	TSubclassOf<UObject> SelectedTarget;
+
 	// Required type of target
-	// TODO When AETVShip is implemented
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Action|Target")
-	//TSubclassOf<AETVShip> RequiredTargetType;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Action|Target")
+	TSubclassOf<UObject> RequiredTargetType;
 
 	// Chance of failure when action is used
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Action|Target", meta = (ClampMin = "0.0", ClampMax = "100.0"))
@@ -35,6 +34,7 @@ public:
 	UFUNCTION()
 	virtual void ApplyEffectsTarget() {}
 
-	// TODO When AETVShip is implemented
-	//virtual bool IsTargetValid(TSubclassOf<AETVShip> Target);
+	virtual bool IsTargetValid(TSubclassOf<UObject> Target) PURE_VIRTUAL(UETVActionTarget::IsTargetValid, return false; );
+
+	void Perform() override;
 };

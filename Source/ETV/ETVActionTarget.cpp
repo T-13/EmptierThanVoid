@@ -8,3 +8,10 @@ UETVActionTarget::UETVActionTarget() : Super()
 	// No failure possibility
 	FailureChance = 0.0f;
 }
+
+void UETVActionTarget::Perform()
+{
+	Super::Perform();
+
+	ApplyEffectsTarget();
+}

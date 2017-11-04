@@ -27,6 +27,11 @@ bool UETVAction::CanPerform()
 	return Available == EETVActionAvailability::ActionAvailable;
 }
 
+void UETVAction::Perform()
+{
+    ApplyEffectsSelf();
+}
+
 EETVActionAvailability UETVAction::ToggleAvailability()
 {
 	if (Available == EETVActionAvailability::ActionAvailable)

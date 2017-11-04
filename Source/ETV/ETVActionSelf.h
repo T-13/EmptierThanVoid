@@ -24,8 +24,8 @@ protected:
     int32 RequiredSafetyDistance;
 
 public:
-    bool CanPerform() override;
-
     UFUNCTION()
     virtual bool IsSafe();
+
+    bool CanPerform() override;
 };

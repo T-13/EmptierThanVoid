@@ -1,4 +1,4 @@
-# Emptier Than Void
+# Emptier than Void
 
 Software development game project at Software Development (slo. Razvoj Programske Opreme).
 

@@ -17,25 +17,25 @@ class ETV_API AETVShipCapital : public AETVShip
 
 public:
 	// Sets default values for this actor's properties
-	//TODO AETVShipCapital();
+	// TODO AETVShipCapital();
 
 protected:
 	// If ship has a hyperdrive
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship|Fighter")
-	bool hasHyperdrive;
+	bool HasHyperdrive;
 
 	// Affects damage done by laser
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Action|Target", meta = (ClampMin = "0.0"))
-	float laserREsistance;
+	float LaserResistance;
 
 	// Number of hangars smaller ships can go into and repair
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Action|Target", meta = (ClampMin = "0"))
 	int32 NumOfHangars;
 
 public:
-	//TODO Add methods
-	//UseHyperdrive(int32 x, int32 y);
-	//RepairShipInHangar(AETVShip ship, int32 hangar);
+	// TODO Add methods
+	// UseHyperdrive(int32 x, int32 y);
+	// RepairShipInHangar(AETVShip ship, int32 hangar);
 	
 	
 	

@@ -16,7 +16,7 @@ class ETV_API AETVShipFighter : public AETVShip
 	
 public:
 	// Sets default values for this actor's properties
-	//TODO AETVShipFighter();
+	// TODO AETVShipFighter();
 
 protected:
 	// Chance for ship to deflect an attack
@@ -28,6 +28,6 @@ protected:
 	float Acceleration;
 	
 public:
-	//TODO Add methods
+	// TODO Add methods
 	
 };

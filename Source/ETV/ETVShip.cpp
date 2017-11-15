@@ -2,7 +2,7 @@
 
 #include "ETVShip.h"
 
-void AETVShip::getCurrentPosition()
+void AETVShip::GetCurrentPosition()
 {
 }
 
@@ -10,6 +10,7 @@ void AETVShip::RechargeShields()
 {
 }
 
-void AETVShip::getReport()
+void AETVShip::GetReport()
 {
 }
+

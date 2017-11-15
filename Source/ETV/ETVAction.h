@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "ETVWeapon.h"
 #include "ETVAction.generated.h"
 
 UENUM(BlueprintType)
@@ -56,9 +57,8 @@ protected:
 	bool bEndsTurn;
 
 	// Required weapon for the action to be available
-	// TODO When AETVWeapon is implemented
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Action")
-	//TSubclassOf<AETVWeapon> RequiresWeapon;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Action")
+	TSubclassOf<AETVWeapon> RequiredWeapon;
 
 public:
 	UFUNCTION()

@@ -18,60 +18,60 @@ class ETV_API AETVShip : public APaperSpriteActor
 
 public:
 	// Sets default values for this actor's properties
-	//TODO AETVShip();
+	// TODO AETVShip();
 
 protected:
-	//Name of the ship
+	// Name of the ship
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship")
 	FName Name;
 
-	//Health points of the ship
+	// Health points of the ship
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship", meta = (ClampMin = "0.0"))
 	int32 HealthPoints;
 	
-	//Bonus to health for ships
+	// Bonus to health for ships
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship", meta = (ClampMin = "0.0"))
 	int32 ShieldPoints;
 
-	//Time for the shields to recharge
+	// Time for the shields to recharge
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship", meta = (ClampMin = "0.0"))
 	int32 ShieldRechargeTime;
 
-	//Weapon slots
-	//TODO When AETVWeapon is implemented
+	// Weapon slots
+	// TODO When AETVWeapon is implemented
 
-	//Integers (x,y) that represent a point on a sprite where the attachement goes
+	// Integers (x,y) that represent a point on a sprite where the attachement goes
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship")
 	TArray<int32> AttachementSlots;
 
-	//Size of the ship
+	// Size of the ship
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship", meta = (ClampMin = "1.0"))
 	int32 Size;
 
-	//Area that ship is allowed to move to
+	// Area that ship is allowed to move to
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship", meta = (ClampMin = "1.0"))
 	int32 MoveRange;
 
-	//Integers (x,y) for possible fields that ship can move to
+	// Integers (x,y) for possible fields that ship can move to
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship")
 	TArray<int32> Fields;
 
-	//Action avaible on ship
+	// Action avaible on ship
 	TArray<UETVAction> Actions;
 
-	//How fast ship moves
+	// How fast ship moves
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship", meta = (ClampMin = "1.0"))
 	int32 ShipSpeed;
 
 
 public:
 	UFUNCTION()
-	virtual void getCurrentPosition();
+	virtual void GetCurrentPosition();
 
 	UFUNCTION()
 	virtual void RechargeShields();
 
 	UFUNCTION()
-	virtual void getReport();
+	virtual void GetReport();
 
 };

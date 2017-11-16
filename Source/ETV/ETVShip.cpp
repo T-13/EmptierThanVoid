@@ -1,10 +1,9 @@
-﻿// Copyright (C) Team13. All rights reserved.
+// Copyright (C) Team13. All rights reserved.
 
 #include "ETVShip.h"
 #include "UserWidget.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
-
 
 // Sets default values
 AETVShip::AETVShip() : Super()
@@ -60,3 +59,4 @@ void AETVShip::ClosingContextMenu()
 	// Remove the reference to the Closed Menu
 	CurrentContextMenu = nullptr;
 }
+

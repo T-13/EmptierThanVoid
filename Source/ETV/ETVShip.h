@@ -1,4 +1,4 @@
-﻿// Copyright (C) Team13. All rights reserved.
+// Copyright (C) Team13. All rights reserved.
 
 #pragma once
 
@@ -16,7 +16,6 @@ class ETV_API AETVShip : public APaperSpriteActor
 {
 	GENERATED_BODY()
 	
-
 public:
 	// Sets default values for this actor's properties
 	AETVShip();
@@ -25,6 +24,7 @@ protected:
 	// Called when the game starts or when spawned
 	void BeginPlay() override;
 
+protected:
 	// Name of the ship
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship")
 	FName Name;
@@ -33,7 +33,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship", meta = (ClampMin = "0.0"))
 	int32 HealthPoints;
 	
-	//Bonus to health for ships
+	// Bonus to health for ships
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship", meta = (ClampMin = "0.0"))
 	int32 ShieldPoints;
 
@@ -42,7 +42,7 @@ protected:
 	int32 ShieldRechargeTime;
 
 	// Weapon slots
-	//TODO When AETVWeapon is implemented
+	// TODO When AETVWeapon is implemented
 
 	// Integers (x,y) that represent a point on a sprite where the attachement goes
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship")

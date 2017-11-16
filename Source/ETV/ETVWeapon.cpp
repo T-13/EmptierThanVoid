@@ -2,7 +2,7 @@
 
 #include "ETVWeapon.h"
 
-AETVWeapon::AETVWeapon()
+AETVWeapon::AETVWeapon():Super()
 {
 }
 
@@ -20,7 +20,7 @@ int32 AETVWeapon::GetSlotSpecifications()
     return int32();
 }
 
-int32 AETVWeapon::GetRport()
+int32 AETVWeapon::GetReport()
 {
     return int32();
 }

@@ -5,6 +5,7 @@
 #include "ETVAction.h"
 #include "CoreMinimal.h"
 #include "PaperSpriteActor.h"
+#include "ETVShipContextMenuWidget.h"
 #include "ETVShip.generated.h"
 
 /**
@@ -18,14 +19,17 @@ class ETV_API AETVShip : public APaperSpriteActor
 
 public:
 	// Sets default values for this actor's properties
-	//TODO AETVShip();
+	AETVShip();
 
 protected:
-	//Name of the ship
+	// Called when the game starts or when spawned
+	void BeginPlay() override;
+
+	// Name of the ship
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship")
 	FName Name;
 
-	//Health points of the ship
+	// Health points of the ship
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship", meta = (ClampMin = "0.0"))
 	int32 HealthPoints;
 	
@@ -33,45 +37,62 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship", meta = (ClampMin = "0.0"))
 	int32 ShieldPoints;
 
-	//Time for the shields to recharge
+	// Time for the shields to recharge
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship", meta = (ClampMin = "0.0"))
 	int32 ShieldRechargeTime;
 
-	//Weapon slots
+	// Weapon slots
 	//TODO When AETVWeapon is implemented
 
-	//Integers (x,y) that represent a point on a sprite where the attachement goes
+	// Integers (x,y) that represent a point on a sprite where the attachement goes
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship")
 	TArray<int32> AttachementSlots;
 
-	//Size of the ship
+	// Size of the ship
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship", meta = (ClampMin = "1.0"))
 	int32 Size;
 
-	//Area that ship is allowed to move to
+	// Area that ship is allowed to move to
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship", meta = (ClampMin = "1.0"))
 	int32 MoveRange;
 
-	//Integers (x,y) for possible fields that ship can move to
+	// Integers (x,y) for possible fields that ship can move to
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship")
 	TArray<int32> Fields;
 
-	//Action avaible on ship
+	// Action avaible on ship
 	TArray<UETVAction> Actions;
 
-	//How fast ship moves
+	// How fast ship moves
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship", meta = (ClampMin = "1.0"))
 	int32 ShipSpeed;
 
+	// The widget class for the ContextMenu
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ETV Ship", meta = (BlueprintProtected = "true"))
+	TSubclassOf<class UETVShipContextMenuWidget> ContextMenuClass;
+
+	// Instance of our ContextMenu
+	UPROPERTY()
+	class UETVShipContextMenuWidget* CurrentContextMenu;
+
+	// Tells us if ContextMenu for this ship is Open
+	UPROPERTY()
+	bool IsContextMenuOpen;
 
 public:
 	UFUNCTION()
-	virtual void getCurrentPosition();
+	virtual void GetCurrentPosition();
 
 	UFUNCTION()
 	virtual void RechargeShields();
 
 	UFUNCTION()
-	virtual void getReport();
+	virtual void GetReport();
+
+	UFUNCTION()
+	void SpawnContextMenu(AActor *Actor, FKey Key);
+
+	UFUNCTION(BlueprintCallable)
+	void ClosingContextMenu();
 
 };

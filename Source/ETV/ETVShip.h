@@ -1,4 +1,4 @@
-﻿// Copyright (C) Team13. All rights reserved.
+// Copyright (C) Team13. All rights reserved.
 
 #pragma once
 
@@ -10,7 +10,7 @@
 /**
  * Abstract base Ship class.
  */
-UCLASS(NotPlaceable, Abstract)
+UCLASS(Abstract)
 class ETV_API AETVShip : public APaperSpriteActor
 {
 	GENERATED_BODY()

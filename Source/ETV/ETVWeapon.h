@@ -1,4 +1,4 @@
-﻿// Copyright (C) Team13. All rights reserved.
+// Copyright (C) Team13. All rights reserved.
 
 #pragma once
 
@@ -12,7 +12,7 @@
 /**
 *
 */
-UCLASS()
+UCLASS(Abstract)
 class ETV_API AETVWeapon : public APaperSpriteActor
 {
     GENERATED_BODY()

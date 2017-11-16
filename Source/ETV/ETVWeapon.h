@@ -1,4 +1,4 @@
-﻿// Copyright (C) Team13. All rights reserved.
+// Copyright (C) Team13. All rights reserved.
 
 #pragma once
 
@@ -20,7 +20,7 @@ public:
 	AETVWeapon();
 
 protected:
-	//Display weapon's name
+	// Display weapon's name
     UPROPERTY(EditAnywhere)
     FName Name;
 
@@ -66,13 +66,13 @@ public:
 
     // Get targets that weapon can hit
     UFUNCTION(BlueprintCallable)
-    virtual TArray<int32> GetPossibleTargets();   // TODO-Object AETVShip not yet defined 
+    virtual TArray<int32> GetPossibleTargets(); // TODO-Object AETVShip not yet defined
 
-    //Gives the requirments for the weapon slot
+    // Gives the requirments for the weapon slot
     UFUNCTION(BlueprintCallable)
-    virtual int32 GetSlotSpecifications();    // TODO-Object SlotSpecification not yet defined 
+    virtual int32 GetSlotSpecifications(); // TODO-Object SlotSpecification not yet defined
 
     // Get current status
     UFUNCTION(BlueprintCallable)
-    virtual int32 GetReport(); // TODO-Object REPORT not yet defined 
+    virtual int32 GetReport(); // TODO-Object REPORT not yet defined
 };

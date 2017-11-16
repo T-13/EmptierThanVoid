@@ -1,4 +1,4 @@
-﻿// Copyright (C) Team13. All rights reserved.
+// Copyright (C) Team13. All rights reserved.
 
 #pragma once
 
@@ -6,13 +6,11 @@
 #include "Blueprint/UserWidget.h"
 #include "ETVShipContextMenuWidget.generated.h"
 
-
-/**
- * Class for the ContextMenuWidget for ETVShips
- */
-
 class AETVShip;
 
+/**
+ * Class for the ContextMenuWidget for ETVShips.
+ */
 UCLASS()
 class ETV_API UETVShipContextMenuWidget : public UUserWidget
 {

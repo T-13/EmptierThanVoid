@@ -1,8 +1,8 @@
-﻿// Copyright (C) Team13. All rights reserved.
+// Copyright (C) Team13. All rights reserved.
 
 #include "ETVWeapon.h"
 
-AETVWeapon::AETVWeapon():Super()
+AETVWeapon::AETVWeapon() : Super()
 {
 }
 

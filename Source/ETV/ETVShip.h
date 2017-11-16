@@ -5,6 +5,7 @@
 #include "ETVAction.h"
 #include "CoreMinimal.h"
 #include "PaperSpriteActor.h"
+#include "ETVShipContextMenuWidget.h"
 #include "ETVShip.generated.h"
 
 /**
@@ -15,10 +16,13 @@ class ETV_API AETVShip : public APaperSpriteActor
 {
 	GENERATED_BODY()
 	
-
 public:
 	// Sets default values for this actor's properties
-	// TODO AETVShip();
+	AETVShip();
+
+protected:
+	// Called when the game starts or when spawned
+	void BeginPlay() override;
 
 protected:
 	// Name of the ship
@@ -63,6 +67,17 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship", meta = (ClampMin = "1.0"))
 	int32 ShipSpeed;
 
+	// The widget class for the ContextMenu
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ETV Ship", meta = (BlueprintProtected = "true"))
+	TSubclassOf<class UETVShipContextMenuWidget> ContextMenuClass;
+
+	// Instance of our ContextMenu
+	UPROPERTY()
+	class UETVShipContextMenuWidget* CurrentContextMenu;
+
+	// Tells us if ContextMenu for this ship is Open
+	UPROPERTY()
+	bool IsContextMenuOpen;
 
 public:
 	UFUNCTION()
@@ -73,5 +88,11 @@ public:
 
 	UFUNCTION()
 	virtual void GetReport();
+
+	UFUNCTION()
+	void SpawnContextMenu(AActor *Actor, FKey Key);
+
+	UFUNCTION(BlueprintCallable)
+	void ClosingContextMenu();
 
 };

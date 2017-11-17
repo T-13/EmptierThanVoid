@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "ETVWeapon.h"
 #include "ETVAction.generated.h"
 
 UENUM(BlueprintType)
@@ -17,7 +18,7 @@ enum class EETVActionAvailability : uint8
  * Abstract base Action class.
  * Actions are attached to assets (eg. ships, weapons).
  */
-UCLASS(NotPlaceable, Abstract)
+UCLASS(Abstract)
 class ETV_API UETVAction : public UObject
 {
 	GENERATED_BODY()
@@ -56,9 +57,8 @@ protected:
 	bool bEndsTurn;
 
 	// Required weapon for the action to be available
-	// TODO When AETVWeapon is implemented
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Action")
-	//TSubclassOf<AETVWeapon> RequiresWeapon;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Action")
+	TSubclassOf<AETVWeapon> RequiredWeapon;
 
 public:
 	UFUNCTION()

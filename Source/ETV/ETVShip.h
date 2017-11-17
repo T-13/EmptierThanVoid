@@ -11,7 +11,7 @@
 /**
  * Abstract base Ship class.
  */
-UCLASS(NotPlaceable, Abstract)
+UCLASS(Abstract)
 class ETV_API AETVShip : public APaperSpriteActor
 {
 	GENERATED_BODY()

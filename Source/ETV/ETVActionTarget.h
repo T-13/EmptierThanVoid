@@ -14,14 +14,13 @@ class ETV_API UETVActionTarget : public UETVAction
 {
 	GENERATED_BODY()
 	
+	TSubclassOf<UObject> SelectedTarget;
 	
 public:
 	// Sets default values for this actor's properties
 	UETVActionTarget();
 
 protected:
-	TSubclassOf<UObject> SelectedTarget;
-
 	// Required type of target
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Action|Target")
 	TSubclassOf<UObject> RequiredTargetType;
@@ -34,7 +33,9 @@ public:
 	UFUNCTION()
 	virtual void ApplyEffectsTarget() {}
 
-	virtual bool IsTargetValid(TSubclassOf<UObject> Target) PURE_VIRTUAL(UETVActionTarget::IsTargetValid, return false; );
+	virtual void SetTarget(TSubclassOf<UObject> Target);
+	virtual bool IsTargetValid(TSubclassOf<UObject> Target);
 
+	bool CanPerform() override;
 	void Perform() override;
 };

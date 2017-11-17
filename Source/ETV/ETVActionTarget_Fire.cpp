@@ -6,8 +6,7 @@
 UETVActionTarget_Fire::UETVActionTarget_Fire() : Super()
 {
 	// Set required target type to general ship
-	// TODO When AETVShip is implemented
-	//RequiredTargetType = AETVShip::StaticClass();
+	RequiredTargetType = AETVShip::StaticClass();
 }
 
 bool UETVActionTarget_Fire::CanPerform()

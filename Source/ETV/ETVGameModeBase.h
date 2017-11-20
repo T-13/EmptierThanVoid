@@ -9,30 +9,25 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "ETVActionTarget.h"
 #include "ETVShip.h"
+#include "ETVStructTile.h"
 #include "GameFramework/GameModeBase.h"
 #include "ETVGameModeBase.generated.h"
 
-USTRUCT(BlueprintType, DisplayName = "ETV Tile Data")
-struct FETVTileData
+UENUM(BlueprintType)
+enum EETVTileLayer
 {
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tile Data")
-	FVector2D PointLeftTop;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tile Data")
-	FVector2D PointRightBottom;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tile Data")
-	int32 X;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tile Data")
-	int32 Y;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tile Data")
-	int32 Index;
+	Effect	UMETA(DisplayName = "Effects"),
+	Ship	UMETA(DisplayName = "Ships"),
+	Target	UMETA(DisplayName = "Target"),
+	Board	UMETA(DisplayName = "Board")
 };
 
+UENUM(BlueprintType)
+enum EETVTargetValidity
+{
+	Valid	UMETA(DisplayName = "Valid"),
+	Invalid	UMETA(DisplayName = "Invalid")
+};
 
 /**
  * Base game mode class.
@@ -44,15 +39,16 @@ class ETV_API AETVGameModeBase : public AGameModeBase
 
 	APaperTileMapActor* TileMapActor;
 	UPaperTileMapComponent* TileMapComp;
+	TArray<FETVTileData> TileData;
 	
 	// Targeting
 	bool bTargeting;
+	FETVTile CurrentTile;
+	FETVTile LastTile; // Reset this tile when mouse leaves it
+	FETVTile PreDelayTile; // Reset this tile when click animation stops
+
 	UETVActionTarget* SelectedAction;
 	AETVShip* TargetingInstigator;
-	TArray<FETVTileData> TileData;
-	int32 LastTileX;
-	int32 LastTileY;
-	int32 LastTileIndex;
 
 public:
 	// Sets default values for this actor's properties
@@ -66,13 +62,13 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV Map")
 	UPaperTileSet* TileSet;
 
-	// Higlighted tile set of the board for valid target
+	// Higlighted tile set of the board for valid (index 0) and invalid (index 1) targets
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV Map")
-	UPaperTileSet* TileSetValidTarget;
+	UPaperTileSet* TileSetTarget;
 
-	// Higlighted tile set of the board for invalid target
+	// Higlighted tile set of the board for valid (index 0) and invalid (index 1) targets on click
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV Map")
-	UPaperTileSet* TileSetInvalidTarget;
+	UPaperTileSet* TileSetTargetClick;
 
 	// Size of one tile
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV Map")
@@ -85,6 +81,10 @@ protected:
 	// Height of the board
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV Map")
 	float MapHeight;
+
+	// Start with targeting enabled (debug)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV Map")
+	bool bTargetingOnStart;
 	
 public:
 	// Called every frame
@@ -94,15 +94,21 @@ public:
 	UFUNCTION()
 	void MapGeneration();
 
+	// Fires when map finishes generating
 	UFUNCTION(BlueprintImplementableEvent, Category = "ETV Map")
 	void MapGenerated(APaperTileMapActor* TileMapActor);
 
+	// Get tile position below mouse pointer
 	UFUNCTION(BlueprintCallable, Category = "ETV Map")
-	void GetMouseOverTile(/*out*/ int32& X, /*out*/ int32& Y, /*out*/ int32& Index);
+	void GetMouseOverTile(/*out*/ FETVTile& Tile);
 
+	// Target selection effect (Tile Maps don't support animations at this time)
 	UFUNCTION()
-	void OnClickMapTile(AActor* Actor, FKey Key);
+	void OnClickedMapTile(AActor* Actor, FKey Key);
 
+	// Target deselection effect (Tile Maps don't support animations at this time)
+	UFUNCTION()
+	void OnReleasedMapTile(AActor* Actor, FKey Key);
 
 	// Starts targeting, handles ETV Action calls and stops targeting after target is selected
 	UFUNCTION(BlueprintCallable, Category = "ETV Targeting")

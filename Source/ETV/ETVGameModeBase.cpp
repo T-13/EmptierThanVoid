@@ -14,6 +14,7 @@ AETVGameModeBase::AETVGameModeBase()
 
 	// Targeting
 	bTargeting = false;
+	bTargetingOnStart = false;
 }
 
 // Called when the game starts or when spawned
@@ -24,6 +25,12 @@ void AETVGameModeBase::BeginPlay()
 	if (TileSet != nullptr)
 	{
 		MapGeneration();
+
+		// Debug start with targeting enabled
+		if (bTargetingOnStart)
+		{
+			bTargeting = true;
+		}
 	}
 }
 
@@ -34,54 +41,44 @@ void AETVGameModeBase::Tick(float DeltaTime)
 
 	if (bTargeting)
 	{
-		int32 X;
-		int32 Y;
-		int32 Index;
-		GetMouseOverTile(X, Y, Index);
+		FETVTile MouseOverTile;
+		GetMouseOverTile(MouseOverTile);
 
-		bool bIsDifferentTile = X != LastTileX || Y != LastTileY;
+		bool bIsDifferentTile = MouseOverTile.X != LastTile.X || MouseOverTile.Y != LastTile.Y;
 		// Only continue if hoevered tile is different than in previous frame and we are still in targeting
 		if (bIsDifferentTile && bTargeting)
 		{
+			CurrentTile = MouseOverTile;
+
 			// Highlight currently hovered tile based on ability to perform an action
 			FPaperTileInfo TileInfo;
-			TileInfo.PackedTileIndex = Index;
-			if (SelectedAction->CanPerform())
+			if (TileSetTarget != nullptr)
 			{
-				if (TileSetValidTarget != nullptr)
-				{
-					TileInfo.TileSet = TileSetValidTarget;
-				}
+				TileInfo.TileSet = TileSetTarget;
 			}
-			else
-			{
-				if (TileSetInvalidTarget != nullptr)
-				{
-					TileInfo.TileSet = TileSetInvalidTarget;
-				}
-			}
-			TileMapComp->SetTile(X, Y, 0, TileInfo);
+			TileInfo.PackedTileIndex = SelectedAction != nullptr && SelectedAction->CanPerform() ? EETVTargetValidity::Valid : EETVTargetValidity::Invalid;
+			//TileInfo.PackedTileIndex = FMath::RandRange(0, 1); // Debug
+			CurrentTile.Index = TileInfo.PackedTileIndex;
+			TileMapComp->SetTile(CurrentTile.X, CurrentTile.Y, EETVTileLayer::Target, TileInfo);
 
-			// Reset previous tile
-			if (LastTileX >= 0 && LastTileY >= 0 && LastTileIndex >= 0)
+			// Reset previous tile (only if not in click phase)
+			if (LastTile.IsValid())
 			{
 				FPaperTileInfo LastTileInfo;
-				LastTileInfo.TileSet = TileSet;
-				LastTileInfo.PackedTileIndex = LastTileIndex;
-				TileMapComp->SetTile(LastTileX, LastTileY, 0, LastTileInfo);
+				LastTileInfo.PackedTileIndex = LastTile.Index;
+				TileMapComp->SetTile(LastTile.X, LastTile.Y, EETVTileLayer::Target, LastTileInfo);
 			}
 
 			// Set previous tile variables to currently hovered tile
-			LastTileX = X;
-			LastTileY = Y;
-			LastTileIndex = Index;
+			LastTile.Set(CurrentTile);
 		}
 	}
 }
 
-void AETVGameModeBase::MapGeneration() {
+void AETVGameModeBase::MapGeneration()
+{
 	// Vector for spawn location (takes into account height, width and tile size)
-	const FVector LocDim(-(MapHeight * TileSize / 2), -(MapWidth * TileSize / 2), 750);
+	const FVector LocDim(-(MapHeight * TileSize / 2), -(MapWidth * TileSize / 2), -450);
 
 	// Actor spawn parameters
 	const FActorSpawnParameters SpawnInfo;
@@ -93,11 +90,18 @@ void AETVGameModeBase::MapGeneration() {
 	TileMapActor = GetWorld()->SpawnActor<APaperTileMapActor>(LocDim, Rotator, SpawnInfo);
 
 	// Getting Tile Map Component from Tile Map Actor
-	TileMapComp = TileMapActor->GetRenderComponent();
+	TileMapComp = TileMapActor->GetRenderComponent();	
 
-	// Create map and make it editable
-	TileMapComp->CreateNewTileMap(MapWidth, MapHeight);
+	// Create map and make it editable (last layer)
+	TileMapComp->CreateNewTileMap(MapWidth, MapHeight, 32, 32, 1.0f, false);
+	TileMapComp->TileMap->SeparationPerLayer = 0.1f;
 	TileMapComp->MakeTileMapEditable();
+
+	// Create additional layers before creating board layer (which creates empty layer at the bottom)
+	TileMapComp->AddNewLayer(); // Layer 3 for Effects
+	TileMapComp->AddNewLayer(); // Layer 2 for Ships
+	TileMapComp->AddNewLayer(); // Layer 1 for Targeting
+	TileMapComp->AddNewLayer(); // Layer 0 for Board
 
 	// Paper tile info for SetTile function
 	FPaperTileInfo TileInfo;
@@ -109,22 +113,21 @@ void AETVGameModeBase::MapGeneration() {
 	for (int32 i = 0; i < MapHeight; i++) {
 		for (int32 j = 0; j < MapWidth; j++) {
 
-			// We have 2 sprites and they have to alternate between PackedTileIndex 0 and 1
-			TileInfo.PackedTileIndex = (i + j) % 2;
+			// PackedTileIndex is -1 by default
+			TileInfo.PackedTileIndex = 0;
 
 			// Setting the tile with coordinates i and j
-			TileMapComp->SetTile(i, j, 0, TileInfo);
+			TileMapComp->SetTile(i, j, EETVTileLayer::Board, TileInfo);
 
 			// Add to Tile Data
 			FETVTileData CurrentTileData;
-			CurrentTileData.X = j;
-			CurrentTileData.Y = i;
-			CurrentTileData.Index = TileInfo.PackedTileIndex;
+			CurrentTileData.Tile.Set(j, i, TileInfo.PackedTileIndex);
 
 			TArray<FVector> CurrentTilePoints;
 			TileMapComp->GetTilePolygon(j, i, CurrentTilePoints, 0, true);
 			CurrentTileData.PointLeftTop = FVector2D(CurrentTilePoints[0]);
 			CurrentTileData.PointRightBottom = FVector2D(CurrentTilePoints[2]);
+
 			TileData.Add(CurrentTileData);
 		}
 	}
@@ -133,15 +136,17 @@ void AETVGameModeBase::MapGeneration() {
 	MapGenerated(TileMapActor);
 
 	// Bind click
-	TileMapActor->OnClicked.AddDynamic(this, &AETVGameModeBase::OnClickMapTile);
+	TileMapActor->OnClicked.AddDynamic(this, &AETVGameModeBase::OnClickedMapTile);
+	TileMapActor->OnReleased.AddDynamic(this, &AETVGameModeBase::OnReleasedMapTile);
 }
 
-void AETVGameModeBase::GetMouseOverTile(int32& X, int32& Y, int32& Index)
+void AETVGameModeBase::GetMouseOverTile(FETVTile& Tile)
 {
 	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 	ObjectTypes.Add(EObjectTypeQuery::ObjectTypeQuery1);
 	FHitResult Hit;
+
 	if (PlayerController->GetHitResultUnderCursorForObjects(ObjectTypes, true, Hit))
 	{
 		for (auto &CurrentTileData : TileData)
@@ -150,29 +155,54 @@ void AETVGameModeBase::GetMouseOverTile(int32& X, int32& Y, int32& Index)
 			bool bInRangeY = UKismetMathLibrary::InRange_FloatFloat(Hit.Location.Y, CurrentTileData.PointLeftTop.Y, CurrentTileData.PointRightBottom.Y, false, false);
 			if (bInRangeX && bInRangeY)
 			{
-				X = CurrentTileData.X;
-				Y = CurrentTileData.Y;
-				Index = CurrentTileData.Index;
-
-				break;
+				Tile.Set(CurrentTileData.Tile);
+				return;
 			}
 		}
 	}
+
+	Tile.Invalidate();
 }
 
-void AETVGameModeBase::OnClickMapTile(AActor* Actor, FKey Key)
+void AETVGameModeBase::OnClickedMapTile(AActor* Actor, FKey Key)
 {
-	if (bTargeting)
+	// Make sure we are still targeting (in case of race conditions)
+	if (bTargeting && !PreDelayTile.IsValid() && TileSetTargetClick != nullptr)
 	{
-		int32 X;
-		int32 Y;
-		int32 Index;
-		GetMouseOverTile(X, Y, Index);
+		PreDelayTile.Set(CurrentTile); // Prevents race conditions when leaving tile between click and release
 
-		StopTargeting();
+		// Set Tile Set to Click
+		FPaperTileInfo TileInfo = TileMapComp->GetTile(PreDelayTile.X, PreDelayTile.Y, EETVTileLayer::Target);
+		TileInfo.TileSet = TileSetTargetClick;
+		TileMapComp->SetTile(PreDelayTile.X, PreDelayTile.Y, EETVTileLayer::Target, TileInfo);
+
+		// Stop targeting if valid target
+		if (PreDelayTile.Index == EETVTargetValidity::Valid)
+		{
+			StopTargeting();
+		}
 	}
+	
 }
 
+void AETVGameModeBase::OnReleasedMapTile(AActor* Actor, FKey Key)
+{
+	if (PreDelayTile.IsValid())
+	{
+		// Remove highlight Tile Set
+		FPaperTileInfo ResetTileInfo;
+		ResetTileInfo.PackedTileIndex = PreDelayTile.Index;
+		if (PreDelayTile == CurrentTile && TileSetTarget != nullptr)
+		{
+			ResetTileInfo.TileSet = TileSetTarget;
+		}
+		TileMapComp->SetTile(PreDelayTile.X, PreDelayTile.Y, EETVTileLayer::Target, ResetTileInfo);
+
+		// Set pre-delay tile variable to invalid
+		PreDelayTile.Invalidate();
+	}
+
+}
 
 void AETVGameModeBase::StartTargeting(AETVShip* TargetingInstigator, UETVActionTarget* Action)
 {
@@ -186,18 +216,17 @@ void AETVGameModeBase::StopTargeting()
 {
 	bTargeting = false;
 
-	// Reset tile
-	FPaperTileInfo LastTileInfo;
-	LastTileInfo.TileSet = TileSet;
-	LastTileInfo.PackedTileIndex = LastTileIndex;
-	TileMapComp->SetTile(LastTileX, LastTileY, 0, LastTileInfo);
-
 	// Set previous tile variables to invalid
-	LastTileX = -1;
-	LastTileY = -1;
-	LastTileIndex = -1;
+	CurrentTile.Invalidate();
+	LastTile.Invalidate();
 
-	// TODO Get ship on grid (layer 1)
-	//SelectedAction->SetTarget();
-	SelectedAction->Perform();
+	if (SelectedAction != nullptr)
+	{
+		// TODO
+		// Get ship on last tile
+		FPaperTileInfo TileInfoShip = TileMapComp->GetTile(LastTile.X, LastTile.Y, EETVTileLayer::Ship);
+
+		//SelectedAction->SetTarget();
+		SelectedAction->Perform();
+	}
 }

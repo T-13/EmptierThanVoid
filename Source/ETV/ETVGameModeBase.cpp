@@ -98,9 +98,9 @@ void AETVGameModeBase::MapGeneration()
 	TileMapComp->MakeTileMapEditable();
 
 	// Create additional layers before creating board layer (which creates empty layer at the bottom)
-	TileMapComp->AddNewLayer(); // Layer 3 for Effects
-	TileMapComp->AddNewLayer(); // Layer 2 for Ships
-	TileMapComp->AddNewLayer(); // Layer 1 for Targeting
+	TileMapComp->AddNewLayer(); // Layer 3 for Targeting
+	TileMapComp->AddNewLayer(); // Layer 2 for Effects
+	TileMapComp->AddNewLayer(); // Layer 1 for Ships
 	TileMapComp->AddNewLayer(); // Layer 0 for Board
 
 	// Paper tile info for SetTile function
@@ -201,7 +201,27 @@ void AETVGameModeBase::OnReleasedMapTile(AActor* Actor, FKey Key)
 		// Set pre-delay tile variable to invalid
 		PreDelayTile.Invalidate();
 	}
+}
 
+void AETVGameModeBase::SetTileVisibility(int32 X, int32 Y, bool bVisible)
+{
+	if (bVisible)
+	{
+		TileMapComp->SetTile(X, Y, EETVTileLayer::Effect, FPaperTileInfo());
+	}
+	else
+	{
+		FPaperTileInfo TileInfo;
+		TileInfo.TileSet = TileSetHidden;
+		TileInfo.PackedTileIndex = 0;
+		TileMapComp->SetTile(X, Y, EETVTileLayer::Effect, TileInfo);
+	}
+}
+
+bool AETVGameModeBase::IsTileVisible(int32 X, int32 Y)
+{
+	FPaperTileInfo TileInfo = TileMapComp->GetTile(X, Y, EETVTileLayer::Effect);
+	return TileInfo.TileSet != TileSetHidden;
 }
 
 void AETVGameModeBase::StartTargeting(AETVShip* TargetingInstigator, UETVActionTarget* Action)

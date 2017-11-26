@@ -16,9 +16,9 @@
 UENUM(BlueprintType)
 enum EETVTileLayer
 {
+	Target	UMETA(DisplayName = "Target"),
 	Effect	UMETA(DisplayName = "Effects"),
 	Ship	UMETA(DisplayName = "Ships"),
-	Target	UMETA(DisplayName = "Target"),
 	Board	UMETA(DisplayName = "Board")
 };
 
@@ -70,6 +70,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV Map")
 	UPaperTileSet* TileSetTargetClick;
 
+	// Hidden tile set of the board out of visibility effect
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV Map")
+	UPaperTileSet* TileSetHidden;
+
 	// Size of one tile
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV Map")
 	int32 TileSize;
@@ -109,6 +113,14 @@ public:
 	// Target deselection effect (Tile Maps don't support animations at this time)
 	UFUNCTION()
 	void OnReleasedMapTile(AActor* Actor, FKey Key);
+
+	// Set tile visibility (fog effect)
+	UFUNCTION(BlueprintCallable, Category = "ETV Map")
+	void SetTileVisibility(int32 X, int32 Y, bool bVisible);
+
+	// Returns tile visibility
+	UFUNCTION(BlueprintCallable, Category = "ETV Map")
+	bool IsTileVisible(int32 X, int32 Y);
 
 	// Starts targeting, handles ETV Action calls and stops targeting after target is selected
 	UFUNCTION(BlueprintCallable, Category = "ETV Targeting")

@@ -24,3 +24,13 @@ int32 AETVWeapon::GetReport()
 {
     return int32();
 }
+
+int32 AETVWeapon::GetType()
+{
+	return Type;
+}
+
+float AETVWeapon::GetDMG()
+{
+	return Damage;
+}

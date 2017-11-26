@@ -24,9 +24,13 @@ protected:
     UPROPERTY(EditAnywhere)
     FName Name;
 
-	// Weapons HitPoints
-    UPROPERTY(EditAnywhere, meta = (ClampMin = "0.0", ClampMax = "100.0"))
-    float HP;
+	// Health Points of the Weapon
+    UPROPERTY(EditAnywhere, meta = (ClampMin = "0.0"))
+    float HealthPoints;
+
+	// Maximum Health Points of the Weapon
+	UPROPERTY(EditAnywhere, meta = (ClampMin = "0.0"))
+	float MaximumHealthPoints;
 
 	// DMG this weapon deals
     UPROPERTY(EditAnywhere)
@@ -34,8 +38,8 @@ protected:
 
 	// Type of this weapon
 	// For easier identification for players
-    UPROPERTY(EditAnywhere)
-    FString Type;
+    UPROPERTY()
+    int32 Type;
 
 	// The weight of the weapon
     UPROPERTY(EditAnywhere)
@@ -56,7 +60,7 @@ protected:
 
 	// The range of the weapon
     UPROPERTY(EditAnywhere)
-    int32 TravelDistance;
+    int32 FiringRange;
 
 public:
 
@@ -75,4 +79,18 @@ public:
     // Get current status
     UFUNCTION(BlueprintCallable)
     virtual int32 GetReport(); // TODO-Object REPORT not yet defined
+
+	// Get current status
+	UFUNCTION(BlueprintCallable)
+	int32 GetType();
+
+	// Get current status
+	UFUNCTION(BlueprintCallable)
+	float GetDMG();
+
+	// Static intigers to define type of effect a weapon has
+	const static int32 DAMAGE_HULL = 1;
+	const static int32 DAMAGE_SHIELD_THEN_HULL = 2;
+	const static int32 HEAL_HULL = 3;
+	const static int32 HEAL_SHIELD = 4;
 };

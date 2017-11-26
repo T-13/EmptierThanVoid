@@ -32,6 +32,10 @@ protected:
 	// Health points of the ship
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship", meta = (ClampMin = "0.0"))
 	int32 HealthPoints;
+
+	// Maximum health points of the ship
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship", meta = (ClampMin = "0.0"))
+	int32 MaximumHealthPoints;
 	
 	// Bonus to health for ships
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship", meta = (ClampMin = "0.0"))
@@ -91,6 +95,23 @@ public:
 
 	UFUNCTION()
 	void SpawnContextMenu(AActor *Actor, FKey Key);
+
+	UFUNCTION()
+	int32 GetHP();
+
+	UFUNCTION()
+	void SetHP(int32 newValue);
+
+	UFUNCTION()
+	int32 GetShields();
+
+	UFUNCTION()
+	void SetShields(int32 newValue);
+
+
+	// Returns a multiplier for the effectivness of ship's actions depending on its' status
+	UFUNCTION()
+	virtual float GetMultiplier();
 
 	UFUNCTION(BlueprintCallable)
 	void ClosingContextMenu();

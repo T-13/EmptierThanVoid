@@ -1,4 +1,4 @@
-// Copyright (C) Team13. All rights reserved.
+﻿// Copyright (C) Team13. All rights reserved.
 
 #pragma once
 
@@ -9,6 +9,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "ETVActionTarget.h"
 #include "ETVShip.h"
+#include "ETVShipCapital.h"
 #include "ETVStructTile.h"
 #include "GameFramework/GameModeBase.h"
 #include "ETVGameModeBase.generated.h"
@@ -40,6 +41,8 @@ class ETV_API AETVGameModeBase : public AGameModeBase
 	APaperTileMapActor* TileMapActor;
 	UPaperTileMapComponent* TileMapComp;
 	TArray<FETVTileData> TileData;
+
+	AETVShipCapital* CapitalShip;
 	
 	// Targeting
 	bool bTargeting;
@@ -69,6 +72,22 @@ protected:
 	// Higlighted tile set of the board for valid (index 0) and invalid (index 1) targets on click
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV Map")
 	UPaperTileSet* TileSetTargetClick;
+
+	// Player capital ship
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV Map")
+	UPaperTileSet* PlayerCapitalShip;
+
+	// Player fighter ship
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV Map")
+	UPaperTileSet* PlayerFighterShip;
+
+	// Enemy capital ship
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV Map")
+	UPaperTileSet* EnemyCapitalShip;
+
+	// Enemy fighter ship
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV Map")
+	UPaperTileSet* EnemyFighterShip;
 
 	// Size of one tile
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV Map")
@@ -117,4 +136,9 @@ public:
 	// Stops targeting, resetting targeting mode
 	UFUNCTION(BlueprintCallable, Category = "ETV Targeting")
 	void StopTargeting();
+
+	// Generate Player and Enemy Ships on each side of the map
+	UFUNCTION(BlueprintCallable, Category = "ETV Targeting")
+	void GenerateShips();
+
 };

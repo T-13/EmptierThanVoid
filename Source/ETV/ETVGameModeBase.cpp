@@ -1,4 +1,4 @@
-// Copyright (C) Team13. All rights reserved.
+﻿// Copyright (C) Team13. All rights reserved.
 
 #include "ETVGameModeBase.h"
 
@@ -31,6 +31,8 @@ void AETVGameModeBase::BeginPlay()
 		{
 			bTargeting = true;
 		}
+
+		GenerateShips();
 	}
 }
 
@@ -90,7 +92,7 @@ void AETVGameModeBase::MapGeneration()
 	TileMapActor = GetWorld()->SpawnActor<APaperTileMapActor>(LocDim, Rotator, SpawnInfo);
 
 	// Getting Tile Map Component from Tile Map Actor
-	TileMapComp = TileMapActor->GetRenderComponent();	
+	TileMapComp = TileMapActor->GetRenderComponent();
 
 	// Create map and make it editable (last layer)
 	TileMapComp->CreateNewTileMap(MapWidth, MapHeight, 32, 32, 1.0f, false);
@@ -182,7 +184,7 @@ void AETVGameModeBase::OnClickedMapTile(AActor* Actor, FKey Key)
 			StopTargeting();
 		}
 	}
-	
+
 }
 
 void AETVGameModeBase::OnReleasedMapTile(AActor* Actor, FKey Key)
@@ -228,5 +230,107 @@ void AETVGameModeBase::StopTargeting()
 
 		//SelectedAction->SetTarget();
 		SelectedAction->Perform();
+	}
+}
+
+void AETVGameModeBase::GenerateShips()
+{
+
+	int32 ycoord;
+	int32 xcoord;
+	int32 numOfSpawnedShips = FMath::FRandRange(FMath::Sqrt(MapWidth), MapWidth / 2); 
+
+	// To check if Tile is allready set
+	bool isTileSet;
+
+	// Array for all set x coordinates
+	TArray<int32> xArr;
+
+	// Array for all set y coordinates
+	TArray<int32> yArr;
+
+	FPaperTileInfo TileInfo;
+	TileInfo.PackedTileIndex = 0;
+
+	// Spawning Capital Ship for Player
+	TileInfo.TileSet = PlayerCapitalShip;
+	ycoord = FMath::FRandRange(0, MapWidth);
+	TileMapComp->SetTile(0, ycoord, EETVTileLayer::Ship, TileInfo);
+
+	// So that nothing will overlay the Capital
+	xArr.Push(0);
+	yArr.Push(ycoord);
+
+	// Spawning Capital Ship for Enemy
+	TileInfo.TileSet = EnemyCapitalShip;
+	ycoord = FMath::FRandRange(0, MapWidth);
+	TileMapComp->SetTile(MapWidth - 1, ycoord, EETVTileLayer::Ship, TileInfo);
+
+	// So that nothing will overlay the Capital
+	xArr.Push(MapWidth - 1);
+	yArr.Push(ycoord);
+
+	// Spawning Fighter Sihps on each side
+	for (int32 i = 0; i < numOfSpawnedShips; i++) {
+
+		isTileSet = true;
+		// Player Fighter Ship
+		TileInfo.TileSet = PlayerFighterShip;
+
+		// Loop for looking for empty Tile
+		while (isTileSet) {
+			isTileSet = false;
+			ycoord = FMath::FRandRange(0, MapWidth);
+
+			// So that middle 20% are left empty
+			xcoord = FMath::FRandRange(0, (MapWidth / 2 - MapWidth * 0.1));
+
+			UE_LOG(LogTemp, Log, TEXT("xcoord F: %f"), xcoord);
+			UE_LOG(LogTemp, Log, TEXT("result F: %f"), (MapWidth / 2 + MapWidth * 0.1));
+
+			for (int j = 0; j < xArr.Num(); j++) {
+				if (xArr[j] == xcoord && yArr[j] == ycoord) {
+					isTileSet = true;
+				}
+			}
+		}
+
+		// Set Tile
+		TileMapComp->SetTile(xcoord, ycoord, EETVTileLayer::Ship, TileInfo);
+
+		// Push to array for later to check if those coordinates are allready filled
+		xArr.Push(xcoord);
+		yArr.Push(ycoord);
+
+
+		// Enemy Fighter Ship
+		TileInfo.TileSet = EnemyFighterShip;
+
+		isTileSet = true;
+
+		// Loop for looking for empty Tile
+		while (isTileSet) {
+			isTileSet = false;
+			ycoord = FMath::FRandRange(0, MapWidth);
+
+			// So that middle 20% are left empty
+			xcoord = FMath::FRandRange((MapWidth / 2 + MapWidth * 0.1), MapWidth);
+
+			UE_LOG(LogTemp, Log, TEXT("xcoord E: %f"), xcoord);
+			UE_LOG(LogTemp, Log, TEXT("result E: %f"), (MapWidth / 2 + MapWidth * 0.1));
+
+			for (int j = 0; j < xArr.Num(); j++) {
+				if (xArr[j] == xcoord && yArr[j] == ycoord) {
+					isTileSet = true;
+				}
+			}
+		}
+
+		// Set Tile
+		TileMapComp->SetTile(xcoord, ycoord, EETVTileLayer::Ship, TileInfo);
+
+		// Push to array for later to check if those coordinates are allready filled
+		xArr.Push(xcoord);
+		yArr.Push(ycoord);
 	}
 }

@@ -43,6 +43,9 @@ class ETV_API AETVGameModeBase : public AGameModeBase
 	TArray<FETVTileData> TileData;
 
 	AETVShipCapital* CapitalShip;
+
+	// TEST
+	AETVShipCapital* TestCapitalShip;
 	
 	// Targeting
 	bool bTargeting;
@@ -88,6 +91,14 @@ protected:
 	// Enemy fighter ship
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV Map")
 	UPaperTileSet* EnemyFighterShip;
+
+	// The widget class for the ContextMenu for Ship class
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ETV Ship", meta = (BlueprintProtected = "true"))
+	TSubclassOf<class UETVShipContextMenuWidget> ContextMenu;
+
+	// Sprite for Ship Actor (Should be transparent)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV Ship")
+	UPaperSprite* Sprite;
 
 	// Size of one tile
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV Map")
@@ -140,5 +151,9 @@ public:
 	// Generate Player and Enemy Ships on each side of the map
 	UFUNCTION(BlueprintCallable, Category = "ETV Targeting")
 	void GenerateShips();
+
+	// Spawn ShipActor on the correct X and Y
+	UFUNCTION(BlueprintCallable, Category = "ETV Targeting")
+	void SpawnShip(int32 x, int32 y);
 
 };

@@ -255,20 +255,27 @@ void AETVGameModeBase::GenerateShips()
 	// Spawning Capital Ship for Player
 	TileInfo.TileSet = PlayerCapitalShip;
 	ycoord = FMath::FRandRange(0, MapWidth);
-	TileMapComp->SetTile(0, ycoord, EETVTileLayer::Ship, TileInfo);
+	xcoord = 0;
+	TileMapComp->SetTile(xcoord, ycoord, EETVTileLayer::Ship, TileInfo);
 
 	// So that nothing will overlay the Capital
 	xArr.Push(0);
 	yArr.Push(ycoord);
 
+	SpawnShip(xcoord, ycoord);
+
+
 	// Spawning Capital Ship for Enemy
 	TileInfo.TileSet = EnemyCapitalShip;
 	ycoord = FMath::FRandRange(0, MapWidth);
-	TileMapComp->SetTile(MapWidth - 1, ycoord, EETVTileLayer::Ship, TileInfo);
+	xcoord = MapWidth - 1;
+	TileMapComp->SetTile(xcoord, ycoord, EETVTileLayer::Ship, TileInfo);
 
 	// So that nothing will overlay the Capital
 	xArr.Push(MapWidth - 1);
 	yArr.Push(ycoord);
+
+	SpawnShip(xcoord, ycoord);
 
 	// Spawning Fighter Sihps on each side
 	for (int32 i = 0; i < numOfSpawnedShips; i++) {
@@ -302,6 +309,8 @@ void AETVGameModeBase::GenerateShips()
 		xArr.Push(xcoord);
 		yArr.Push(ycoord);
 
+		SpawnShip(xcoord, ycoord);
+
 
 		// Enemy Fighter Ship
 		TileInfo.TileSet = EnemyFighterShip;
@@ -332,5 +341,27 @@ void AETVGameModeBase::GenerateShips()
 		// Push to array for later to check if those coordinates are allready filled
 		xArr.Push(xcoord);
 		yArr.Push(ycoord);
+
+		SpawnShip(xcoord, ycoord);
+
 	}
+}
+
+void AETVGameModeBase::SpawnShip(int32 x, int32 y)
+{
+	// Vector for spawn location based on where TileSet is in TileMap
+	const FVector LocDim(-(TileSize / 2)*MapWidth + x*TileSize, -(TileSize / 2)*MapHeight + y*TileSize, -449);
+
+	// Actor spawn parameters
+	const FActorSpawnParameters SpawnInfo;
+
+	// Rotate upwards to face the top-down camera
+	const FRotator Rotator(0, 0, -90);
+
+	// Spawning Tile Map Actor
+	TestCapitalShip = GetWorld()->SpawnActor<AETVShipCapital>(LocDim, Rotator, SpawnInfo);
+	TestCapitalShip->SetContextMenu(ContextMenu);
+	TestCapitalShip->GetRenderComponent()->SetMobility(EComponentMobility::Stationary);
+	TestCapitalShip->GetRenderComponent()->SetSprite(Sprite);
+	TestCapitalShip->GetRenderComponent()->SetSpriteColor(FLinearColor(1.0f, 1.0f, 1.0f, 0.0f));
 }

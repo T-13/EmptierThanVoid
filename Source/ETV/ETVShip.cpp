@@ -60,3 +60,8 @@ void AETVShip::ClosingContextMenu()
 	CurrentContextMenu = nullptr;
 }
 
+void AETVShip::SetContextMenu(TSubclassOf<class UETVShipContextMenuWidget> ContextMenu)
+{
+	ContextMenuClass = ContextMenu;
+}
+

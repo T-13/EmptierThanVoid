@@ -1,4 +1,4 @@
-// Copyright (C) Team13. All rights reserved.
+﻿// Copyright (C) Team13. All rights reserved.
 
 #pragma once
 
@@ -25,6 +25,7 @@ protected:
 	void BeginPlay() override;
 
 protected:
+
 	// Name of the ship
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship")
 	FName Name;
@@ -94,5 +95,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void ClosingContextMenu();
+
+	UFUNCTION(BlueprintCallable)
+	void SetContextMenu(TSubclassOf<class UETVShipContextMenuWidget> ContextMenu);
 
 };

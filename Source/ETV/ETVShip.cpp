@@ -1,4 +1,4 @@
-// Copyright (C) Team13. All rights reserved.
+﻿// Copyright (C) Team13. All rights reserved.
 
 #include "ETVShip.h"
 #include "UserWidget.h"
@@ -34,15 +34,16 @@ void AETVShip::SpawnContextMenu(AActor *Actor, FKey Key)
 {
 	if (ContextMenuClass != nullptr)
 	{
-		if(!IsContextMenuOpen){		
+		if (!IsContextMenuOpen) 
+		{
 			CurrentContextMenu = CreateWidget<UETVShipContextMenuWidget>(GetWorld(), ContextMenuClass);
 			CurrentContextMenu->AssignShip(this);
-			if(CurrentContextMenu != nullptr)
+			if (CurrentContextMenu != nullptr)
 			{
 				float x; // X coordinate of MouseCursor
 				float y; // Y coordinate of MouseCursor
-				if(UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetMousePosition(x,y)){
-					CurrentContextMenu->SetPositionInViewport(UKismetMathLibrary::MakeVector2D(x,y));
+				if (UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetMousePosition(x, y)) {
+					CurrentContextMenu->SetPositionInViewport(UKismetMathLibrary::MakeVector2D(x, y));
 					CurrentContextMenu->SetDesiredSizeInViewport(UKismetMathLibrary::MakeVector2D(320, 280));
 					CurrentContextMenu->AddToViewport();
 					IsContextMenuOpen = true;
@@ -60,3 +61,7 @@ void AETVShip::ClosingContextMenu()
 	CurrentContextMenu = nullptr;
 }
 
+void AETVShip::SetContextMenu(TSubclassOf<class UETVShipContextMenuWidget> ContextMenu)
+{
+	ContextMenuClass = ContextMenu;
+}

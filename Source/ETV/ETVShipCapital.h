@@ -17,7 +17,7 @@ class ETV_API AETVShipCapital : public AETVShip
 
 public:
 	// Sets default values for this actor's properties
-	// TODO AETVShipCapital();
+	// TODO:: AETVShipCapital();
 
 protected:
 	// If ship has a hyperdrive

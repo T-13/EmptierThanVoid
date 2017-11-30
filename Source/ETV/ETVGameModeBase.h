@@ -10,7 +10,9 @@
 #include "ETVActionTarget.h"
 #include "ETVShip.h"
 #include "ETVShipCapital.h"
+#include "ETVShipFighter.h"
 #include "ETVStructTile.h"
+#include "EngineUtils.h"
 #include "GameFramework/GameModeBase.h"
 #include "ETVGameModeBase.generated.h"
 
@@ -42,10 +44,8 @@ class ETV_API AETVGameModeBase : public AGameModeBase
 	UPaperTileMapComponent* TileMapComp;
 	TArray<FETVTileData> TileData;
 
-	AETVShipCapital* CapitalShip;
-
-	// TEST
-	AETVShipCapital* TestCapitalShip;
+	AETVShip* Ship;
+	TArray<AETVShip*> Ships;
 	
 	// Targeting
 	bool bTargeting;
@@ -153,7 +153,14 @@ public:
 	void GenerateShips();
 
 	// Spawn ShipActor on the correct X and Y
-	UFUNCTION(BlueprintCallable, Category = "ETV Targeting")
-	void SpawnShip(int32 x, int32 y);
+	UFUNCTION()
+	void SpawnShip(int32 x, int32 y, UPaperTileSet* type);
 
+	// Get Ships Actor from passing in Tiles x and y
+	UFUNCTION()
+	AETVShip* GetShipActor(int32 x, int32 y);
+
+	// Get Ships location from Tiles x and y;
+	UFUNCTION()
+	FVector GetPosition(int32 x, int32 y, int32 z = -449);
 };

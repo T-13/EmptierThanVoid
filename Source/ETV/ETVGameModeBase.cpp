@@ -235,10 +235,9 @@ void AETVGameModeBase::StopTargeting()
 
 void AETVGameModeBase::GenerateShips()
 {
-
 	int32 ycoord;
 	int32 xcoord;
-	int32 numOfSpawnedShips = FMath::FRandRange(FMath::Sqrt(MapWidth), MapWidth / 2); 
+	int32 numOfSpawnedShips = FMath::FRandRange(FMath::Sqrt(MapWidth), MapWidth / 2);
 
 	// To check if Tile is allready set
 	bool isTileSet;
@@ -262,7 +261,7 @@ void AETVGameModeBase::GenerateShips()
 	xArr.Push(0);
 	yArr.Push(ycoord);
 
-	SpawnShip(xcoord, ycoord);
+	SpawnShip(xcoord, ycoord, TileInfo.TileSet);
 
 
 	// Spawning Capital Ship for Enemy
@@ -275,7 +274,7 @@ void AETVGameModeBase::GenerateShips()
 	xArr.Push(MapWidth - 1);
 	yArr.Push(ycoord);
 
-	SpawnShip(xcoord, ycoord);
+	SpawnShip(xcoord, ycoord, TileInfo.TileSet);
 
 	// Spawning Fighter Sihps on each side
 	for (int32 i = 0; i < numOfSpawnedShips; i++) {
@@ -292,9 +291,6 @@ void AETVGameModeBase::GenerateShips()
 			// So that middle 20% are left empty
 			xcoord = FMath::FRandRange(0, (MapWidth / 2 - MapWidth * 0.1));
 
-			UE_LOG(LogTemp, Log, TEXT("xcoord F: %f"), xcoord);
-			UE_LOG(LogTemp, Log, TEXT("result F: %f"), (MapWidth / 2 + MapWidth * 0.1));
-
 			for (int j = 0; j < xArr.Num(); j++) {
 				if (xArr[j] == xcoord && yArr[j] == ycoord) {
 					isTileSet = true;
@@ -309,7 +305,7 @@ void AETVGameModeBase::GenerateShips()
 		xArr.Push(xcoord);
 		yArr.Push(ycoord);
 
-		SpawnShip(xcoord, ycoord);
+		SpawnShip(xcoord, ycoord, TileInfo.TileSet);
 
 
 		// Enemy Fighter Ship
@@ -325,9 +321,6 @@ void AETVGameModeBase::GenerateShips()
 			// So that middle 20% are left empty
 			xcoord = FMath::FRandRange((MapWidth / 2 + MapWidth * 0.1), MapWidth);
 
-			UE_LOG(LogTemp, Log, TEXT("xcoord E: %f"), xcoord);
-			UE_LOG(LogTemp, Log, TEXT("result E: %f"), (MapWidth / 2 + MapWidth * 0.1));
-
 			for (int j = 0; j < xArr.Num(); j++) {
 				if (xArr[j] == xcoord && yArr[j] == ycoord) {
 					isTileSet = true;
@@ -342,15 +335,15 @@ void AETVGameModeBase::GenerateShips()
 		xArr.Push(xcoord);
 		yArr.Push(ycoord);
 
-		SpawnShip(xcoord, ycoord);
+		SpawnShip(xcoord, ycoord, TileInfo.TileSet);
 
 	}
 }
 
-void AETVGameModeBase::SpawnShip(int32 x, int32 y)
+void AETVGameModeBase::SpawnShip(int32 x, int32 y, UPaperTileSet* type)
 {
 	// Vector for spawn location based on where TileSet is in TileMap
-	const FVector LocDim(-(TileSize / 2)*MapWidth + x*TileSize, -(TileSize / 2)*MapHeight + y*TileSize, -449);
+	const FVector LocDim = GetPosition(x, y);
 
 	// Actor spawn parameters
 	const FActorSpawnParameters SpawnInfo;
@@ -358,10 +351,37 @@ void AETVGameModeBase::SpawnShip(int32 x, int32 y)
 	// Rotate upwards to face the top-down camera
 	const FRotator Rotator(0, 0, -90);
 
-	// Spawning Tile Map Actor
-	TestCapitalShip = GetWorld()->SpawnActor<AETVShipCapital>(LocDim, Rotator, SpawnInfo);
-	TestCapitalShip->SetContextMenu(ContextMenu);
-	TestCapitalShip->GetRenderComponent()->SetMobility(EComponentMobility::Stationary);
-	TestCapitalShip->GetRenderComponent()->SetSprite(Sprite);
-	TestCapitalShip->GetRenderComponent()->SetSpriteColor(FLinearColor(1.0f, 1.0f, 1.0f, 0.0f));
+	// Spawning ShipActor based on class
+	if (type == PlayerCapitalShip || type == EnemyCapitalShip)
+		Ship = GetWorld()->SpawnActor<AETVShipCapital>(LocDim, Rotator, SpawnInfo);
+	else if (type == PlayerFighterShip || type == EnemyFighterShip)
+		Ship = GetWorld()->SpawnActor<AETVShipFighter>(LocDim, Rotator, SpawnInfo);
+
+	Ship->SetContextMenu(ContextMenu);
+	Ship->GetRenderComponent()->SetMobility(EComponentMobility::Movable);
+	Ship->GetRenderComponent()->SetSprite(Sprite);
+
+	// Setting sprite color to transparent
+	Ship->GetRenderComponent()->SetSpriteColor(FLinearColor(1.0f, 1.0f, 1.0f, 0.0f));
+
+	Ships.Add(Ship);
+}
+
+AETVShip * AETVGameModeBase::GetShipActor(int32 x, int32 y)
+{
+	const FVector LocDim = GetPosition(x, y);
+
+	// Iterate through Ships TArray to find the correct UETVShip
+	for (AETVShip* ship : Ships) {
+		if (ship->GetActorLocation() == LocDim) {
+			return ship;
+		}
+	}
+
+	return nullptr;
+}
+
+FVector AETVGameModeBase::GetPosition(int32 x, int32 y, int32 z)
+{
+	return FVector(-(TileSize / 2)*MapWidth + x*TileSize, -(TileSize / 2)*MapHeight + y*TileSize, z);
 }

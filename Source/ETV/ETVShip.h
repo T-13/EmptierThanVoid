@@ -69,7 +69,7 @@ protected:
 	int32 ShipSpeed;
 
 	// The widget class for the ContextMenu
-	UPROPERTY(/*EditDefaultsOnly*/EditAnywhere, BlueprintReadWrite, Category = "ETV Ship", meta = (BlueprintProtected = "true"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ETV Ship", meta = (BlueprintProtected = "true"))
 	TSubclassOf<class UETVShipContextMenuWidget> ContextMenuClass;
 
 	// Instance of our ContextMenu

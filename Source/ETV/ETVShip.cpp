@@ -34,7 +34,8 @@ void AETVShip::SpawnContextMenu(AActor *Actor, FKey Key)
 {
 	if (ContextMenuClass != nullptr)
 	{
-		if (!IsContextMenuOpen) {
+		if (!IsContextMenuOpen) 
+		{
 			CurrentContextMenu = CreateWidget<UETVShipContextMenuWidget>(GetWorld(), ContextMenuClass);
 			CurrentContextMenu->AssignShip(this);
 			if (CurrentContextMenu != nullptr)
@@ -64,4 +65,3 @@ void AETVShip::SetContextMenu(TSubclassOf<class UETVShipContextMenuWidget> Conte
 {
 	ContextMenuClass = ContextMenu;
 }
-

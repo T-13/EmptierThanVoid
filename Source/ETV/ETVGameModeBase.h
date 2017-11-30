@@ -94,7 +94,7 @@ protected:
 
 	// The widget class for the ContextMenu for Ship class
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ETV Ship", meta = (BlueprintProtected = "true"))
-	TSubclassOf<class UETVShipContextMenuWidget> ContextMenu;
+	TSubclassOf<UETVShipContextMenuWidget> ContextMenu;
 
 	// Sprite for Ship Actor (Should be transparent)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV Ship")
@@ -160,7 +160,7 @@ public:
 	UFUNCTION()
 	AETVShip* GetShipActor(int32 x, int32 y);
 
-	// Get Ships location from Tiles x and y;
+	// Get Ships location from Tiles x and y
 	UFUNCTION()
 	FVector GetPosition(int32 x, int32 y, int32 z = -449);
 };

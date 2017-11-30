@@ -240,7 +240,7 @@ void AETVGameModeBase::GenerateShips()
 	int32 numOfSpawnedShips = FMath::FRandRange(FMath::Sqrt(MapWidth), MapWidth / 2);
 
 	// To check if Tile is allready set
-	bool isTileSet;
+	bool bIsTileSet;
 
 	// Array for all set x coordinates
 	TArray<int32> xArr;
@@ -279,13 +279,13 @@ void AETVGameModeBase::GenerateShips()
 	// Spawning Fighter Sihps on each side
 	for (int32 i = 0; i < numOfSpawnedShips; i++) {
 
-		isTileSet = true;
+		bIsTileSet = true;
 		// Player Fighter Ship
 		TileInfo.TileSet = PlayerFighterShip;
 
 		// Loop for looking for empty Tile
-		while (isTileSet) {
-			isTileSet = false;
+		while (bIsTileSet) {
+			bIsTileSet = false;
 			ycoord = FMath::FRandRange(0, MapWidth);
 
 			// So that middle 20% are left empty
@@ -293,7 +293,7 @@ void AETVGameModeBase::GenerateShips()
 
 			for (int j = 0; j < xArr.Num(); j++) {
 				if (xArr[j] == xcoord && yArr[j] == ycoord) {
-					isTileSet = true;
+					bIsTileSet = true;
 				}
 			}
 		}
@@ -311,11 +311,11 @@ void AETVGameModeBase::GenerateShips()
 		// Enemy Fighter Ship
 		TileInfo.TileSet = EnemyFighterShip;
 
-		isTileSet = true;
+		bIsTileSet = true;
 
 		// Loop for looking for empty Tile
-		while (isTileSet) {
-			isTileSet = false;
+		while (bIsTileSet) {
+			bIsTileSet = false;
 			ycoord = FMath::FRandRange(0, MapWidth);
 
 			// So that middle 20% are left empty
@@ -323,7 +323,7 @@ void AETVGameModeBase::GenerateShips()
 
 			for (int j = 0; j < xArr.Num(); j++) {
 				if (xArr[j] == xcoord && yArr[j] == ycoord) {
-					isTileSet = true;
+					bIsTileSet = true;
 				}
 			}
 		}
@@ -385,3 +385,4 @@ FVector AETVGameModeBase::GetPosition(int32 x, int32 y, int32 z)
 {
 	return FVector(-(TileSize / 2)*MapWidth + x*TileSize, -(TileSize / 2)*MapHeight + y*TileSize, z);
 }
+

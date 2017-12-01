@@ -109,6 +109,7 @@ float AETVShip::GetMultiplier()
 	{
 		// If Ship is dead or MaxHP is less then Current HP
 		// We shouldn't get here!
+		UE_LOG(LogTemp, Error, TEXT("GetMultiplier(): Ship is dead or MaxHP is less then Current HP!"));
 		return 0;	
 	}
 }

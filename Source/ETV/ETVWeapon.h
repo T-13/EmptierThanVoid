@@ -18,6 +18,11 @@ class ETV_API AETVWeapon : public APaperSpriteActor
 public:
 	// Sets default values for this actor's properties
 	AETVWeapon();
+	// Construct the weapon with the specified parameters
+	AETVWeapon(FName NewName, float MaximumHP, float Dmg, float WeaponWeight, float WeaponSize, int32 Range);
+
+	// Construct a random weapon depending on the Power LVL
+	AETVWeapon(FName NewName, int32 PowerLvl);
 
 protected:
 	// Display weapon's name
@@ -45,18 +50,13 @@ protected:
     UPROPERTY(EditAnywhere)
     float Weight;
 
-	// Protection of the weapon
+	// Size of the weapon
     UPROPERTY(EditAnywhere)
-    float Armour;
+    float Size;
 
-	// The angles between which this weapon can hit
-    UPROPERTY(EditAnywhere)
-    int32 Angle[2];
-
-	// Action point required to complete an action with this weapon
-	// Might get removed
-    UPROPERTY(EditAnywhere)
-    int32 ActionPointsPerAction;
+	// TODO The angles between which this weapon can hit
+    // UPROPERTY(EditAnywhere)
+	// TArray<int32> Angle;
 
 	// The range of the weapon
     UPROPERTY(EditAnywhere)
@@ -64,17 +64,17 @@ protected:
 
 public:
 
-    // Method to tell the weapon to fire.
-    UFUNCTION(BlueprintCallable)
-    virtual void Fire(int32 x, int32 y);
+    // TODO Get the angle at which the weapon can fire 
+    // UFUNCTION(BlueprintCallable)
+    // TArray<int32> getAngle(); 
 
-    // Get targets that weapon can hit
+    // Gives the Weight requirment for the weapon slot
     UFUNCTION(BlueprintCallable)
-    virtual TArray<int32> GetPossibleTargets(); // TODO-Object AETVShip not yet defined
+    float GetWeight();
 
-    // Gives the requirments for the weapon slot
-    UFUNCTION(BlueprintCallable)
-    virtual int32 GetSlotSpecifications(); // TODO-Object SlotSpecification not yet defined
+	// Gives the Size requirments for the weapon slot
+	UFUNCTION(BlueprintCallable)
+	float GetSize();
 
     // Get current status
     UFUNCTION(BlueprintCallable)
@@ -84,13 +84,19 @@ public:
 	UFUNCTION(BlueprintCallable)
 	int32 GetType();
 
-	// Get current status
+	// Get weapon damage
 	UFUNCTION(BlueprintCallable)
 	float GetDMG();
 
+	// Set weapons current HealthPoints
+	void setHP(int32 newValue);
+
+	// Get weapons current HealthPoints
+	int32 getHP();
+
 	// Static intigers to define type of effect a weapon has
-	const static int32 DAMAGE_HULL = 1;
-	const static int32 DAMAGE_SHIELD_THEN_HULL = 2;
-	const static int32 HEAL_HULL = 3;
-	const static int32 HEAL_SHIELD = 4;
+	const static int32 DamageHUll = 1;
+	const static int32 DamageShieldThenHull = 2;
+	const static int32 HealHull = 3;
+	const static int32 HealShield = 4;
 };

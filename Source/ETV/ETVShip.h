@@ -3,6 +3,7 @@
 #pragma once
 
 #include "ETVAction.h"
+#include "ETVWeaponSlot.h"
 #include "CoreMinimal.h"
 #include "PaperSpriteActor.h"
 #include "ETVShipContextMenuWidget.h"
@@ -46,7 +47,7 @@ protected:
 	int32 ShieldRechargeTime;
 
 	// Weapon slots
-	// TODO When AETVWeapon is implemented
+	TArray<UETVWeaponSlot> Weapons;
 
 	// Integers (x,y) that represent a point on a sprite where the attachement goes
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship")
@@ -64,7 +65,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship")
 	TArray<int32> Fields;
 
-	// Action avaible on ship
+	// Actions avaible on ship
 	TArray<UETVAction> Actions;
 
 	// How fast ship moves

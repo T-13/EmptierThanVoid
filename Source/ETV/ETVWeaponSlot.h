@@ -19,7 +19,7 @@ public:
 	// Sets default values for this actor's properties
 	UETVWeaponSlot();
 	// Constructs the WeaponSlot with specified parameters
-	UETVWeaponSlot(float Size, float Wieght);
+	UETVWeaponSlot(float Size, float Weight);
 
 protected:
 	// The weapon holstered in this slot
@@ -45,9 +45,9 @@ public:
 	bool RemoveWeapon();
 
 	// Returns the reference to the slotted weapon
-	AETVWeapon* getWeapon();
+	AETVWeapon* GetWeapon();
 
 	// Returns true if weapon is slotted and false otherwise
-	bool hasWeapon();
+	bool HasWeapon();
 	
 };

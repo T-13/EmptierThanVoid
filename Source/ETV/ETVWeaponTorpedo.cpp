@@ -15,7 +15,7 @@ AETVWeaponTorpedo::AETVWeaponTorpedo(FName NewName, float MaximumHP, float Dmg, 
 	SquaresPerTurn = Speed;
 }
 
-AETVWeaponTorpedo::AETVWeaponTorpedo(FName newName, int32 PowerLvl) : Super(newName, PowerLvl)
+AETVWeaponTorpedo::AETVWeaponTorpedo(FName NewName, int32 PowerLvl) : Super(NewName, PowerLvl)
 {
 	Type = AETVWeapon::DamageHull;
 
@@ -31,7 +31,7 @@ AETVWeaponTorpedo::AETVWeaponTorpedo(FName newName, int32 PowerLvl) : Super(newN
 		SquaresPerTurn = FMath::RandRange(2, 5);
 }
 
-int32 AETVWeaponTorpedo::getSquaresPerTurn()
+int32 AETVWeaponTorpedo::GetSquaresPerTurn()
 {
 	return SquaresPerTurn;
 }

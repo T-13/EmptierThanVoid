@@ -22,7 +22,7 @@ bool UETVWeaponSlot::DoesWeaponFit(AETVWeapon * NewWeapon)
 
 bool UETVWeaponSlot::FitWeapon(AETVWeapon * NewWeapon)
 {
-	if (DoesWeaponFit(NewWeapon) && !hasWeapon())
+	if (DoesWeaponFit(NewWeapon) && !HasWeapon())
 	{
 		Weapon = NewWeapon;
 		return true;
@@ -32,7 +32,7 @@ bool UETVWeaponSlot::FitWeapon(AETVWeapon * NewWeapon)
 
 bool UETVWeaponSlot::RemoveWeapon()
 {
-	if (hasWeapon())
+	if (HasWeapon())
 	{
 		Weapon = nullptr;
 		return true;
@@ -40,14 +40,14 @@ bool UETVWeaponSlot::RemoveWeapon()
 	return false;
 }
 
-AETVWeapon* UETVWeaponSlot::getWeapon()
+AETVWeapon* UETVWeaponSlot::GetWeapon()
 {
 	return Weapon;
 }
 
-bool UETVWeaponSlot::hasWeapon()
+bool UETVWeaponSlot::HasWeapon()
 {
-	if(Weapon == nullptr)
+	if (Weapon == nullptr)
 	{
 		return false;
 	}

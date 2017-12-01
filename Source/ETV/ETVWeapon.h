@@ -66,7 +66,7 @@ public:
 
     // TODO Get the angle at which the weapon can fire 
     // UFUNCTION(BlueprintCallable)
-    // TArray<int32> getAngle(); 
+    // TArray<int32> GetAngle(); 
 
     // Gives the Weight requirment for the weapon slot
     UFUNCTION(BlueprintCallable)
@@ -89,10 +89,10 @@ public:
 	float GetDMG();
 
 	// Set weapons current HealthPoints
-	void setHP(int32 newValue);
+	void SetHP(int32 newValue);
 
 	// Get weapons current HealthPoints
-	int32 getHP();
+	int32 GetHP();
 
 	// Static intigers to define type of effect a weapon has
 	const static int32 DamageHull = 1;

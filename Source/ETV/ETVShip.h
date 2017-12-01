@@ -110,7 +110,7 @@ public:
 	void SetShields(int32 newValue);
 
 
-	// Returns a multiplier for the effectivness of ship's actions depending on its' status
+	// Returns a multiplier for the effectiveness of ship's actions depending on its status
 	UFUNCTION()
 	virtual float GetMultiplier();
 

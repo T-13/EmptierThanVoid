@@ -45,7 +45,7 @@ AETVWeapon::AETVWeapon(FName NewName, int32 PowerLvl) : Super()
 }
 
 /* This will be added later
-TArray<int32> AETVWeapon::getAngle()
+TArray<int32> AETVWeapon::GetAngle()
 {
     return Angle;
 }*/
@@ -76,7 +76,7 @@ float AETVWeapon::GetDMG()
 	return Damage;
 }
 
-void AETVWeapon::setHP(int32 newValue)
+void AETVWeapon::SetHP(int32 newValue)
 {
 	if (newValue >= 0 || newValue <= MaximumHealthPoints)
 		HealthPoints = newValue;
@@ -86,7 +86,7 @@ void AETVWeapon::setHP(int32 newValue)
 		HealthPoints = MaximumHealthPoints;
 }
 
-int32 AETVWeapon::getHP()
+int32 AETVWeapon::GetHP()
 {
 	return HealthPoints;
 }

@@ -29,6 +29,6 @@ protected:
 
 public:
 	// Returns the speed of the ship
-	int32 getSquaresPerTurn();
+	int32 GetSquaresPerTurn();
 	
 };

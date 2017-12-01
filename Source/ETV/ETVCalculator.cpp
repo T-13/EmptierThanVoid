@@ -17,7 +17,7 @@ void UETVCalculator::CalculateWeaponEffect(AETVShip *User, AETVWeapon *WeaponUse
 	int32 ChangeValue = User->GetMultiplier()*WeaponUsed->GetDMG();
 
 	// Weapon ignores shields
-	if(WeaponUsed->GetType() == AETVWeapon::DamageHUll)
+	if(WeaponUsed->GetType() == AETVWeapon::DamageHull)
 	{
 		Target->SetHP(Target->GetHP() - ChangeValue);
 	}	

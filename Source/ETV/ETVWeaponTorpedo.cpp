@@ -5,19 +5,19 @@
 
 AETVWeaponTorpedo::AETVWeaponTorpedo() : Super()
 {
-	Type = AETVWeapon::DamageHUll;
+	Type = AETVWeapon::DamageHull;
 }
 
 AETVWeaponTorpedo::AETVWeaponTorpedo(FName NewName, float MaximumHP, float Dmg, float WeaponWeight, float WeaponSize, int32 Range, int32 Speed) : Super(NewName, MaximumHP, Dmg, WeaponWeight,  WeaponSize, Range)
 {
-	Type = AETVWeapon::DamageHUll;
+	Type = AETVWeapon::DamageHull;
 
 	SquaresPerTurn = Speed;
 }
 
 AETVWeaponTorpedo::AETVWeaponTorpedo(FName newName, int32 PowerLvl) : Super(newName, PowerLvl)
 {
-	Type = AETVWeapon::DamageHUll;
+	Type = AETVWeapon::DamageHull;
 
 	if (PowerLvl < 50)
 		PowerLvl = 50;

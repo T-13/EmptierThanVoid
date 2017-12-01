@@ -95,7 +95,7 @@ public:
 	int32 getHP();
 
 	// Static intigers to define type of effect a weapon has
-	const static int32 DamageHUll = 1;
+	const static int32 DamageHull = 1;
 	const static int32 DamageShieldThenHull = 2;
 	const static int32 HealHull = 3;
 	const static int32 HealShield = 4;

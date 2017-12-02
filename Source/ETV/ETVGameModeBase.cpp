@@ -139,13 +139,14 @@ void AETVGameModeBase::MapGeneration()
 	MapGenerated(TileMapActor);
 
 	// Bind click
-	TileMapActor->OnClicked.AddDynamic(this, &AETVGameModeBase::OnClickedMapTile);
-	TileMapActor->OnReleased.AddDynamic(this, &AETVGameModeBase::OnReleasedMapTile);
+	UInputComponent* InputComponent = GetWorld()->GetFirstPlayerController()->InputComponent;
+	InputComponent->BindAction("ClickTile", IE_Pressed, this, &AETVGameModeBase::OnClickedMapTile);
+	InputComponent->BindAction("ClickTile", IE_Released, this, &AETVGameModeBase::OnReleasedMapTile);
 }
 
 void AETVGameModeBase::GetMouseOverTile(FETVTile& Tile)
 {
-	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 
 	FVector WorldLocation;
 	FVector WorldDirection;
@@ -167,7 +168,7 @@ void AETVGameModeBase::GetMouseOverTile(FETVTile& Tile)
 				bInRangeY = UKismetMathLibrary::InRange_FloatFloat(WorldLocation.Y, CurrentTileData.PointLeftTop.Y, CurrentTileData.PointRightBottom.Y, false, false);
 				if (bInRangeX && bInRangeY)
 				{
-					UE_LOG(LogTemp, Warning, TEXT("%s -- %s"), *WorldLocation.ToString(), *WorldDirection.ToString())
+					//UE_LOG(LogTemp, Warning, TEXT("Loc (%s) -- Dir (%s)"), *WorldLocation.ToString(), *WorldDirection.ToString())
 					Tile.Set(CurrentTileData.Tile);
 					return;
 				}
@@ -178,7 +179,7 @@ void AETVGameModeBase::GetMouseOverTile(FETVTile& Tile)
 	Tile.Invalidate();
 }
 
-void AETVGameModeBase::OnClickedMapTile(AActor* Actor, FKey Key)
+void AETVGameModeBase::OnClickedMapTile()
 {
 	// Make sure we are still targeting (in case of race conditions)
 	if (bTargeting && !PreDelayTile.IsValid() && TileSetTargetClick != nullptr)
@@ -199,7 +200,7 @@ void AETVGameModeBase::OnClickedMapTile(AActor* Actor, FKey Key)
 
 }
 
-void AETVGameModeBase::OnReleasedMapTile(AActor* Actor, FKey Key)
+void AETVGameModeBase::OnReleasedMapTile()
 {
 	if (PreDelayTile.IsValid())
 	{

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "ETVAction.h"
+#include "ETVWeaponSlot.h"
 #include "CoreMinimal.h"
 #include "PaperSpriteActor.h"
 #include "ETVShipContextMenuWidget.h"
@@ -33,6 +34,10 @@ protected:
 	// Health points of the ship
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship", meta = (ClampMin = "0.0"))
 	int32 HealthPoints;
+
+	// Maximum health points of the ship
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship", meta = (ClampMin = "0.0"))
+	int32 MaximumHealthPoints;
 	
 	// Bonus to health for ships
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship", meta = (ClampMin = "0.0"))
@@ -43,7 +48,7 @@ protected:
 	int32 ShieldRechargeTime;
 
 	// Weapon slots
-	// TODO When AETVWeapon is implemented
+	TArray<UETVWeaponSlot> Weapons;
 
 	// Integers (x,y) that represent a point on a sprite where the attachement goes
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship")
@@ -61,7 +66,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship")
 	TArray<int32> Fields;
 
-	// Action avaible on ship
+	// Actions avaible on ship
 	TArray<UETVAction> Actions;
 
 	// How fast ship moves
@@ -92,6 +97,23 @@ public:
 
 	UFUNCTION()
 	void SpawnContextMenu(AActor *Actor, FKey Key);
+
+	UFUNCTION()
+	int32 GetHP();
+
+	UFUNCTION()
+	void SetHP(int32 newValue);
+
+	UFUNCTION()
+	int32 GetShields();
+
+	UFUNCTION()
+	void SetShields(int32 newValue);
+
+
+	// Returns a multiplier for the effectiveness of ship's actions depending on its status
+	UFUNCTION()
+	virtual float GetMultiplier();
 
 	UFUNCTION(BlueprintCallable)
 	void ClosingContextMenu();

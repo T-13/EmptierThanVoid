@@ -18,15 +18,24 @@ class ETV_API AETVWeapon : public APaperSpriteActor
 public:
 	// Sets default values for this actor's properties
 	AETVWeapon();
+	// Construct the weapon with the specified parameters
+	AETVWeapon(FName NewName, float MaximumHP, float Dmg, float WeaponWeight, float WeaponSize, int32 Range);
+
+	// Construct a random weapon depending on the Power LVL
+	AETVWeapon(FName NewName, int32 PowerLvl);
 
 protected:
 	// Display weapon's name
     UPROPERTY(EditAnywhere)
     FName Name;
 
-	// Weapons HitPoints
-    UPROPERTY(EditAnywhere, meta = (ClampMin = "0.0", ClampMax = "100.0"))
-    float HP;
+	// Health Points of the Weapon
+    UPROPERTY(EditAnywhere, meta = (ClampMin = "0.0"))
+    float HealthPoints;
+
+	// Maximum Health Points of the Weapon
+	UPROPERTY(EditAnywhere, meta = (ClampMin = "0.0"))
+	float MaximumHealthPoints;
 
 	// DMG this weapon deals
     UPROPERTY(EditAnywhere)
@@ -34,45 +43,60 @@ protected:
 
 	// Type of this weapon
 	// For easier identification for players
-    UPROPERTY(EditAnywhere)
-    FString Type;
+    UPROPERTY()
+    int32 Type;
 
 	// The weight of the weapon
     UPROPERTY(EditAnywhere)
     float Weight;
 
-	// Protection of the weapon
+	// Size of the weapon
     UPROPERTY(EditAnywhere)
-    float Armour;
+    float Size;
 
-	// The angles between which this weapon can hit
-    UPROPERTY(EditAnywhere)
-    int32 Angle[2];
-
-	// Action point required to complete an action with this weapon
-	// Might get removed
-    UPROPERTY(EditAnywhere)
-    int32 ActionPointsPerAction;
+	// TODO The angles between which this weapon can hit
+    // UPROPERTY(EditAnywhere)
+	// TArray<int32> Angle;
 
 	// The range of the weapon
     UPROPERTY(EditAnywhere)
-    int32 TravelDistance;
+    int32 FiringRange;
 
 public:
 
-    // Method to tell the weapon to fire.
-    UFUNCTION(BlueprintCallable)
-    virtual void Fire(int32 x, int32 y);
+    // TODO Get the angle at which the weapon can fire 
+    // UFUNCTION(BlueprintCallable)
+    // TArray<int32> GetAngle(); 
 
-    // Get targets that weapon can hit
+    // Gives the Weight requirment for the weapon slot
     UFUNCTION(BlueprintCallable)
-    virtual TArray<int32> GetPossibleTargets(); // TODO-Object AETVShip not yet defined
+    float GetWeight();
 
-    // Gives the requirments for the weapon slot
-    UFUNCTION(BlueprintCallable)
-    virtual int32 GetSlotSpecifications(); // TODO-Object SlotSpecification not yet defined
+	// Gives the Size requirments for the weapon slot
+	UFUNCTION(BlueprintCallable)
+	float GetSize();
 
     // Get current status
     UFUNCTION(BlueprintCallable)
     virtual int32 GetReport(); // TODO-Object REPORT not yet defined
+
+	// Get current status
+	UFUNCTION(BlueprintCallable)
+	int32 GetType();
+
+	// Get weapon damage
+	UFUNCTION(BlueprintCallable)
+	float GetDMG();
+
+	// Set weapons current HealthPoints
+	void SetHP(int32 newValue);
+
+	// Get weapons current HealthPoints
+	int32 GetHP();
+
+	// Static intigers to define type of effect a weapon has
+	const static int32 DamageHull = 1;
+	const static int32 DamageShieldThenHull = 2;
+	const static int32 HealHull = 3;
+	const static int32 HealShield = 4;
 };

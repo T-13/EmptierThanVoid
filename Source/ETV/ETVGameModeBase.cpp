@@ -1,4 +1,4 @@
-// Copyright (C) Team13. All rights reserved.
+﻿// Copyright (C) Team13. All rights reserved.
 
 #include "ETVGameModeBase.h"
 
@@ -31,6 +31,8 @@ void AETVGameModeBase::BeginPlay()
 		{
 			bTargeting = true;
 		}
+
+		GenerateShips();
 	}
 }
 
@@ -90,7 +92,7 @@ void AETVGameModeBase::MapGeneration()
 	TileMapActor = GetWorld()->SpawnActor<APaperTileMapActor>(LocDim, Rotator, SpawnInfo);
 
 	// Getting Tile Map Component from Tile Map Actor
-	TileMapComp = TileMapActor->GetRenderComponent();	
+	TileMapComp = TileMapActor->GetRenderComponent();
 
 	// Create map and make it editable (last layer)
 	TileMapComp->CreateNewTileMap(MapWidth, MapHeight, 32, 32, 1.0f, false);
@@ -182,7 +184,7 @@ void AETVGameModeBase::OnClickedMapTile(AActor* Actor, FKey Key)
 			StopTargeting();
 		}
 	}
-	
+
 }
 
 void AETVGameModeBase::OnReleasedMapTile(AActor* Actor, FKey Key)
@@ -230,3 +232,157 @@ void AETVGameModeBase::StopTargeting()
 		SelectedAction->Perform();
 	}
 }
+
+void AETVGameModeBase::GenerateShips()
+{
+	int32 ycoord;
+	int32 xcoord;
+	int32 numOfSpawnedShips = FMath::FRandRange(FMath::Sqrt(MapWidth), MapWidth / 2);
+
+	// To check if Tile is allready set
+	bool bIsTileSet;
+
+	// Array for all set x coordinates
+	TArray<int32> xArr;
+
+	// Array for all set y coordinates
+	TArray<int32> yArr;
+
+	FPaperTileInfo TileInfo;
+	TileInfo.PackedTileIndex = 0;
+
+	// Spawning Capital Ship for Player
+	TileInfo.TileSet = PlayerCapitalShip;
+	ycoord = FMath::FRandRange(0, MapWidth);
+	xcoord = 0;
+	TileMapComp->SetTile(xcoord, ycoord, EETVTileLayer::Ship, TileInfo);
+
+	// So that nothing will overlay the Capital
+	xArr.Push(0);
+	yArr.Push(ycoord);
+
+	SpawnShip(xcoord, ycoord, TileInfo.TileSet);
+
+
+	// Spawning Capital Ship for Enemy
+	TileInfo.TileSet = EnemyCapitalShip;
+	ycoord = FMath::FRandRange(0, MapWidth);
+	xcoord = MapWidth - 1;
+	TileMapComp->SetTile(xcoord, ycoord, EETVTileLayer::Ship, TileInfo);
+
+	// So that nothing will overlay the Capital
+	xArr.Push(MapWidth - 1);
+	yArr.Push(ycoord);
+
+	SpawnShip(xcoord, ycoord, TileInfo.TileSet);
+
+	// Spawning Fighter Sihps on each side
+	for (int32 i = 0; i < numOfSpawnedShips; i++) {
+
+		bIsTileSet = true;
+		// Player Fighter Ship
+		TileInfo.TileSet = PlayerFighterShip;
+
+		// Loop for looking for empty Tile
+		while (bIsTileSet) {
+			bIsTileSet = false;
+			ycoord = FMath::FRandRange(0, MapWidth);
+
+			// So that middle 20% are left empty
+			xcoord = FMath::FRandRange(0, (MapWidth / 2 - MapWidth * 0.1));
+
+			for (int j = 0; j < xArr.Num(); j++) {
+				if (xArr[j] == xcoord && yArr[j] == ycoord) {
+					bIsTileSet = true;
+				}
+			}
+		}
+
+		// Set Tile
+		TileMapComp->SetTile(xcoord, ycoord, EETVTileLayer::Ship, TileInfo);
+
+		// Push to array for later to check if those coordinates are allready filled
+		xArr.Push(xcoord);
+		yArr.Push(ycoord);
+
+		SpawnShip(xcoord, ycoord, TileInfo.TileSet);
+
+
+		// Enemy Fighter Ship
+		TileInfo.TileSet = EnemyFighterShip;
+
+		bIsTileSet = true;
+
+		// Loop for looking for empty Tile
+		while (bIsTileSet) {
+			bIsTileSet = false;
+			ycoord = FMath::FRandRange(0, MapWidth);
+
+			// So that middle 20% are left empty
+			xcoord = FMath::FRandRange((MapWidth / 2 + MapWidth * 0.1), MapWidth);
+
+			for (int j = 0; j < xArr.Num(); j++) {
+				if (xArr[j] == xcoord && yArr[j] == ycoord) {
+					bIsTileSet = true;
+				}
+			}
+		}
+
+		// Set Tile
+		TileMapComp->SetTile(xcoord, ycoord, EETVTileLayer::Ship, TileInfo);
+
+		// Push to array for later to check if those coordinates are allready filled
+		xArr.Push(xcoord);
+		yArr.Push(ycoord);
+
+		SpawnShip(xcoord, ycoord, TileInfo.TileSet);
+
+	}
+}
+
+void AETVGameModeBase::SpawnShip(int32 x, int32 y, UPaperTileSet* type)
+{
+	// Vector for spawn location based on where TileSet is in TileMap
+	const FVector LocDim = GetPosition(x, y);
+
+	// Actor spawn parameters
+	const FActorSpawnParameters SpawnInfo;
+
+	// Rotate upwards to face the top-down camera
+	const FRotator Rotator(0, 0, -90);
+
+	// Spawning ShipActor based on class
+	if (type == PlayerCapitalShip || type == EnemyCapitalShip)
+		Ship = GetWorld()->SpawnActor<AETVShipCapital>(LocDim, Rotator, SpawnInfo);
+	else if (type == PlayerFighterShip || type == EnemyFighterShip)
+		Ship = GetWorld()->SpawnActor<AETVShipFighter>(LocDim, Rotator, SpawnInfo);
+
+	Ship->SetContextMenu(ContextMenu);
+	Ship->GetRenderComponent()->SetMobility(EComponentMobility::Movable);
+	Ship->GetRenderComponent()->SetSprite(Sprite);
+
+	// Setting sprite color to transparent
+	Ship->GetRenderComponent()->SetSpriteColor(FLinearColor(1.0f, 1.0f, 1.0f, 0.0f));
+
+	Ships.Add(Ship);
+}
+
+AETVShip * AETVGameModeBase::GetShipActor(int32 x, int32 y)
+{
+	const FVector LocDim = GetPosition(x, y);
+
+	// Iterate through Ships TArray to find the correct UETVShip
+	for (AETVShip* ship : Ships) {
+		if (ship->GetActorLocation() == LocDim) {
+			return ship;
+		}
+	}
+
+	return nullptr;
+}
+
+FVector AETVGameModeBase::GetPosition(int32 x, int32 y, int32 z)
+{
+	return FVector(-(TileSize / 2)*MapWidth + x*TileSize, -(TileSize / 2)*MapHeight + y*TileSize, z);
+}
+

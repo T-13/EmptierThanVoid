@@ -1,4 +1,4 @@
-﻿// Copyright (C) Team13. All rights reserved.
+// Copyright (C) Team13. All rights reserved.
 
 #pragma once
 
@@ -43,6 +43,7 @@ class ETV_API AETVGameModeBase : public AGameModeBase
 	APaperTileMapActor* TileMapActor;
 	UPaperTileMapComponent* TileMapComp;
 	TArray<FETVTileData> TileData;
+	int32 TileHeight;
 
 	AETVShip* Ship;
 	TArray<AETVShip*> Ships;

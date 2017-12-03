@@ -39,6 +39,7 @@ class ETV_API AETVGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 
+	/* Generation */
 	APaperTileMapActor* TileMapActor;
 	UPaperTileMapComponent* TileMapComp;
 	TArray<FETVTileData> TileData;
@@ -46,8 +47,9 @@ class ETV_API AETVGameModeBase : public AGameModeBase
 
 	AETVShip* Ship;
 	TArray<AETVShip*> Ships;
-	
-	// Targeting
+
+
+	/* Targeting */
 	bool bTargeting;
 	FETVTile CurrentTile;
 	FETVTile LastTile; // Reset this tile when mouse leaves it
@@ -64,6 +66,8 @@ protected:
 	// Called when the game starts or when spawned
 	void BeginPlay() override;
 
+
+	/* Generation */
 	// Tile set of the board
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV Map")
 	UPaperTileSet* TileSet;
@@ -112,10 +116,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV Map")
 	float MapHeight;
 
-	// Start with targeting enabled (debug)
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV Map")
-	bool bTargetingOnStart;
 
+	/* Game Loop */
 	// Elapsed game time since start of first turn, in seconds
 	UPROPERTY(BlueprintReadOnly, Category = "ETV Game")
 	float ElapsedTime;
@@ -131,11 +133,23 @@ protected:
 	// Time left until end of turn, in seconds
 	UPROPERTY(BlueprintReadOnly, Category = "ETV Game")
 	float CurrentTurnTime;
+
+	// Disable AI (debug)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV Game")
+	bool bDisableAI;
+
+
+	/* Targeting */
+	// Start with targeting enabled (debug)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV Map")
+	bool bTargetingOnStart;
 	
 public:
 	// Called every frame
 	void Tick(float DeltaTime) override;
 
+
+	/* Generation */
 	// Generate map of size MapWidth and MapHeight
 	UFUNCTION()
 	void MapGeneration();
@@ -144,6 +158,38 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "ETV Map")
 	void MapGenerated(APaperTileMapActor* TileMapActor);
 
+	// Generate Player and Enemy Ships on each side of the map
+	UFUNCTION(BlueprintCallable, Category = "ETV Map")
+	void GenerateShips();
+
+	// Spawn ShipActor on the correct X and Y
+	UFUNCTION()
+	void SpawnShip(int32 x, int32 y, UPaperTileSet* type);
+
+	// Get Ships Actor from passing in Tiles x and y
+	UFUNCTION()
+	AETVShip* GetShipActor(int32 x, int32 y);
+
+	// Get Ships location from Tiles x and y
+	UFUNCTION()
+	FVector GetPosition(int32 x, int32 y, int32 z = -449);
+
+
+	/* Game Loop */
+	// End current turn
+	UFUNCTION(BlueprintCallable, Category = "ETV Game")
+	void EndTurn();
+
+	// Start next turn
+	UFUNCTION(BlueprintCallable, Category = "ETV Game")
+	void NextTurn();
+
+	// Get current turn time percentage until end of turn
+	UFUNCTION(BlueprintCallable, Category = "ETV Game")
+	float GetCurrentTurnPercentage();
+
+
+	/* Targeting */
 	// Get tile position below mouse pointer
 	UFUNCTION(BlueprintCallable, Category = "ETV Map")
 	void GetMouseOverTile(/*out*/ FETVTile& Tile);
@@ -163,28 +209,4 @@ public:
 	// Stops targeting, resetting targeting mode
 	UFUNCTION(BlueprintCallable, Category = "ETV Targeting")
 	void StopTargeting();
-
-	// Generate Player and Enemy Ships on each side of the map
-	UFUNCTION(BlueprintCallable, Category = "ETV Targeting")
-	void GenerateShips();
-
-	// Spawn ShipActor on the correct X and Y
-	UFUNCTION()
-	void SpawnShip(int32 x, int32 y, UPaperTileSet* type);
-
-	// Get Ships Actor from passing in Tiles x and y
-	UFUNCTION()
-	AETVShip* GetShipActor(int32 x, int32 y);
-
-	// Get Ships location from Tiles x and y
-	UFUNCTION()
-	FVector GetPosition(int32 x, int32 y, int32 z = -449);
-
-	// End current turn
-	UFUNCTION(BlueprintCallable, Category = "ETV Game")
-	void EndTurn();
-
-	// Get current turn time percentage until end of turn
-	UFUNCTION(BlueprintCallable, Category = "ETV Game")
-	float GetCurrentTurnPercentage();
 };

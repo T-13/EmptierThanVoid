@@ -1,4 +1,4 @@
-﻿// Copyright (C) Team13. All rights reserved.
+// Copyright (C) Team13. All rights reserved.
 
 #include "ETVGameModeBase.h"
 
@@ -80,7 +80,8 @@ void AETVGameModeBase::Tick(float DeltaTime)
 void AETVGameModeBase::MapGeneration()
 {
 	// Vector for spawn location (takes into account height, width and tile size)
-	const FVector LocDim(-(MapHeight * TileSize / 2), -(MapWidth * TileSize / 2), -450);
+	TileHeight = -450; // TODO Scale dynamically based on size
+	const FVector LocDim(-(MapHeight * TileSize / 2), -(MapWidth * TileSize / 2), TileHeight);
 
 	// Actor spawn parameters
 	const FActorSpawnParameters SpawnInfo;
@@ -138,27 +139,39 @@ void AETVGameModeBase::MapGeneration()
 	MapGenerated(TileMapActor);
 
 	// Bind click
-	TileMapActor->OnClicked.AddDynamic(this, &AETVGameModeBase::OnClickedMapTile);
-	TileMapActor->OnReleased.AddDynamic(this, &AETVGameModeBase::OnReleasedMapTile);
+	UInputComponent* InputComponent = GetWorld()->GetFirstPlayerController()->InputComponent;
+	InputComponent->BindAction("ClickTile", IE_Pressed, this, &AETVGameModeBase::OnClickedMapTile);
+	InputComponent->BindAction("ClickTile", IE_Released, this, &AETVGameModeBase::OnReleasedMapTile);
 }
 
 void AETVGameModeBase::GetMouseOverTile(FETVTile& Tile)
 {
-	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-	ObjectTypes.Add(EObjectTypeQuery::ObjectTypeQuery1);
-	FHitResult Hit;
+	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 
-	if (PlayerController->GetHitResultUnderCursorForObjects(ObjectTypes, true, Hit))
+	FVector WorldLocation;
+	FVector WorldDirection;
+	if (PlayerController->DeprojectMousePositionToWorld(WorldLocation, WorldDirection))
 	{
-		for (auto &CurrentTileData : TileData)
+		// Add height to tile map
+		WorldDirection *= abs(TileHeight / WorldDirection.Z + WorldLocation.Z);
+		WorldLocation += WorldDirection;
+
+		// Check if on tile at all
+		bool bInRangeX = UKismetMathLibrary::InRange_FloatFloat(WorldLocation.X, TileData[0].PointLeftTop.X, TileData.Last().PointRightBottom.X, false, false);
+		bool bInRangeY = UKismetMathLibrary::InRange_FloatFloat(WorldLocation.Y, TileData[0].PointLeftTop.Y, TileData.Last().PointRightBottom.Y, false, false);
+		if (bInRangeX && bInRangeY)
 		{
-			bool bInRangeX = UKismetMathLibrary::InRange_FloatFloat(Hit.Location.X, CurrentTileData.PointLeftTop.X, CurrentTileData.PointRightBottom.X, false, false);
-			bool bInRangeY = UKismetMathLibrary::InRange_FloatFloat(Hit.Location.Y, CurrentTileData.PointLeftTop.Y, CurrentTileData.PointRightBottom.Y, false, false);
-			if (bInRangeX && bInRangeY)
+			// Check each tile if in range
+			for (auto &CurrentTileData : TileData)
 			{
-				Tile.Set(CurrentTileData.Tile);
-				return;
+				bInRangeX = UKismetMathLibrary::InRange_FloatFloat(WorldLocation.X, CurrentTileData.PointLeftTop.X, CurrentTileData.PointRightBottom.X, false, false);
+				bInRangeY = UKismetMathLibrary::InRange_FloatFloat(WorldLocation.Y, CurrentTileData.PointLeftTop.Y, CurrentTileData.PointRightBottom.Y, false, false);
+				if (bInRangeX && bInRangeY)
+				{
+					//UE_LOG(LogTemp, Warning, TEXT("Loc (%s) -- Dir (%s)"), *WorldLocation.ToString(), *WorldDirection.ToString())
+					Tile.Set(CurrentTileData.Tile);
+					return;
+				}
 			}
 		}
 	}
@@ -166,7 +179,7 @@ void AETVGameModeBase::GetMouseOverTile(FETVTile& Tile)
 	Tile.Invalidate();
 }
 
-void AETVGameModeBase::OnClickedMapTile(AActor* Actor, FKey Key)
+void AETVGameModeBase::OnClickedMapTile()
 {
 	// Make sure we are still targeting (in case of race conditions)
 	if (bTargeting && !PreDelayTile.IsValid() && TileSetTargetClick != nullptr)
@@ -187,7 +200,7 @@ void AETVGameModeBase::OnClickedMapTile(AActor* Actor, FKey Key)
 
 }
 
-void AETVGameModeBase::OnReleasedMapTile(AActor* Actor, FKey Key)
+void AETVGameModeBase::OnReleasedMapTile()
 {
 	if (PreDelayTile.IsValid())
 	{

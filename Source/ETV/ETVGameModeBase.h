@@ -1,11 +1,10 @@
-﻿// Copyright (C) Team13. All rights reserved.
+// Copyright (C) Team13. All rights reserved.
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Paper2DClasses.h"
 #include "ConstructorHelpers.h"
-#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "ETVActionTarget.h"
 #include "ETVShip.h"
@@ -43,6 +42,7 @@ class ETV_API AETVGameModeBase : public AGameModeBase
 	APaperTileMapActor* TileMapActor;
 	UPaperTileMapComponent* TileMapComp;
 	TArray<FETVTileData> TileData;
+	int32 TileHeight;
 
 	AETVShip* Ship;
 	TArray<AETVShip*> Ships;
@@ -134,11 +134,11 @@ public:
 
 	// Target selection effect (Tile Maps don't support animations at this time)
 	UFUNCTION()
-	void OnClickedMapTile(AActor* Actor, FKey Key);
+	void OnClickedMapTile();
 
 	// Target deselection effect (Tile Maps don't support animations at this time)
 	UFUNCTION()
-	void OnReleasedMapTile(AActor* Actor, FKey Key);
+	void OnReleasedMapTile();
 
 	// Starts targeting, handles ETV Action calls and stops targeting after target is selected
 	UFUNCTION(BlueprintCallable, Category = "ETV Targeting")

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "ETVWeapon.h"
+#include "ETVGameModeBase.h"
 #include "ETVAction.generated.h"
 
 UENUM(BlueprintType)

@@ -55,7 +55,15 @@ void AETVGameModeBase::Tick(float DeltaTime)
 	if (ElapsedTime >= 0.0f)
 	{
 		ElapsedTime += DeltaTime;
-		CurrentTurnTime -= DeltaTime;
+
+		if (CurrentTurnTime > 0.0f)
+		{
+			CurrentTurnTime -= DeltaTime;
+		}
+		else
+		{
+			EndTurn();
+		}
 	}
 
 	// Targeting

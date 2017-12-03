@@ -116,9 +116,21 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV Map")
 	bool bTargetingOnStart;
 
-	// Elapsed game time since start of first turn
+	// Elapsed game time since start of first turn, in seconds
 	UPROPERTY(BlueprintReadOnly, Category = "ETV Game")
-	float GameTime;
+	float ElapsedTime;
+
+	// Time each turn lasts, in seconds
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV Game")
+	int32 TurnTime;
+
+	// Current turn number
+	UPROPERTY(BlueprintReadOnly, Category = "ETV Game")
+	int32 CurrentTurn;
+
+	// Time left until end of turn, in seconds
+	UPROPERTY(BlueprintReadOnly, Category = "ETV Game")
+	float CurrentTurnTime;
 	
 public:
 	// Called every frame
@@ -167,4 +179,12 @@ public:
 	// Get Ships location from Tiles x and y
 	UFUNCTION()
 	FVector GetPosition(int32 x, int32 y, int32 z = -449);
+
+	// End current turn
+	UFUNCTION(BlueprintCallable, Category = "ETV Game")
+	void EndTurn();
+
+	// Get current turn time percentage until end of turn
+	UFUNCTION(BlueprintCallable, Category = "ETV Game")
+	float GetCurrentTurnPercentage();
 };

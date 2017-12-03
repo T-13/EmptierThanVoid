@@ -13,7 +13,10 @@ AETVGameModeBase::AETVGameModeBase()
 	MapHeight = 25.0f;
 
 	// Disable game time (until everything is generated)
-	GameTime = -1.0f;
+	ElapsedTime = -1.0f;
+	CurrentTurn = 0;
+	// One turn lasts 45 seconds
+	TurnTime = 45;
 
 	// Targeting
 	bTargeting = false;
@@ -38,7 +41,8 @@ void AETVGameModeBase::BeginPlay()
 		GenerateShips();
 
 		// Start game lopp
-		GameTime = 0.0f;
+		ElapsedTime = 0.0f;
+		CurrentTurnTime = static_cast<float>(TurnTime);
 	}
 }
 
@@ -48,9 +52,10 @@ void AETVGameModeBase::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	// Game loop
-	if (GameTime >= 0.0f)
+	if (ElapsedTime >= 0.0f)
 	{
-		GameTime += DeltaTime;
+		ElapsedTime += DeltaTime;
+		CurrentTurnTime -= DeltaTime;
 	}
 
 	// Targeting
@@ -410,4 +415,15 @@ AETVShip * AETVGameModeBase::GetShipActor(int32 x, int32 y)
 FVector AETVGameModeBase::GetPosition(int32 x, int32 y, int32 z)
 {
 	return FVector(-(TileSize / 2)*MapWidth + x*TileSize, -(TileSize / 2)*MapHeight + y*TileSize, z);
+}
+
+void AETVGameModeBase::EndTurn()
+{
+	CurrentTurn++;
+	CurrentTurnTime = static_cast<float>(TurnTime);
+}
+
+float AETVGameModeBase::GetCurrentTurnPercentage()
+{
+	return 1.0f - CurrentTurnTime / static_cast<float>(TurnTime);
 }

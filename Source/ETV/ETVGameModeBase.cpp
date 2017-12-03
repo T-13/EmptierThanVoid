@@ -332,6 +332,14 @@ FVector AETVGameModeBase::GetPosition(int32 x, int32 y, int32 z)
 
 void AETVGameModeBase::EndTurn()
 {
+	// Close context menu if any is open
+	for (AETVShip* CurShip : Ships)
+	{
+		// TODO Close context menu
+		//CurShip->CloseMenu();
+	}
+
+	// Handle turn end
 	if (bDisableAI)
 	{
 		// Continue to next turn directly

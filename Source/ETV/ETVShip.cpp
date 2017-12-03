@@ -9,6 +9,8 @@
 AETVShip::AETVShip() : Super()
 {
 	IsContextMenuOpen = false;
+
+	Type = EETVShipType::PlayerShip;
 }
 
 void AETVShip::BeginPlay()
@@ -124,4 +126,9 @@ void AETVShip::ClosingContextMenu()
 void AETVShip::SetContextMenu(TSubclassOf<class UETVShipContextMenuWidget> ContextMenu)
 {
 	ContextMenuClass = ContextMenu;
+}
+
+void AETVShip::SetTypeToEnemy()
+{
+	Type = EETVShipType::EnemyShip;
 }

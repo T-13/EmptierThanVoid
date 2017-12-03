@@ -28,6 +28,18 @@ AETVGameModeBase::AETVGameModeBase()
 	/* Targeting */
 	bTargeting = false;
 	bTargetingOnStart = false;
+
+	static ConstructorHelpers::FObjectFinder<UPaperTileSet> EnemyCapitalTile(TEXT("PaperTileSet'/Game/EmptierThanVoid/Art/Ships/EnemyCapitalShipTile.EnemyCapitalShipTile'"));
+	EnemyCapitalShip = EnemyCapitalTile.Object;
+
+	static ConstructorHelpers::FObjectFinder<UPaperTileSet> PlayerCapitalTile(TEXT("PaperTileSet'/Game/EmptierThanVoid/Art/Ships/PlayerCapitalShipTile.PlayerCapitalShipTile'"));
+	PlayerCapitalShip = PlayerCapitalTile.Object;
+
+	static ConstructorHelpers::FObjectFinder<UPaperTileSet> EnemyFighterTile(TEXT("PaperTileSet'/Game/EmptierThanVoid/Art/Ships/EnemyFighterShipTile.EnemyFighterShipTile'"));
+	EnemyFighterShip = EnemyFighterTile.Object;
+
+	static ConstructorHelpers::FObjectFinder<UPaperTileSet> PlayerFighterTile(TEXT("PaperTileSet'/Game/EmptierThanVoid/Art/Ships/PlayerFighterShipTile.PlayerFighterShipTile'"));
+	PlayerFighterShip = PlayerFighterTile.Object;
 }
 
 // Called when the game starts or when spawned
@@ -296,11 +308,16 @@ void AETVGameModeBase::SpawnShip(int32 x, int32 y, UPaperTileSet* type)
 	const FRotator Rotator(0, 0, -90);
 
 	// Spawning ShipActor based on class
-	if (type == PlayerCapitalShip || type == EnemyCapitalShip)
+	if (type == PlayerCapitalShip || type == EnemyCapitalShip) {
 		Ship = GetWorld()->SpawnActor<AETVShipCapital>(LocDim, Rotator, SpawnInfo);
-	else if (type == PlayerFighterShip || type == EnemyFighterShip)
+		if (type == EnemyCapitalShip)
+			Ship->SetTypeToEnemy();
+	}
+	else if (type == PlayerFighterShip || type == EnemyFighterShip) {
 		Ship = GetWorld()->SpawnActor<AETVShipFighter>(LocDim, Rotator, SpawnInfo);
-
+		if (type == EnemyFighterShip)
+			Ship->SetTypeToEnemy();
+	}
 	Ship->SetContextMenu(ContextMenu);
 	Ship->GetRenderComponent()->SetMobility(EComponentMobility::Movable);
 	Ship->GetRenderComponent()->SetSprite(Sprite);

@@ -1,6 +1,7 @@
 // Copyright (C) Team13. All rights reserved.
 
 #include "ETVAction.h"
+#include "ETVGameModeBase.h" // Not in .h due to circular dependency
 
 // Sets default values
 UETVAction::UETVAction()

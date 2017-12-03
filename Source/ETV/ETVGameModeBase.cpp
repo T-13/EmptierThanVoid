@@ -1,4 +1,4 @@
-﻿// Copyright (C) Team13. All rights reserved.
+// Copyright (C) Team13. All rights reserved.
 
 #include "ETVGameModeBase.h"
 
@@ -8,11 +8,24 @@ AETVGameModeBase::AETVGameModeBase()
 	// Set this actor to call Tick() every frame
 	PrimaryActorTick.bCanEverTick = true;
 
+	/* Generation */
 	TileSize = 32;
 	MapWidth = 25.0f;
 	MapHeight = 25.0f;
 
-	// Targeting
+
+	/* Game Loop */
+	// Disable game time (until everything is generated)
+	ElapsedTime = -1.0f;
+	CurrentTurn = 0;
+
+	// One turn lasts 45 seconds
+	TurnTime = 45;
+
+	bDisableAI = false;
+
+
+	/* Targeting */
 	bTargeting = false;
 	bTargetingOnStart = false;
 
@@ -45,6 +58,10 @@ void AETVGameModeBase::BeginPlay()
 		}
 
 		GenerateShips();
+
+		// Start game lopp
+		ElapsedTime = 0.0f;
+		CurrentTurnTime = static_cast<float>(TurnTime);
 	}
 }
 
@@ -53,6 +70,22 @@ void AETVGameModeBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	// Game loop
+	if (ElapsedTime >= 0.0f)
+	{
+		ElapsedTime += DeltaTime;
+
+		if (CurrentTurnTime > 0.0f)
+		{
+			CurrentTurnTime -= DeltaTime;
+		}
+		else
+		{
+			EndTurn();
+		}
+	}
+
+	// Targeting
 	if (bTargeting)
 	{
 		FETVTile MouseOverTile;
@@ -92,7 +125,8 @@ void AETVGameModeBase::Tick(float DeltaTime)
 void AETVGameModeBase::MapGeneration()
 {
 	// Vector for spawn location (takes into account height, width and tile size)
-	const FVector LocDim(-(MapHeight * TileSize / 2), -(MapWidth * TileSize / 2), -450);
+	TileHeight = -450; // TODO Scale dynamically based on size
+	const FVector LocDim(-(MapHeight * TileSize / 2), -(MapWidth * TileSize / 2), TileHeight);
 
 	// Actor spawn parameters
 	const FActorSpawnParameters SpawnInfo;
@@ -150,99 +184,9 @@ void AETVGameModeBase::MapGeneration()
 	MapGenerated(TileMapActor);
 
 	// Bind click
-	TileMapActor->OnClicked.AddDynamic(this, &AETVGameModeBase::OnClickedMapTile);
-	TileMapActor->OnReleased.AddDynamic(this, &AETVGameModeBase::OnReleasedMapTile);
-}
-
-void AETVGameModeBase::GetMouseOverTile(FETVTile& Tile)
-{
-	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-	ObjectTypes.Add(EObjectTypeQuery::ObjectTypeQuery1);
-	FHitResult Hit;
-
-	if (PlayerController->GetHitResultUnderCursorForObjects(ObjectTypes, true, Hit))
-	{
-		for (auto &CurrentTileData : TileData)
-		{
-			bool bInRangeX = UKismetMathLibrary::InRange_FloatFloat(Hit.Location.X, CurrentTileData.PointLeftTop.X, CurrentTileData.PointRightBottom.X, false, false);
-			bool bInRangeY = UKismetMathLibrary::InRange_FloatFloat(Hit.Location.Y, CurrentTileData.PointLeftTop.Y, CurrentTileData.PointRightBottom.Y, false, false);
-			if (bInRangeX && bInRangeY)
-			{
-				Tile.Set(CurrentTileData.Tile);
-				return;
-			}
-		}
-	}
-
-	Tile.Invalidate();
-}
-
-void AETVGameModeBase::OnClickedMapTile(AActor* Actor, FKey Key)
-{
-	// Make sure we are still targeting (in case of race conditions)
-	if (bTargeting && !PreDelayTile.IsValid() && TileSetTargetClick != nullptr)
-	{
-		PreDelayTile.Set(CurrentTile); // Prevents race conditions when leaving tile between click and release
-
-		// Set Tile Set to Click
-		FPaperTileInfo TileInfo = TileMapComp->GetTile(PreDelayTile.X, PreDelayTile.Y, EETVTileLayer::Target);
-		TileInfo.TileSet = TileSetTargetClick;
-		TileMapComp->SetTile(PreDelayTile.X, PreDelayTile.Y, EETVTileLayer::Target, TileInfo);
-
-		// Stop targeting if valid target
-		if (PreDelayTile.Index == EETVTargetValidity::Valid)
-		{
-			StopTargeting();
-		}
-	}
-
-}
-
-void AETVGameModeBase::OnReleasedMapTile(AActor* Actor, FKey Key)
-{
-	if (PreDelayTile.IsValid())
-	{
-		// Remove highlight Tile Set
-		FPaperTileInfo ResetTileInfo;
-		ResetTileInfo.PackedTileIndex = PreDelayTile.Index;
-		if (PreDelayTile == CurrentTile && TileSetTarget != nullptr)
-		{
-			ResetTileInfo.TileSet = TileSetTarget;
-		}
-		TileMapComp->SetTile(PreDelayTile.X, PreDelayTile.Y, EETVTileLayer::Target, ResetTileInfo);
-
-		// Set pre-delay tile variable to invalid
-		PreDelayTile.Invalidate();
-	}
-
-}
-
-void AETVGameModeBase::StartTargeting(AETVShip* TargetingInstigator, UETVActionTarget* Action)
-{
-	TargetingInstigator = TargetingInstigator;
-	SelectedAction = Action;
-
-	bTargeting = true;
-}
-
-void AETVGameModeBase::StopTargeting()
-{
-	bTargeting = false;
-
-	// Set previous tile variables to invalid
-	CurrentTile.Invalidate();
-	LastTile.Invalidate();
-
-	if (SelectedAction != nullptr)
-	{
-		// TODO
-		// Get ship on last tile
-		FPaperTileInfo TileInfoShip = TileMapComp->GetTile(LastTile.X, LastTile.Y, EETVTileLayer::Ship);
-
-		//SelectedAction->SetTarget();
-		SelectedAction->Perform();
-	}
+	UInputComponent* InputComponent = GetWorld()->GetFirstPlayerController()->InputComponent;
+	InputComponent->BindAction("ClickTile", IE_Pressed, this, &AETVGameModeBase::OnClickedMapTile);
+	InputComponent->BindAction("ClickTile", IE_Released, this, &AETVGameModeBase::OnReleasedMapTile);
 }
 
 void AETVGameModeBase::GenerateShips()
@@ -288,7 +232,7 @@ void AETVGameModeBase::GenerateShips()
 
 	SpawnShip(xcoord, ycoord, TileInfo.TileSet);
 
-	// Spawning Fighter Sihps on each side
+	// Spawning Fighter Ships on each side
 	for (int32 i = 0; i < numOfSpawnedShips; i++) {
 
 		bIsTileSet = true;
@@ -403,3 +347,147 @@ FVector AETVGameModeBase::GetPosition(int32 x, int32 y, int32 z)
 	return FVector(-(TileSize / 2)*MapWidth + x*TileSize, -(TileSize / 2)*MapHeight + y*TileSize, z);
 }
 
+void AETVGameModeBase::EndTurn()
+{
+	// Close context menu if any is open
+	for (AETVShip* CurShip : Ships)
+	{
+		// TODO Close context menu
+		//CurShip->CloseMenu();
+	}
+
+	// Handle turn end
+	if (bDisableAI)
+	{
+		// Continue to next turn directly
+		NextTurn();
+	}
+	else
+	{
+		// Pause for AI
+		APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+		PlayerController->SetPause(true);
+
+		// Move control to AI
+		// TODO Call into AI to do its thing
+		// TODO AI calls NextTurn() when done
+	}
+}
+
+void AETVGameModeBase::NextTurn()
+{
+	// Apply next turn
+	CurrentTurn++;
+	CurrentTurnTime = static_cast<float>(TurnTime);
+
+	// Unpause
+	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+	PlayerController->SetPause(false);
+}
+
+float AETVGameModeBase::GetCurrentTurnPercentage()
+{
+	return 1.0f - CurrentTurnTime / static_cast<float>(TurnTime);
+}
+
+void AETVGameModeBase::GetMouseOverTile(FETVTile& Tile)
+{
+	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+
+	FVector WorldLocation;
+	FVector WorldDirection;
+	if (PlayerController->DeprojectMousePositionToWorld(WorldLocation, WorldDirection))
+	{
+		// Add height to tile map
+		WorldDirection *= abs(TileHeight / WorldDirection.Z + WorldLocation.Z);
+		WorldLocation += WorldDirection;
+
+		// Check if on tile at all
+		bool bInRangeX = UKismetMathLibrary::InRange_FloatFloat(WorldLocation.X, TileData[0].PointLeftTop.X, TileData.Last().PointRightBottom.X, false, false);
+		bool bInRangeY = UKismetMathLibrary::InRange_FloatFloat(WorldLocation.Y, TileData[0].PointLeftTop.Y, TileData.Last().PointRightBottom.Y, false, false);
+		if (bInRangeX && bInRangeY)
+		{
+			// Check each tile if in range
+			for (auto &CurrentTileData : TileData)
+			{
+				bInRangeX = UKismetMathLibrary::InRange_FloatFloat(WorldLocation.X, CurrentTileData.PointLeftTop.X, CurrentTileData.PointRightBottom.X, false, false);
+				bInRangeY = UKismetMathLibrary::InRange_FloatFloat(WorldLocation.Y, CurrentTileData.PointLeftTop.Y, CurrentTileData.PointRightBottom.Y, false, false);
+				if (bInRangeX && bInRangeY)
+				{
+					//UE_LOG(LogTemp, Warning, TEXT("Loc (%s) -- Dir (%s)"), *WorldLocation.ToString(), *WorldDirection.ToString())
+					Tile.Set(CurrentTileData.Tile);
+					return;
+				}
+			}
+		}
+	}
+
+	Tile.Invalidate();
+}
+
+void AETVGameModeBase::OnClickedMapTile()
+{
+	// Make sure we are still targeting (in case of race conditions)
+	if (bTargeting && !PreDelayTile.IsValid() && TileSetTargetClick != nullptr)
+	{
+		PreDelayTile.Set(CurrentTile); // Prevents race conditions when leaving tile between click and release
+
+		// Set Tile Set to Click
+		FPaperTileInfo TileInfo = TileMapComp->GetTile(PreDelayTile.X, PreDelayTile.Y, EETVTileLayer::Target);
+		TileInfo.TileSet = TileSetTargetClick;
+		TileMapComp->SetTile(PreDelayTile.X, PreDelayTile.Y, EETVTileLayer::Target, TileInfo);
+
+		// Stop targeting if valid target
+		if (PreDelayTile.Index == EETVTargetValidity::Valid)
+		{
+			StopTargeting();
+		}
+	}
+
+}
+
+void AETVGameModeBase::OnReleasedMapTile()
+{
+	if (PreDelayTile.IsValid())
+	{
+		// Remove highlight Tile Set
+		FPaperTileInfo ResetTileInfo;
+		ResetTileInfo.PackedTileIndex = PreDelayTile.Index;
+		if (PreDelayTile == CurrentTile && TileSetTarget != nullptr)
+		{
+			ResetTileInfo.TileSet = TileSetTarget;
+		}
+		TileMapComp->SetTile(PreDelayTile.X, PreDelayTile.Y, EETVTileLayer::Target, ResetTileInfo);
+
+		// Set pre-delay tile variable to invalid
+		PreDelayTile.Invalidate();
+	}
+
+}
+
+void AETVGameModeBase::StartTargeting(AETVShip* TargetingInstigator, UETVActionTarget* Action)
+{
+	TargetingInstigator = TargetingInstigator;
+	SelectedAction = Action;
+
+	bTargeting = true;
+}
+
+void AETVGameModeBase::StopTargeting()
+{
+	bTargeting = false;
+
+	// Set previous tile variables to invalid
+	CurrentTile.Invalidate();
+	LastTile.Invalidate();
+
+	if (SelectedAction != nullptr)
+	{
+		// TODO
+		// Get ship on last tile
+		FPaperTileInfo TileInfoShip = TileMapComp->GetTile(LastTile.X, LastTile.Y, EETVTileLayer::Ship);
+
+		//SelectedAction->SetTarget();
+		SelectedAction->Perform();
+	}
+}

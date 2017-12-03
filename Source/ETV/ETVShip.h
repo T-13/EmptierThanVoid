@@ -1,4 +1,4 @@
-﻿// Copyright (C) Team13. All rights reserved.
+// Copyright (C) Team13. All rights reserved.
 
 #pragma once
 
@@ -20,7 +20,6 @@ enum class EETVShipType : uint8
 /**
 * Abstract base Ship class.
 */
-
 UCLASS(Abstract)
 class ETV_API AETVShip : public APaperSpriteActor
 {
@@ -75,7 +74,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship")
 	TArray<int32> Fields;
 
-	// Actions avaible on ship
+	// Actions available on ship
 	TArray<UETVAction> Actions;
 
 	// How fast ship moves

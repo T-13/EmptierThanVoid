@@ -1,11 +1,10 @@
-﻿// Copyright (C) Team13. All rights reserved.
+// Copyright (C) Team13. All rights reserved.
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Paper2DClasses.h"
 #include "ConstructorHelpers.h"
-#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "ETVActionTarget.h"
 #include "ETVShip.h"
@@ -40,14 +39,17 @@ class ETV_API AETVGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 
+	/* Generation */
 	APaperTileMapActor* TileMapActor;
 	UPaperTileMapComponent* TileMapComp;
 	TArray<FETVTileData> TileData;
+	int32 TileHeight;
 
 	AETVShip* Ship;
 	TArray<AETVShip*> Ships;
-	
-	// Targeting
+
+
+	/* Targeting */
 	bool bTargeting;
 	FETVTile CurrentTile;
 	FETVTile LastTile; // Reset this tile when mouse leaves it
@@ -70,6 +72,8 @@ protected:
 	// Called when the game starts or when spawned
 	void BeginPlay() override;
 
+
+	/* Generation */
 	// Tile set of the board
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV Map")
 	UPaperTileSet* TileSet;
@@ -102,6 +106,30 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV Map")
 	float MapHeight;
 
+
+	/* Game Loop */
+	// Elapsed game time since start of first turn, in seconds
+	UPROPERTY(BlueprintReadOnly, Category = "ETV Game")
+	float ElapsedTime;
+
+	// Time each turn lasts, in seconds
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV Game")
+	int32 TurnTime;
+
+	// Current turn number
+	UPROPERTY(BlueprintReadOnly, Category = "ETV Game")
+	int32 CurrentTurn;
+
+	// Time left until end of turn, in seconds
+	UPROPERTY(BlueprintReadOnly, Category = "ETV Game")
+	float CurrentTurnTime;
+
+	// Disable AI (debug)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV Game")
+	bool bDisableAI;
+
+
+	/* Targeting */
 	// Start with targeting enabled (debug)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV Map")
 	bool bTargetingOnStart;
@@ -110,6 +138,8 @@ public:
 	// Called every frame
 	void Tick(float DeltaTime) override;
 
+
+	/* Generation */
 	// Generate map of size MapWidth and MapHeight
 	UFUNCTION()
 	void MapGeneration();
@@ -118,28 +148,8 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "ETV Map")
 	void MapGenerated(APaperTileMapActor* TileMapActor);
 
-	// Get tile position below mouse pointer
-	UFUNCTION(BlueprintCallable, Category = "ETV Map")
-	void GetMouseOverTile(/*out*/ FETVTile& Tile);
-
-	// Target selection effect (Tile Maps don't support animations at this time)
-	UFUNCTION()
-	void OnClickedMapTile(AActor* Actor, FKey Key);
-
-	// Target deselection effect (Tile Maps don't support animations at this time)
-	UFUNCTION()
-	void OnReleasedMapTile(AActor* Actor, FKey Key);
-
-	// Starts targeting, handles ETV Action calls and stops targeting after target is selected
-	UFUNCTION(BlueprintCallable, Category = "ETV Targeting")
-	void StartTargeting(UPARAM(ref) AETVShip* ActionInstigator, UPARAM(ref) UETVActionTarget* Action);
-
-	// Stops targeting, resetting targeting mode
-	UFUNCTION(BlueprintCallable, Category = "ETV Targeting")
-	void StopTargeting();
-
 	// Generate Player and Enemy Ships on each side of the map
-	UFUNCTION(BlueprintCallable, Category = "ETV Targeting")
+	UFUNCTION(BlueprintCallable, Category = "ETV Map")
 	void GenerateShips();
 
 	// Spawn ShipActor on the correct X and Y
@@ -153,4 +163,40 @@ public:
 	// Get Ships location from Tiles x and y
 	UFUNCTION()
 	FVector GetPosition(int32 x, int32 y, int32 z = -449);
+
+
+	/* Game Loop */
+	// End current turn
+	UFUNCTION(BlueprintCallable, Category = "ETV Game")
+	void EndTurn();
+
+	// Start next turn
+	UFUNCTION(BlueprintCallable, Category = "ETV Game")
+	void NextTurn();
+
+	// Get current turn time percentage until end of turn
+	UFUNCTION(BlueprintCallable, Category = "ETV Game")
+	float GetCurrentTurnPercentage();
+
+
+	/* Targeting */
+	// Get tile position below mouse pointer
+	UFUNCTION(BlueprintCallable, Category = "ETV Map")
+	void GetMouseOverTile(/*out*/ FETVTile& Tile);
+
+	// Target selection effect (Tile Maps don't support animations at this time)
+	UFUNCTION()
+	void OnClickedMapTile();
+
+	// Target deselection effect (Tile Maps don't support animations at this time)
+	UFUNCTION()
+	void OnReleasedMapTile();
+
+	// Starts targeting, handles ETV Action calls and stops targeting after target is selected
+	UFUNCTION(BlueprintCallable, Category = "ETV Targeting")
+	void StartTargeting(UPARAM(ref) AETVShip* ActionInstigator, UPARAM(ref) UETVActionTarget* Action);
+
+	// Stops targeting, resetting targeting mode
+	UFUNCTION(BlueprintCallable, Category = "ETV Targeting")
+	void StopTargeting();
 };

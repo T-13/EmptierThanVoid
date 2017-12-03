@@ -1,4 +1,4 @@
-﻿// Copyright (C) Team13. All rights reserved.
+// Copyright (C) Team13. All rights reserved.
 
 #include "ETVShip.h"
 #include "UserWidget.h"
@@ -34,22 +34,20 @@ void AETVShip::GetReport()
 
 void AETVShip::SpawnContextMenu(AActor *Actor, FKey Key)
 {
-	if (ContextMenuClass != nullptr)
+	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+	if (ContextMenuClass != nullptr && !IsContextMenuOpen && !PlayerController->IsPaused())
 	{
-		if (!IsContextMenuOpen) 
+		CurrentContextMenu = CreateWidget<UETVShipContextMenuWidget>(GetWorld(), ContextMenuClass);
+		CurrentContextMenu->AssignShip(this);
+		if (CurrentContextMenu != nullptr)
 		{
-			CurrentContextMenu = CreateWidget<UETVShipContextMenuWidget>(GetWorld(), ContextMenuClass);
-			CurrentContextMenu->AssignShip(this);
-			if (CurrentContextMenu != nullptr)
-			{
-				float x; // X coordinate of MouseCursor
-				float y; // Y coordinate of MouseCursor
-				if (UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetMousePosition(x, y)) {
-					CurrentContextMenu->SetPositionInViewport(UKismetMathLibrary::MakeVector2D(x, y));
-					CurrentContextMenu->SetDesiredSizeInViewport(UKismetMathLibrary::MakeVector2D(320, 280));
-					CurrentContextMenu->AddToViewport();
-					IsContextMenuOpen = true;
-				}
+			float x; // X coordinate of MouseCursor
+			float y; // Y coordinate of MouseCursor
+			if (PlayerController->GetMousePosition(x, y)) {
+				CurrentContextMenu->SetPositionInViewport(UKismetMathLibrary::MakeVector2D(x, y));
+				CurrentContextMenu->SetDesiredSizeInViewport(UKismetMathLibrary::MakeVector2D(320, 280));
+				CurrentContextMenu->AddToViewport();
+				IsContextMenuOpen = true;
 			}
 		}
 	}

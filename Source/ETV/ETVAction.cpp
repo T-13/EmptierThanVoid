@@ -1,6 +1,7 @@
 // Copyright (C) Team13. All rights reserved.
 
 #include "ETVAction.h"
+#include "ETVGameModeBase.h" // Not in .h due to circular dependency
 
 // Sets default values
 UETVAction::UETVAction()
@@ -29,7 +30,14 @@ bool UETVAction::CanPerform()
 
 void UETVAction::Perform()
 {
-    ApplyEffectsSelf();
+	ApplyEffectsSelf();
+
+	if (bEndsTurn)
+	{
+		// TODO Delay this if necessary
+		AETVGameModeBase* GameMode = (AETVGameModeBase*)GetWorld()->GetAuthGameMode();
+		GameMode->EndTurn();
+	}
 }
 
 EETVActionAvailability UETVAction::ToggleAvailability()

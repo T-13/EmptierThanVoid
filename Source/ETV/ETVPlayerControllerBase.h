@@ -18,4 +18,7 @@ public:
 	// Sets default values for this actor's properties
 	AETVPlayerControllerBase();
 
+public:
+	// Called to bind functionality to input
+	void SetupInputComponent() override;
 };

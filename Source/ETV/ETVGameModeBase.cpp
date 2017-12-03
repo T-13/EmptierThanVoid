@@ -364,11 +364,16 @@ void AETVGameModeBase::SpawnShip(int32 x, int32 y, UPaperTileSet* type)
 	const FRotator Rotator(0, 0, -90);
 
 	// Spawning ShipActor based on class
-	if (type == PlayerCapitalShip || type == EnemyCapitalShip)
+	if (type == PlayerCapitalShip || type == EnemyCapitalShip) {
 		Ship = GetWorld()->SpawnActor<AETVShipCapital>(LocDim, Rotator, SpawnInfo);
-	else if (type == PlayerFighterShip || type == EnemyFighterShip)
+		if (type == EnemyCapitalShip)
+			Ship->SetTypeToEnemy();
+	}
+	else if (type == PlayerFighterShip || type == EnemyFighterShip) {
 		Ship = GetWorld()->SpawnActor<AETVShipFighter>(LocDim, Rotator, SpawnInfo);
-
+		if (type == EnemyFighterShip)
+			Ship->SetTypeToEnemy();
+	}
 	Ship->SetContextMenu(ContextMenu);
 	Ship->GetRenderComponent()->SetMobility(EComponentMobility::Movable);
 	Ship->GetRenderComponent()->SetSprite(Sprite);

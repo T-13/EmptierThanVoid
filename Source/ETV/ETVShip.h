@@ -9,9 +9,18 @@
 #include "ETVShipContextMenuWidget.h"
 #include "ETVShip.generated.h"
 
+UENUM(BlueprintType)
+enum class EETVShipType : uint8
+{
+	PlayerShip	UMETA(DisplayName = "Player"),
+	EnemyShip	UMETA(DisplayName = "Enemy")
+};
+
+
 /**
- * Abstract base Ship class.
- */
+* Abstract base Ship class.
+*/
+
 UCLASS(Abstract)
 class ETV_API AETVShip : public APaperSpriteActor
 {
@@ -85,6 +94,10 @@ protected:
 	UPROPERTY()
 	bool IsContextMenuOpen;
 
+	// Type of Ship (0 = player ship, 1 = enemy ship)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship")
+	EETVShipType Type;
+
 public:
 	UFUNCTION()
 	virtual void GetCurrentPosition();
@@ -120,5 +133,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetContextMenu(TSubclassOf<class UETVShipContextMenuWidget> ContextMenu);
+
+	// Set Ship Type to Enemy
+	UFUNCTION()
+	void SetTypeToEnemy();
 
 };

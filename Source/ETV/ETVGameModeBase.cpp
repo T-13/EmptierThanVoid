@@ -415,7 +415,7 @@ void AETVGameModeBase::OnClickedMapTile()
 	{
 		PreDelayTile.Set(CurrentTile); // Prevents race conditions when leaving tile between click and release
 
-									   // Set Tile Set to Click
+		// Set Tile Set to Click
 		FPaperTileInfo TileInfo = TileMapComp->GetTile(PreDelayTile.X, PreDelayTile.Y, EETVTileLayer::Target);
 		TileInfo.TileSet = TileSetTargetClick;
 		TileMapComp->SetTile(PreDelayTile.X, PreDelayTile.Y, EETVTileLayer::Target, TileInfo);

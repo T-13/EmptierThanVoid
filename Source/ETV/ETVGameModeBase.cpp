@@ -220,7 +220,7 @@ void AETVGameModeBase::GenerateShips()
 
 	SpawnShip(xcoord, ycoord, TileInfo.TileSet);
 
-	// Spawning Fighter Sihps on each side
+	// Spawning Fighter Ships on each side
 	for (int32 i = 0; i < numOfSpawnedShips; i++) {
 
 		bIsTileSet = true;

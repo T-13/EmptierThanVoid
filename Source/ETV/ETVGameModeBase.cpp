@@ -15,6 +15,18 @@ AETVGameModeBase::AETVGameModeBase()
 	// Targeting
 	bTargeting = false;
 	bTargetingOnStart = false;
+
+	static ConstructorHelpers::FObjectFinder<UPaperTileSet> EnemyCapitalTile(TEXT("PaperTileSet'/Game/EmptierThanVoid/Art/Ships/EnemyCapitalShipTile.EnemyCapitalShipTile'"));
+	EnemyCapitalShip = EnemyCapitalTile.Object;
+
+	static ConstructorHelpers::FObjectFinder<UPaperTileSet> PlayerCapitalTile(TEXT("PaperTileSet'/Game/EmptierThanVoid/Art/Ships/PlayerCapitalShipTile.PlayerCapitalShipTile'"));
+	PlayerCapitalShip = PlayerCapitalTile.Object;
+
+	static ConstructorHelpers::FObjectFinder<UPaperTileSet> EnemyFighterTile(TEXT("PaperTileSet'/Game/EmptierThanVoid/Art/Ships/EnemyFighterShipTile.EnemyFighterShipTile'"));
+	EnemyFighterShip = EnemyFighterTile.Object;
+
+	static ConstructorHelpers::FObjectFinder<UPaperTileSet> PlayerFighterTile(TEXT("PaperTileSet'/Game/EmptierThanVoid/Art/Ships/PlayerFighterShipTile.PlayerFighterShipTile'"));
+	PlayerFighterShip = PlayerFighterTile.Object;
 }
 
 // Called when the game starts or when spawned

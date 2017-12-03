@@ -12,6 +12,9 @@ AETVGameModeBase::AETVGameModeBase()
 	MapWidth = 25.0f;
 	MapHeight = 25.0f;
 
+	// Disable game time (until everything is generated)
+	GameTime = -1.0f;
+
 	// Targeting
 	bTargeting = false;
 	bTargetingOnStart = false;
@@ -33,6 +36,9 @@ void AETVGameModeBase::BeginPlay()
 		}
 
 		GenerateShips();
+
+		// Start game lopp
+		GameTime = 0.0f;
 	}
 }
 
@@ -41,6 +47,13 @@ void AETVGameModeBase::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	// Game loop
+	if (GameTime >= 0.0f)
+	{
+		GameTime += DeltaTime;
+	}
+
+	// Targeting
 	if (bTargeting)
 	{
 		FETVTile MouseOverTile;
@@ -398,4 +411,3 @@ FVector AETVGameModeBase::GetPosition(int32 x, int32 y, int32 z)
 {
 	return FVector(-(TileSize / 2)*MapWidth + x*TileSize, -(TileSize / 2)*MapHeight + y*TileSize, z);
 }
-

@@ -115,6 +115,10 @@ protected:
 	// Start with targeting enabled (debug)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV Map")
 	bool bTargetingOnStart;
+
+	// Elapsed game time since start of first turn
+	UPROPERTY(BlueprintReadOnly, Category = "ETV Game")
+	float GameTime;
 	
 public:
 	// Called every frame

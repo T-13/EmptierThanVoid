@@ -1,4 +1,4 @@
-// Copyright (C) Team13. All rights reserved.
+﻿// Copyright (C) Team13. All rights reserved.
 
 #pragma once
 
@@ -10,6 +10,7 @@
 #include "ETVShip.h"
 #include "ETVShipCapital.h"
 #include "ETVShipFighter.h"
+#include "ETVShipRepairShip.h"
 #include "ETVStructTile.h"
 #include "EngineUtils.h"
 #include "GameFramework/GameModeBase.h"
@@ -46,6 +47,9 @@ class ETV_API AETVGameModeBase : public AGameModeBase
 	int32 TileHeight;
 
 	AETVShip* Ship;
+	AETVShipCapital* CapitalShip;
+	AETVShipFighter* FighterShip;
+	AETVShipRepairShip* RepairShip;
 	TArray<AETVShip*> Ships;
 
 

@@ -1,4 +1,4 @@
-// Copyright (C) Team13. All rights reserved.
+﻿// Copyright (C) Team13. All rights reserved.
 
 #pragma once
 
@@ -28,6 +28,7 @@ class ETV_API AETVShip : public APaperSpriteActor
 public:
 	// Sets default values for this actor's properties
 	AETVShip();
+	virtual void Init(FName NewName, int32 HP, int32 MaxHP, int32 ShieldP, int32 NewShieldRechargeTime, int32 NewSize, int32 NewMoveRange, int32 Speed);
 
 protected:
 	// Called when the game starts or when spawned

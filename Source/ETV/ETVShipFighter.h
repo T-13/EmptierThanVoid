@@ -26,7 +26,7 @@ protected:
 	float DeflectionChance;
 
 	// Affects the movement speed
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Action|Target", meta = (ClampMin = "0.0"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship|Fighter", meta = (ClampMin = "0.0"))
 	float Acceleration;
 	
 public:

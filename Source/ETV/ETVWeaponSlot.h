@@ -8,13 +8,13 @@
 #include "ETVWeaponSlot.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class ETV_API UETVWeaponSlot : public UObject
 {
 	GENERATED_BODY()
-	
+
 public:
 	// Sets default values for this actor's properties
 	UETVWeaponSlot();
@@ -50,5 +50,5 @@ public:
 	AETVWeapon* GetWeapon();
 
 	// Returns true if weapon is slotted and false otherwise
-	bool HasWeapon();	
+	bool HasWeapon();
 };

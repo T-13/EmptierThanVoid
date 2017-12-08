@@ -27,10 +27,5 @@ protected:
 
 public:
 	// TODO Add methods
-	// RepairShip(AETVShip ship);
 
-
-
-	
-	
 };

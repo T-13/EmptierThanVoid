@@ -13,7 +13,7 @@ UCLASS()
 class ETV_API AETVWeaponTorpedo : public AETVWeapon
 {
 	GENERATED_BODY()
-	
+
 public:
 	// Sets default values for this actor's properties
 	AETVWeaponTorpedo();
@@ -22,7 +22,7 @@ public:
 
 	// Construct a random weapon depending on the Power LVL
 	void InitRandom(FName NewName, int32 PowerLvl) override;
-	
+
 protected:
 	// The speed of the sheep
 	int32 SquaresPerTurn;
@@ -30,5 +30,5 @@ protected:
 public:
 	// Returns the speed of the ship
 	int32 GetSquaresPerTurn();
-	
+
 };

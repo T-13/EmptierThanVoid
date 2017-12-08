@@ -12,7 +12,6 @@ void UETVWeaponSlot::Init(float Size, float Weight)
 {
 	MaxCarryWeight = Weight;
 	MaxCarrySize = Size;
-	//Weapon = nullptr;
 }
 
 bool UETVWeaponSlot::DoesWeaponFit(AETVWeapon * NewWeapon)

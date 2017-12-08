@@ -23,22 +23,19 @@ public:
 
 protected:
 	// If ship has a hyperdrive
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship|Fighter")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship|Capital")
 	bool HasHyperdrive;
 
 	// Affects damage done by laser
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Action|Target", meta = (ClampMin = "0.0"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship|Capital", meta = (ClampMin = "0.0"))
 	float LaserResistance;
 
 	// Number of hangars smaller ships can go into and repair
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Action|Target", meta = (ClampMin = "0"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship|Capital", meta = (ClampMin = "0"))
 	int32 NumOfHangars;
 
 public:
 	// TODO Add methods
 	// UseHyperdrive(int32 x, int32 y);
 	// RepairShipInHangar(AETVShip ship, int32 hangar);
-	
-	
-	
 };

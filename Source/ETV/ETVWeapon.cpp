@@ -47,7 +47,7 @@ void AETVWeapon::InitRandom(FName NewName, int32 PowerLvl)
 /* This will be added later
 TArray<int32> AETVWeapon::GetAngle()
 {
-    return Angle;
+	return Angle;
 }*/
 
 float AETVWeapon::GetWeight()
@@ -63,7 +63,7 @@ float AETVWeapon::GetSize()
 
 int32 AETVWeapon::GetReport()
 {
-    return int32();
+	return int32();
 }
 
 int32 AETVWeapon::GetType()

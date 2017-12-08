@@ -327,19 +327,19 @@ void AETVGameModeBase::SpawnShip(int32 x, int32 y, UPaperTileSet* type)
 		for (int32 i = 0; i < 4; i++) {
 			if (i == 0)  // Laser
 			{
-				SpawnWeapon(x, y, CapitalShip, AETVWeapon::DamageHull);
+				SpawnWeapon(x, y, CapitalShip, AETVWeapon::DamageHull, 200);
 			}
 			else if (i == 1) // Torpedo
 			{
-				SpawnWeapon(x, y, CapitalShip, AETVWeapon::DamageShieldThenHull);
+				SpawnWeapon(x, y, CapitalShip, AETVWeapon::DamageShieldThenHull, 200);
 			}
 			else if (i == 2) // RepairArm
 			{
-				SpawnWeapon(x, y, CapitalShip, AETVWeapon::HealHull);
+				SpawnWeapon(x, y, CapitalShip, AETVWeapon::HealHull, 200);
 			}
 			else if (i == 3) // ShieldBattery
 			{
-				SpawnWeapon(x, y, CapitalShip, AETVWeapon::HealShield);
+				SpawnWeapon(x, y, CapitalShip, AETVWeapon::HealShield, 200);
 			}
 		}
 		CapitalShip->SetActionsForWeapons();
@@ -358,15 +358,15 @@ void AETVGameModeBase::SpawnShip(int32 x, int32 y, UPaperTileSet* type)
 		for (int32 i = 0; i < 3; i++) {
 			if (i == 0)  // Laser
 			{
-				SpawnWeapon(x, y, FighterShip, AETVWeapon::DamageHull);
+				SpawnWeapon(x, y, FighterShip, AETVWeapon::DamageHull, 100);
 			}
 			else if (i == 1) // Torpedo
 			{
-				SpawnWeapon(x, y, FighterShip, AETVWeapon::DamageShieldThenHull);
+				SpawnWeapon(x, y, FighterShip, AETVWeapon::DamageShieldThenHull, 100);
 			}
 			else if (i == 2) // ShieldBattery
 			{
-				SpawnWeapon(x, y, FighterShip, AETVWeapon::HealShield);
+				SpawnWeapon(x, y, FighterShip, AETVWeapon::HealShield, 100);
 			}
 		}
 		FighterShip->SetActionsForWeapons();
@@ -374,9 +374,10 @@ void AETVGameModeBase::SpawnShip(int32 x, int32 y, UPaperTileSet* type)
 	}
 }
 
-void AETVGameModeBase::SpawnWeapon(int32 NewX, int32 NewY, AETVShip* Ship, int32 type)
+void AETVGameModeBase::SpawnWeapon(int32 NewX, int32 NewY, AETVShip* Ship, int32 type, int32 level)
 {
 	UETVWeaponSlot* WeaponSlot = NewObject<UETVWeaponSlot>();
+	WeaponSlot->Init(level, level);
 
 	// Vector for spawn location based on where TileSet is in TileMap
 	const FVector LocDim = GetPosition(NewX, NewY);
@@ -393,8 +394,8 @@ void AETVGameModeBase::SpawnWeapon(int32 NewX, int32 NewY, AETVShip* Ship, int32
 		Laser = GetWorld()->SpawnActor<AETVWeaponLaser>(LocDim, Rotator, SpawnInfo);
 
 		do {
-			Laser->InitRandom("Laser", 100);
-		} while (WeaponSlot->DoesWeaponFit(Laser));
+			Laser->InitRandom("Laser", level);
+		} while (!WeaponSlot->DoesWeaponFit(Laser));
 		WeaponSlot->FitWeapon(Laser);
 		Ship->AddWeapon(WeaponSlot);
 	}
@@ -404,8 +405,8 @@ void AETVGameModeBase::SpawnWeapon(int32 NewX, int32 NewY, AETVShip* Ship, int32
 		Torpedo = GetWorld()->SpawnActor<AETVWeaponTorpedo>(LocDim, Rotator, SpawnInfo);
 
 		do {
-			Torpedo->InitRandom("Torpedo", 100);
-		} while (WeaponSlot->DoesWeaponFit(Torpedo));
+			Torpedo->InitRandom("Torpedo", level);
+		} while (!WeaponSlot->DoesWeaponFit(Torpedo));
 		WeaponSlot->FitWeapon(Torpedo);
 		Ship->AddWeapon(WeaponSlot);
 	}
@@ -415,8 +416,8 @@ void AETVGameModeBase::SpawnWeapon(int32 NewX, int32 NewY, AETVShip* Ship, int32
 		RepairArm = GetWorld()->SpawnActor<AETVWeaponRepairArm>(LocDim, Rotator, SpawnInfo);
 
 		do {
-			RepairArm->InitRandom("Torpedo", 100);
-		} while (WeaponSlot->DoesWeaponFit(RepairArm));
+			RepairArm->InitRandom("RepairArm", level);
+		} while (!WeaponSlot->DoesWeaponFit(RepairArm));
 		WeaponSlot->FitWeapon(RepairArm);
 		Ship->AddWeapon(WeaponSlot);
 	}
@@ -426,8 +427,8 @@ void AETVGameModeBase::SpawnWeapon(int32 NewX, int32 NewY, AETVShip* Ship, int32
 		ShieldBattery = GetWorld()->SpawnActor<AETVWeaponShieldBattery>(LocDim, Rotator, SpawnInfo);
 
 		do {
-			ShieldBattery->InitRandom("Torpedo", 100);
-		} while (WeaponSlot->DoesWeaponFit(ShieldBattery));
+			ShieldBattery->InitRandom("ShieldBattery", level);
+		} while (!WeaponSlot->DoesWeaponFit(ShieldBattery));
 		WeaponSlot->FitWeapon(ShieldBattery);
 		Ship->AddWeapon(WeaponSlot);
 	}

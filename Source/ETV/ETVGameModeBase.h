@@ -162,7 +162,7 @@ public:
 
 	// Spawn WeaponActor for Ship
 	UFUNCTION()
-	void SpawnWeapon(int32 NewX, int32 NewY, AETVShip* Ship, int32 type);
+	void SpawnWeapon(int32 NewX, int32 NewY, AETVShip* Ship, int32 type, int32 level);
 
 	// Get Ships Actor from passing in Tiles x and y
 	UFUNCTION()

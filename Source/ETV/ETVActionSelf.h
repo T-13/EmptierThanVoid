@@ -28,4 +28,6 @@ public:
     virtual bool IsSafe();
 
     bool CanPerform() override;
+
+	bool Activate() override;
 };

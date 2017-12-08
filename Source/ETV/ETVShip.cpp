@@ -1,11 +1,9 @@
-﻿// Copyright (C) Team13. All rights reserved.
+// Copyright (C) Team13. All rights reserved.
 
 #include "ETVShip.h"
 #include "UserWidget.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
-#include "ETVActionTarget_Fire.h"
-#include "ETVActionTarget_Move.h"
 
 // Sets default values
 AETVShip::AETVShip() : Super()
@@ -45,15 +43,14 @@ void AETVShip::AddWeapon(UETVWeaponSlot * Weapon)
 	Weapons.Add(Weapon);
 }
 
-void AETVShip::SetActionsForWeapons()
+void AETVShip::AddAction(UETVAction* Action)
 {
-	for (UETVWeaponSlot* w : Weapons) {
-		UETVActionTarget_Fire *Fire = NewObject<UETVActionTarget_Fire>();
-		Actions.Add(Fire);
-		// TODO::Add weapon to Action
-	}
-	UETVActionTarget_Move *Move = NewObject<UETVActionTarget_Move>();
-	Actions.Add(Move);
+	Actions.Add(Action);
+}
+
+TArray<UETVWeaponSlot*> AETVShip::GetWeapons()
+{
+	return Weapons;
 }
 
 void AETVShip::RechargeShields()

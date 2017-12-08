@@ -1,4 +1,4 @@
-﻿// Copyright (C) Team13. All rights reserved.
+// Copyright (C) Team13. All rights reserved.
 
 #pragma once
 

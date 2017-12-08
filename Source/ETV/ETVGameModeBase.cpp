@@ -1,10 +1,12 @@
-﻿// Copyright (C) Team13. All rights reserved.
+// Copyright (C) Team13. All rights reserved.
 
 #include "ETVGameModeBase.h"
 #include "ETVWeaponLaser.h"
 #include "ETVWeaponTorpedo.h"
 #include "ETVWeaponRepairArm.h"
 #include "ETVWeaponShieldBattery.h"
+#include "ETVActionTarget_Fire.h"
+#include "ETVActionTarget_Move.h"
 
 // Sets default values
 AETVGameModeBase::AETVGameModeBase()
@@ -342,7 +344,7 @@ void AETVGameModeBase::SpawnShip(int32 x, int32 y, UPaperTileSet* type)
 				SpawnWeapon(x, y, CapitalShip, AETVWeapon::HealShield, 200);
 			}
 		}
-		CapitalShip->SetActionsForWeapons();
+		SpawnActions(CapitalShip);
 		Ships.Add(CapitalShip);
 	}
 	else if (type == PlayerFighterShip || type == EnemyFighterShip) {
@@ -369,7 +371,7 @@ void AETVGameModeBase::SpawnShip(int32 x, int32 y, UPaperTileSet* type)
 				SpawnWeapon(x, y, FighterShip, AETVWeapon::HealShield, 100);
 			}
 		}
-		FighterShip->SetActionsForWeapons();
+		SpawnActions(FighterShip);
 		Ships.Add(FighterShip);
 	}
 }
@@ -434,7 +436,21 @@ void AETVGameModeBase::SpawnWeapon(int32 NewX, int32 NewY, AETVShip* Ship, int32
 	}
 }
 
-AETVShip * AETVGameModeBase::GetShipActor(int32 x, int32 y)
+void AETVGameModeBase::SpawnActions(AETVShip* Ship)
+{
+	for (UETVWeaponSlot* w : Ship->GetWeapons())
+	{
+		UETVActionTarget_Fire *Fire = NewObject<UETVActionTarget_Fire>();
+		Fire->Init(Ship, w->GetWeapon());
+		Ship->AddAction(Fire);
+	}
+
+	UETVActionTarget_Move *Move = NewObject<UETVActionTarget_Move>();
+	Move->Init(Ship, nullptr);
+	Ship->AddAction(Move);
+}
+
+AETVShip* AETVGameModeBase::GetShipActor(int32 x, int32 y)
 {
 	const FVector LocDim = GetPosition(x, y);
 
@@ -571,9 +587,8 @@ void AETVGameModeBase::OnReleasedMapTile()
 
 }
 
-void AETVGameModeBase::StartTargeting(AETVShip* TargetingInstigator, UETVActionTarget* Action)
+void AETVGameModeBase::StartTargeting(UETVActionTarget* Action)
 {
-	TargetingInstigator = TargetingInstigator;
 	SelectedAction = Action;
 
 	bTargeting = true;
@@ -584,16 +599,17 @@ void AETVGameModeBase::StopTargeting()
 	bTargeting = false;
 
 	// Set previous tile variables to invalid
-	CurrentTile.Invalidate();
 	LastTile.Invalidate();
 
+	// Make sure nothing stopped targeting
 	if (SelectedAction != nullptr)
 	{
-		// TODO
 		// Get ship on last tile
-		FPaperTileInfo TileInfoShip = TileMapComp->GetTile(LastTile.X, LastTile.Y, EETVTileLayer::Ship);
+		AETVShip* TileShipActor = GetShipActor(CurrentTile.X, CurrentTile.Y);
 
 		//SelectedAction->SetTarget();
 		SelectedAction->Perform();
 	}
+
+	CurrentTile.Invalidate();
 }

@@ -37,5 +37,6 @@ public:
 	virtual bool IsTargetValid(TSubclassOf<UObject> Target);
 
 	bool CanPerform() override;
+	bool Activate() override;
 	void Perform() override;
 };

@@ -17,10 +17,12 @@ bool UETVActionTarget_Fire::CanPerform()
 
 void UETVActionTarget_Fire::ApplyEffectsTarget()
 {
+	Super::ApplyEffectsTarget();
 	// TODO Lower health, show explosion animation
 }
 
 void UETVActionTarget_Fire::ApplyEffectsSelf()
 {
+	Super::ApplyEffectsSelf();
 	// TODO Lower ammo count, recharge or similar
 }

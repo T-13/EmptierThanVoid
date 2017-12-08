@@ -1,4 +1,4 @@
-// Copyright (C) Team13. All rights reserved.
+﻿// Copyright (C) Team13. All rights reserved.
 
 #pragma once
 
@@ -19,10 +19,10 @@ public:
 	// Sets default values for this actor's properties
 	AETVWeapon();
 	// Construct the weapon with the specified parameters
-	AETVWeapon(FName NewName, float MaximumHP, float Dmg, float WeaponWeight, float WeaponSize, int32 Range);
+	virtual void Init(FName NewName, float MaximumHP, float Dmg, float WeaponWeight, float WeaponSize, int32 Range);
 
 	// Construct a random weapon depending on the Power LVL
-	AETVWeapon(FName NewName, int32 PowerLvl);
+	virtual void InitRandom(FName NewName, int32 PowerLvl);
 
 protected:
 	// Display weapon's name

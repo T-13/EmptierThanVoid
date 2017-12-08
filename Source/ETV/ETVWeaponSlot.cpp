@@ -1,4 +1,4 @@
-// Copyright (C) Team13. All rights reserved.
+﻿// Copyright (C) Team13. All rights reserved.
 
 #include "ETVWeaponSlot.h"
 
@@ -8,11 +8,11 @@ UETVWeaponSlot::UETVWeaponSlot() : Super()
 	Weapon = nullptr;
 }
 // Constructs the WeaponSlot with specified parameters
-UETVWeaponSlot::UETVWeaponSlot(float Size, float Weight) : Super()
+void UETVWeaponSlot::Init(float Size, float Weight)
 {
 	MaxCarryWeight = Weight;
 	MaxCarrySize = Size;
-	Weapon = nullptr;
+	//Weapon = nullptr;
 }
 
 bool UETVWeaponSlot::DoesWeaponFit(AETVWeapon * NewWeapon)

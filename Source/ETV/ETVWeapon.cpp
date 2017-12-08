@@ -1,4 +1,4 @@
-// Copyright (C) Team13. All rights reserved.
+﻿// Copyright (C) Team13. All rights reserved.
 
 #include "ETVWeapon.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -7,7 +7,7 @@ AETVWeapon::AETVWeapon() : Super()
 {
 }
 
-AETVWeapon::AETVWeapon(FName NewName, float MaximumHP, float Dmg, float WeaponWeight, float WeaponSize, int32 Range) : Super()
+void AETVWeapon::Init(FName NewName, float MaximumHP, float Dmg, float WeaponWeight, float WeaponSize, int32 Range)
 {
 	Name = NewName;
 	MaximumHealthPoints = MaximumHP;
@@ -17,7 +17,7 @@ AETVWeapon::AETVWeapon(FName NewName, float MaximumHP, float Dmg, float WeaponWe
 	FiringRange = Range;
 }
 
-AETVWeapon::AETVWeapon(FName NewName, int32 PowerLvl) : Super()
+void AETVWeapon::InitRandom(FName NewName, int32 PowerLvl)
 {
 	if (PowerLvl < 50)
 		PowerLvl = 50;
@@ -32,12 +32,12 @@ AETVWeapon::AETVWeapon(FName NewName, int32 PowerLvl) : Super()
 	int32 DMGRangeMax = PowerLvl + 25;
 
 	int32 ReqRangeMin = PowerLvl / 10;
-	int32 ReqRangeMax = ReqRangeMin*2;
+	int32 ReqRangeMax = ReqRangeMin * 2;
 
 	Name = NewName;
 
 	MaximumHealthPoints = FMath::RandRange(DMGRangeMin, DMGRangeMax);
-	HealthPoints = MaximumHealthPoints;	
+	HealthPoints = MaximumHealthPoints;
 	Damage = FMath::RoundToInt(FMath::RandRange(DMGRangeMin, DMGRangeMax) / AvgShotsToKill);
 
 	Size = FMath::RandRange(ReqRangeMin, ReqRangeMax);

@@ -1,4 +1,4 @@
-// Copyright (C) Team13. All rights reserved.
+﻿// Copyright (C) Team13. All rights reserved.
 
 #pragma once
 
@@ -19,7 +19,9 @@ public:
 	// Sets default values for this actor's properties
 	UETVWeaponSlot();
 	// Constructs the WeaponSlot with specified parameters
-	UETVWeaponSlot(float Size, float Weight);
+
+	void Init(float Size, float Weight);
+
 
 protected:
 	// The weapon holstered in this slot
@@ -48,6 +50,5 @@ public:
 	AETVWeapon* GetWeapon();
 
 	// Returns true if weapon is slotted and false otherwise
-	bool HasWeapon();
-	
+	bool HasWeapon();	
 };

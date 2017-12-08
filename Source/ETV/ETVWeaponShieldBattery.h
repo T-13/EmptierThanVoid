@@ -1,4 +1,4 @@
-// Copyright (C) Team13. All rights reserved.
+﻿// Copyright (C) Team13. All rights reserved.
 
 #pragma once
 
@@ -18,10 +18,10 @@ public:
 	// Sets default values for this actor's properties
 	AETVWeaponShieldBattery();
 	// Construct the weapon with the specified parameters
-	AETVWeaponShieldBattery(FName NewName, float MaximumHP, float Dmg, float WeaponWeight, float WeaponSize, int32 Range);
+	// AETVWeaponShieldBattery(FName NewName, float MaximumHP, float Dmg, float WeaponWeight, float WeaponSize, int32 Range);
 
 	// Construct a random weapon depending on the Power LVL
-	AETVWeaponShieldBattery(FName NewName, int32 PowerLvl);
+	// AETVWeaponShieldBattery(FName NewName, int32 PowerLvl);
 	
 	
 };

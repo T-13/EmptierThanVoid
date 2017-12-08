@@ -1,4 +1,4 @@
-// Copyright (C) Team13. All rights reserved.
+﻿// Copyright (C) Team13. All rights reserved.
 
 #include "ETVWeaponTorpedo.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -8,16 +8,16 @@ AETVWeaponTorpedo::AETVWeaponTorpedo() : Super()
 	Type = AETVWeapon::DamageHull;
 }
 
-AETVWeaponTorpedo::AETVWeaponTorpedo(FName NewName, float MaximumHP, float Dmg, float WeaponWeight, float WeaponSize, int32 Range, int32 Speed) : Super(NewName, MaximumHP, Dmg, WeaponWeight,  WeaponSize, Range)
+void AETVWeaponTorpedo::Init(FName NewName, float MaximumHP, float Dmg, float WeaponWeight, float WeaponSize, int32 Range, int32 Speed)
 {
-	Type = AETVWeapon::DamageHull;
+	Super::Init(NewName, MaximumHP, Dmg, WeaponWeight, WeaponSize, Range);
 
 	SquaresPerTurn = Speed;
 }
 
-AETVWeaponTorpedo::AETVWeaponTorpedo(FName NewName, int32 PowerLvl) : Super(NewName, PowerLvl)
+void AETVWeaponTorpedo::InitRandom(FName NewName, int32 PowerLvl)
 {
-	Type = AETVWeapon::DamageHull;
+	Super::InitRandom(NewName, PowerLvl);
 
 	if (PowerLvl < 50)
 		PowerLvl = 50;

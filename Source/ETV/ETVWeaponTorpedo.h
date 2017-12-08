@@ -1,4 +1,4 @@
-// Copyright (C) Team13. All rights reserved.
+﻿// Copyright (C) Team13. All rights reserved.
 
 #pragma once
 
@@ -13,16 +13,16 @@ UCLASS()
 class ETV_API AETVWeaponTorpedo : public AETVWeapon
 {
 	GENERATED_BODY()
-	
+
 public:
 	// Sets default values for this actor's properties
 	AETVWeaponTorpedo();
 	// Construct the weapon with the specified parameters
-	AETVWeaponTorpedo(FName NewName, float MaximumHP, float Dmg, float WeaponWeight, float WeaponSize, int32 Range, int32 Speed);
+	void Init(FName NewName, float MaximumHP, float Dmg, float WeaponWeight, float WeaponSize, int32 Range, int32 Speed);
 
 	// Construct a random weapon depending on the Power LVL
-	AETVWeaponTorpedo(FName NewName, int32 PowerLvl);
-	
+	void InitRandom(FName NewName, int32 PowerLvl) override;
+
 protected:
 	// The speed of the sheep
 	int32 SquaresPerTurn;
@@ -30,5 +30,5 @@ protected:
 public:
 	// Returns the speed of the ship
 	int32 GetSquaresPerTurn();
-	
+
 };

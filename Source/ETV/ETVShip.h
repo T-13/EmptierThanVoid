@@ -1,4 +1,4 @@
-// Copyright (C) Team13. All rights reserved.
+﻿// Copyright (C) Team13. All rights reserved.
 
 #pragma once
 
@@ -16,6 +16,15 @@ enum class EETVShipType : uint8
 	EnemyShip	UMETA(DisplayName = "Enemy")
 };
 
+UENUM(BlueprintType)
+enum class EETVShipClass : uint8
+{
+	Capital	UMETA(DisplayName = "Capital"),
+	Fighter	UMETA(DisplayName = "Fighter"),
+	Repair UMETA(DisplayName = "Repair")
+};
+
+
 
 /**
 * Abstract base Ship class.
@@ -28,6 +37,8 @@ class ETV_API AETVShip : public APaperSpriteActor
 public:
 	// Sets default values for this actor's properties
 	AETVShip();
+	virtual void Init(FName NewName, int32 HP, int32 MaxHP, int32 ShieldP, int32 NewShieldRechargeTime, int32 NewSize, int32 NewMoveRange, int32 Speed);
+
 
 protected:
 	// Called when the game starts or when spawned
@@ -56,7 +67,10 @@ protected:
 	int32 ShieldRechargeTime;
 
 	// Weapon slots
-	TArray<UETVWeaponSlot> Weapons;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship")
+	TArray<UETVWeaponSlot*> Weapons;
+
+	UETVWeaponSlot* WeaponSlot;
 
 	// Integers (x,y) that represent a point on a sprite where the attachement goes
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship")
@@ -75,7 +89,8 @@ protected:
 	TArray<int32> Fields;
 
 	// Actions available on ship
-	TArray<UETVAction> Actions;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship")
+	TArray<UETVAction*> Actions;
 
 	// How fast ship moves
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship", meta = (ClampMin = "1.0"))
@@ -97,9 +112,26 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship")
 	EETVShipType Type;
 
+	// Ship class
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship")
+	EETVShipClass Class;
+
+	// Current X and Y position
+	UPROPERTY()
+	int32 X;
+
+	UPROPERTY()
+	int32 Y;
+
 public:
 	UFUNCTION()
-	virtual void GetCurrentPosition();
+	void SetCurrentPosition(int32 NewX, int32 NewY);
+
+	UFUNCTION()
+	void AddWeapon(UETVWeaponSlot* Weapon);
+
+	UFUNCTION()
+	void SetActionsForWeapons();
 
 	UFUNCTION()
 	virtual void RechargeShields();

@@ -1,6 +1,10 @@
-// Copyright (C) Team13. All rights reserved.
+﻿// Copyright (C) Team13. All rights reserved.
 
 #include "ETVGameModeBase.h"
+#include "ETVWeaponLaser.h"
+#include "ETVWeaponTorpedo.h"
+#include "ETVWeaponRepairArm.h"
+#include "ETVWeaponShieldBattery.h"
 
 // Sets default values
 AETVGameModeBase::AETVGameModeBase()
@@ -309,23 +313,125 @@ void AETVGameModeBase::SpawnShip(int32 x, int32 y, UPaperTileSet* type)
 
 	// Spawning ShipActor based on class
 	if (type == PlayerCapitalShip || type == EnemyCapitalShip) {
-		Ship = GetWorld()->SpawnActor<AETVShipCapital>(LocDim, Rotator, SpawnInfo);
+		CapitalShip = GetWorld()->SpawnActor<AETVShipCapital>(LocDim, Rotator, SpawnInfo);
+		CapitalShip->Init("Cap", 100, 100, 100, 10, 10, 10, 10, true, 1.0f, 1);
+		CapitalShip->SetContextMenu(ContextMenu);
+		CapitalShip->GetRenderComponent()->SetMobility(EComponentMobility::Movable);
+		CapitalShip->GetRenderComponent()->SetSprite(Sprite);
+		
+		// Setting sprite color to transparent
+		CapitalShip->GetRenderComponent()->SetSpriteColor(FLinearColor(1.0f, 1.0f, 1.0f, 0.0f));
+		Ships.Add(CapitalShip);
 		if (type == EnemyCapitalShip)
-			Ship->SetTypeToEnemy();
+			CapitalShip->SetTypeToEnemy();
+		for (int32 i = 0; i < 4; i++) {
+			if (i == 0)  // Laser
+			{
+				SpawnWeapon(x, y, CapitalShip, AETVWeapon::DamageHull, 200);
+			}
+			else if (i == 1) // Torpedo
+			{
+				SpawnWeapon(x, y, CapitalShip, AETVWeapon::DamageShieldThenHull, 200);
+			}
+			else if (i == 2) // RepairArm
+			{
+				SpawnWeapon(x, y, CapitalShip, AETVWeapon::HealHull, 200);
+			}
+			else if (i == 3) // ShieldBattery
+			{
+				SpawnWeapon(x, y, CapitalShip, AETVWeapon::HealShield, 200);
+			}
+		}
+		CapitalShip->SetActionsForWeapons();
+		Ships.Add(CapitalShip);
 	}
 	else if (type == PlayerFighterShip || type == EnemyFighterShip) {
-		Ship = GetWorld()->SpawnActor<AETVShipFighter>(LocDim, Rotator, SpawnInfo);
+		FighterShip = GetWorld()->SpawnActor<AETVShipFighter>(LocDim, Rotator, SpawnInfo);
+		FighterShip->Init("Fighter", 100, 100, 100, 10, 10, 10, 10, 1.0f, 2.0f);
+		FighterShip->SetContextMenu(ContextMenu);
+		FighterShip->GetRenderComponent()->SetMobility(EComponentMobility::Movable);
+		FighterShip->GetRenderComponent()->SetSprite(Sprite);		
+		// Setting sprite color to transparent
+		FighterShip->GetRenderComponent()->SetSpriteColor(FLinearColor(1.0f, 1.0f, 1.0f, 0.0f));
 		if (type == EnemyFighterShip)
-			Ship->SetTypeToEnemy();
+			FighterShip->SetTypeToEnemy();
+		for (int32 i = 0; i < 3; i++) {
+			if (i == 0)  // Laser
+			{
+				SpawnWeapon(x, y, FighterShip, AETVWeapon::DamageHull, 100);
+			}
+			else if (i == 1) // Torpedo
+			{
+				SpawnWeapon(x, y, FighterShip, AETVWeapon::DamageShieldThenHull, 100);
+			}
+			else if (i == 2) // ShieldBattery
+			{
+				SpawnWeapon(x, y, FighterShip, AETVWeapon::HealShield, 100);
+			}
+		}
+		FighterShip->SetActionsForWeapons();
+		Ships.Add(FighterShip);
 	}
-	Ship->SetContextMenu(ContextMenu);
-	Ship->GetRenderComponent()->SetMobility(EComponentMobility::Movable);
-	Ship->GetRenderComponent()->SetSprite(Sprite);
+}
 
-	// Setting sprite color to transparent
-	Ship->GetRenderComponent()->SetSpriteColor(FLinearColor(1.0f, 1.0f, 1.0f, 0.0f));
+void AETVGameModeBase::SpawnWeapon(int32 NewX, int32 NewY, AETVShip* Ship, int32 type, int32 level)
+{
+	UETVWeaponSlot* WeaponSlot = NewObject<UETVWeaponSlot>();
+	WeaponSlot->Init(level, level);
 
-	Ships.Add(Ship);
+	// Vector for spawn location based on where TileSet is in TileMap
+	const FVector LocDim = GetPosition(NewX, NewY);
+
+	// Actor spawn parameters
+	const FActorSpawnParameters SpawnInfo;
+
+	// Rotate upwards to face the top-down camera
+	const FRotator Rotator(0, 0, -90);
+	// Spawning ShipActor based on class
+	if (type == AETVWeapon::DamageShieldThenHull)
+	{
+		AETVWeaponLaser* Laser;
+		Laser = GetWorld()->SpawnActor<AETVWeaponLaser>(LocDim, Rotator, SpawnInfo);
+
+		do {
+			Laser->InitRandom("Laser", level);
+		} while (!WeaponSlot->DoesWeaponFit(Laser));
+		WeaponSlot->FitWeapon(Laser);
+		Ship->AddWeapon(WeaponSlot);
+	}
+	else if (type == AETVWeapon::DamageHull)
+	{
+		AETVWeaponTorpedo* Torpedo;
+		Torpedo = GetWorld()->SpawnActor<AETVWeaponTorpedo>(LocDim, Rotator, SpawnInfo);
+
+		do {
+			Torpedo->InitRandom("Torpedo", level);
+		} while (!WeaponSlot->DoesWeaponFit(Torpedo));
+		WeaponSlot->FitWeapon(Torpedo);
+		Ship->AddWeapon(WeaponSlot);
+	}
+	else if (type == AETVWeapon::HealHull)
+	{
+		AETVWeaponRepairArm* RepairArm;
+		RepairArm = GetWorld()->SpawnActor<AETVWeaponRepairArm>(LocDim, Rotator, SpawnInfo);
+
+		do {
+			RepairArm->InitRandom("RepairArm", level);
+		} while (!WeaponSlot->DoesWeaponFit(RepairArm));
+		WeaponSlot->FitWeapon(RepairArm);
+		Ship->AddWeapon(WeaponSlot);
+	}
+	else if (type == AETVWeapon::HealShield)
+	{
+		AETVWeaponShieldBattery* ShieldBattery;
+		ShieldBattery = GetWorld()->SpawnActor<AETVWeaponShieldBattery>(LocDim, Rotator, SpawnInfo);
+
+		do {
+			ShieldBattery->InitRandom("ShieldBattery", level);
+		} while (!WeaponSlot->DoesWeaponFit(ShieldBattery));
+		WeaponSlot->FitWeapon(ShieldBattery);
+		Ship->AddWeapon(WeaponSlot);
+	}
 }
 
 AETVShip * AETVGameModeBase::GetShipActor(int32 x, int32 y)

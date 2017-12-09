@@ -92,7 +92,7 @@ void AETVGameModeBase::Tick(float DeltaTime)
 	}
 
 	// Targeting
-	if (bTargeting)
+	if (bTargeting && SelectedAction != nullptr)
 	{
 		FETVTile MouseOverTile;
 		GetMouseOverTile(MouseOverTile);
@@ -121,7 +121,7 @@ void AETVGameModeBase::Tick(float DeltaTime)
 			// Set target
 			SelectedAction->SetTarget(TargetActor, CurrentTile.X, CurrentTile.Y);
 
-			TileInfo.PackedTileIndex = SelectedAction != nullptr && SelectedAction->CanPerform() ? EETVTargetValidity::Valid : EETVTargetValidity::Invalid;
+			TileInfo.PackedTileIndex =  SelectedAction->CanPerform() ? EETVTargetValidity::Valid : EETVTargetValidity::Invalid;
 			//TileInfo.PackedTileIndex = FMath::RandRange(0, 1); // Debug
 			//TileInfo.PackedTileIndex = EETVTargetValidity::Valid; // Debug
 			CurrentTile.Index = TileInfo.PackedTileIndex;

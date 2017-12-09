@@ -7,6 +7,8 @@
 // Sets default values
 UETVActionTarget_Move::UETVActionTarget_Move() : Super()
 {
+	Name = FName(TEXT("Move"));
+
 	// Set required target type to tile
 	RequiredTargetType = APaperTileMapActor::StaticClass();
 }

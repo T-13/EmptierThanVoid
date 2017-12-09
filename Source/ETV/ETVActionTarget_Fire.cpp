@@ -6,6 +6,8 @@
 // Sets default values
 UETVActionTarget_Fire::UETVActionTarget_Fire() : Super()
 {
+	Name = FName(TEXT("Fire"));
+
 	// Set required target type to general ship
 	RequiredTargetType = AETVShip::StaticClass();
 }

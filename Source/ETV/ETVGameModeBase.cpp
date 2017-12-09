@@ -630,6 +630,7 @@ void AETVGameModeBase::StopTargeting()
 	// Make sure nothing stopped targeting
 	if (SelectedAction != nullptr)
 	{
+		// Double check that if we can perform, then perform
 		if (SelectedAction->CanPerform())
 		{
 			SelectedAction->Perform();

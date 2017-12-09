@@ -109,8 +109,21 @@ void AETVGameModeBase::Tick(float DeltaTime)
 			{
 				TileInfo.TileSet = TileSetTarget;
 			}
+
+			// Get ship on currently hovered tile
+			AActor* TargetActor = GetShipActor(CurrentTile.X, CurrentTile.Y);
+			// Get tile if no ship on that tile
+			if (TargetActor == nullptr)
+			{
+				TargetActor = TileMapActor;
+			}
+
+			// Set target
+			SelectedAction->SetTarget(TargetActor, CurrentTile.X, CurrentTile.Y);
+
 			TileInfo.PackedTileIndex = SelectedAction != nullptr && SelectedAction->CanPerform() ? EETVTargetValidity::Valid : EETVTargetValidity::Invalid;
 			//TileInfo.PackedTileIndex = FMath::RandRange(0, 1); // Debug
+			//TileInfo.PackedTileIndex = EETVTargetValidity::Valid; // Debug
 			CurrentTile.Index = TileInfo.PackedTileIndex;
 			TileMapComp->SetTile(CurrentTile.X, CurrentTile.Y, EETVTileLayer::Target, TileInfo);
 
@@ -323,9 +336,7 @@ void AETVGameModeBase::SpawnShip(int32 x, int32 y, UPaperTileSet* type)
 		
 		// Setting sprite color to transparent
 		CapitalShip->GetRenderComponent()->SetSpriteColor(FLinearColor(1.0f, 1.0f, 1.0f, 0.0f));
-		Ships.Add(CapitalShip);
-		if (type == EnemyCapitalShip)
-			CapitalShip->SetTypeToEnemy();
+
 		for (int32 i = 0; i < 4; i++) {
 			if (i == 0)  // Laser
 			{
@@ -344,7 +355,12 @@ void AETVGameModeBase::SpawnShip(int32 x, int32 y, UPaperTileSet* type)
 				SpawnWeapon(x, y, CapitalShip, AETVWeapon::HealShield, 200);
 			}
 		}
-		SpawnActions(CapitalShip);
+
+		if (type == EnemyCapitalShip)
+			CapitalShip->SetTypeToEnemy();
+		else
+			SpawnActions(CapitalShip);
+
 		Ships.Add(CapitalShip);
 	}
 	else if (type == PlayerFighterShip || type == EnemyFighterShip) {
@@ -352,11 +368,11 @@ void AETVGameModeBase::SpawnShip(int32 x, int32 y, UPaperTileSet* type)
 		FighterShip->Init("Fighter", 100, 100, 100, 10, 10, 10, 10, 1.0f, 2.0f);
 		FighterShip->SetContextMenu(ContextMenu);
 		FighterShip->GetRenderComponent()->SetMobility(EComponentMobility::Movable);
-		FighterShip->GetRenderComponent()->SetSprite(Sprite);		
+		FighterShip->GetRenderComponent()->SetSprite(Sprite);
+
 		// Setting sprite color to transparent
 		FighterShip->GetRenderComponent()->SetSpriteColor(FLinearColor(1.0f, 1.0f, 1.0f, 0.0f));
-		if (type == EnemyFighterShip)
-			FighterShip->SetTypeToEnemy();
+
 		for (int32 i = 0; i < 3; i++) {
 			if (i == 0)  // Laser
 			{
@@ -371,7 +387,12 @@ void AETVGameModeBase::SpawnShip(int32 x, int32 y, UPaperTileSet* type)
 				SpawnWeapon(x, y, FighterShip, AETVWeapon::HealShield, 100);
 			}
 		}
-		SpawnActions(FighterShip);
+
+		if (type == EnemyFighterShip)
+			FighterShip->SetTypeToEnemy();
+		else
+			SpawnActions(FighterShip);
+
 		Ships.Add(FighterShip);
 	}
 }
@@ -512,6 +533,11 @@ float AETVGameModeBase::GetCurrentTurnPercentage()
 	return 1.0f - CurrentTurnTime / static_cast<float>(TurnTime);
 }
 
+bool AETVGameModeBase::IsTargeting()
+{
+	return bTargeting;
+}
+
 void AETVGameModeBase::GetMouseOverTile(FETVTile& Tile)
 {
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
@@ -604,11 +630,10 @@ void AETVGameModeBase::StopTargeting()
 	// Make sure nothing stopped targeting
 	if (SelectedAction != nullptr)
 	{
-		// Get ship on last tile
-		AETVShip* TileShipActor = GetShipActor(CurrentTile.X, CurrentTile.Y);
-
-		//SelectedAction->SetTarget();
-		SelectedAction->Perform();
+		if (SelectedAction->CanPerform())
+		{
+			SelectedAction->Perform();
+		}
 	}
 
 	CurrentTile.Invalidate();

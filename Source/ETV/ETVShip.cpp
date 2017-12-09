@@ -4,6 +4,7 @@
 #include "UserWidget.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
+#include "ETVGameModeBase.h"
 
 // Sets default values
 AETVShip::AETVShip() : Super()
@@ -63,8 +64,9 @@ void AETVShip::GetReport()
 
 void AETVShip::SpawnContextMenu(AActor *Actor, FKey Key)
 {
+	AETVGameModeBase* GameMode = (AETVGameModeBase*)GetWorld()->GetAuthGameMode();
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-	if (ContextMenuClass != nullptr && !IsContextMenuOpen && !PlayerController->IsPaused())
+	if (ContextMenuClass != nullptr && !GameMode->IsTargeting() && !IsContextMenuOpen && !PlayerController->IsPaused())
 	{
 		CurrentContextMenu = CreateWidget<UETVShipContextMenuWidget>(GetWorld(), ContextMenuClass);
 		CurrentContextMenu->AssignShip(this);
@@ -108,6 +110,16 @@ void AETVShip::SetShields(int32 newValue)
 		ShieldPoints = 0;
 	else
 		ShieldPoints = newValue;
+}
+
+bool AETVShip::CanMove()
+{
+	return ShipSpeed != 0;
+}
+
+bool AETVShip::IsEnemy()
+{
+	return Type == EETVShipType::EnemyShip;
 }
 
 float AETVShip::GetMultiplier()

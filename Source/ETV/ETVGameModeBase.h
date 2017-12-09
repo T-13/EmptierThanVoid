@@ -12,7 +12,6 @@
 #include "ETVShipFighter.h"
 #include "ETVShipRepairShip.h"
 #include "ETVStructTile.h"
-#include "EngineUtils.h"
 #include "GameFramework/GameModeBase.h"
 #include "ETVGameModeBase.generated.h"
 
@@ -191,8 +190,12 @@ public:
 
 
 	/* Targeting */
+	// Get targeting enabled
+	UFUNCTION(BlueprintCallable, Category = "ETV Targeting")
+	bool IsTargeting();
+
 	// Get tile position below mouse pointer
-	UFUNCTION(BlueprintCallable, Category = "ETV Map")
+	UFUNCTION(BlueprintCallable, Category = "ETV Targeting")
 	void GetMouseOverTile(/*out*/ FETVTile& Tile);
 
 	// Target selection effect (Tile Maps don't support animations at this time)

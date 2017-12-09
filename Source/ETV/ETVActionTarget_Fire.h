@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "ETVActionTarget.h"
-#include "ETVShip.h"
 #include "ETVActionTarget_Fire.generated.h"
 
 /**

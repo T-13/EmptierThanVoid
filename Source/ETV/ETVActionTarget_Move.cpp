@@ -1,17 +1,19 @@
 // Copyright (C) Team13. All rights reserved.
 
 #include "ETVActionTarget_Move.h"
+#include "ETVShip.h"
+#include "PaperTileMapActor.h"
 
 // Sets default values
 UETVActionTarget_Move::UETVActionTarget_Move() : Super()
 {
 	// Set required target type to tile
+	RequiredTargetType = APaperTileMapActor::StaticClass();
 }
 
 bool UETVActionTarget_Move::CanPerform()
 {
-	// TODO Check if tile is selected target, check if drives are operable
-	return Super::CanPerform();
+	return Super::CanPerform() && OwnerShip->CanMove();
 }
 
 void UETVActionTarget_Move::ApplyEffectsSelf()

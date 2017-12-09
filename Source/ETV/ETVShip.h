@@ -156,6 +156,12 @@ public:
 	UFUNCTION()
 	void SetShields(int32 newValue);
 
+	UFUNCTION()
+	bool CanMove();
+
+	UFUNCTION()
+	bool IsEnemy();
+
 
 	// Returns a multiplier for the effectiveness of ship's actions depending on its status
 	UFUNCTION()

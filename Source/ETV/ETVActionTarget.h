@@ -13,8 +13,10 @@ UCLASS(Blueprintable)
 class ETV_API UETVActionTarget : public UETVAction
 {
 	GENERATED_BODY()
-	
-	TSubclassOf<UObject> SelectedTarget;
+
+	AActor* SelectedTarget;
+	int32 TileX;
+	int32 TileY;
 	
 public:
 	// Sets default values for this actor's properties
@@ -23,7 +25,7 @@ public:
 protected:
 	// Required type of target
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Action|Target")
-	TSubclassOf<UObject> RequiredTargetType;
+	TSubclassOf<AActor> RequiredTargetType;
 
 	// Chance of failure when action is used
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Action|Target", meta = (ClampMin = "0.0", ClampMax = "100.0"))
@@ -33,8 +35,8 @@ public:
 	UFUNCTION()
 	virtual void ApplyEffectsTarget() {}
 
-	virtual void SetTarget(TSubclassOf<UObject> Target);
-	virtual bool IsTargetValid(TSubclassOf<UObject> Target);
+	virtual void SetTarget(AActor* Target, int32 X, int32 Y);
+	virtual bool IsTargetValid();
 
 	bool CanPerform() override;
 	bool Activate() override;

@@ -40,7 +40,6 @@ bool UETVAction::Activate()
 	if (CanPerform())
 	{
 		Perform();
-
 		return true;
 	}
 	return false;

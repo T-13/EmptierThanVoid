@@ -10,6 +10,11 @@ UETVActionTarget::UETVActionTarget() : Super()
 	FailureChance = 0.0f;
 }
 
+AActor* UETVActionTarget::GetSelectedTarget()
+{
+	return SelectedTarget;
+}
+
 void UETVActionTarget::SetTarget(AActor* Target, int32 X, int32 Y)
 {
 	SelectedTarget = Target;

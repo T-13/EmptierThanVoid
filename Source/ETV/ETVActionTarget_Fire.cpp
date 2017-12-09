@@ -14,7 +14,14 @@ UETVActionTarget_Fire::UETVActionTarget_Fire() : Super()
 
 bool UETVActionTarget_Fire::CanPerform()
 {
-	return Super::CanPerform() && OwnerWeapon != nullptr && OwnerShip->IsEnemy();
+	// Check if a weapon is set
+	if (Super::CanPerform() && OwnerWeapon != nullptr)
+	{
+		// Check if enemy, required type is ship (checked in Super) so casting is safe
+		AETVShip* SelectedShip = Cast<AETVShip>(GetSelectedTarget());
+		return SelectedShip->IsEnemy();
+	}
+	return false;
 }
 
 void UETVActionTarget_Fire::ApplyEffectsTarget()

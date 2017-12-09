@@ -52,7 +52,7 @@ protected:
 
 public:
 	UFUNCTION()
-	virtual void Init(AETVShip* OwnerShipPtr, AETVWeapon* OwnerWeaponPtr);
+	virtual void Init(AETVShip* OwnerShipPtr, AETVWeapon* OwnerWeaponPtr = nullptr);
 
 	UFUNCTION()
 	virtual bool CanPerform();

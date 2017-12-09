@@ -112,7 +112,7 @@ void AETVGameModeBase::Tick(float DeltaTime)
 
 			// Get ship on currently hovered tile
 			AActor* TargetActor = GetShipActor(CurrentTile.X, CurrentTile.Y);
-			// Get tile if no ship on that tile
+			// Get tile if no ship on that location
 			if (TargetActor == nullptr)
 			{
 				TargetActor = TileMapActor;
@@ -467,7 +467,7 @@ void AETVGameModeBase::SpawnActions(AETVShip* Ship)
 	}
 
 	UETVActionTarget_Move *Move = NewObject<UETVActionTarget_Move>();
-	Move->Init(Ship, nullptr);
+	Move->Init(Ship);
 	Ship->AddAction(Move);
 }
 

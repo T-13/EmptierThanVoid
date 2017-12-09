@@ -626,6 +626,7 @@ void AETVGameModeBase::StopTargeting()
 
 	// Set previous tile variables to invalid
 	LastTile.Invalidate();
+	CurrentTile.Invalidate();
 
 	// Make sure nothing stopped targeting
 	if (SelectedAction != nullptr)
@@ -636,6 +637,4 @@ void AETVGameModeBase::StopTargeting()
 			SelectedAction->Perform();
 		}
 	}
-
-	CurrentTile.Invalidate();
 }

@@ -28,7 +28,6 @@ void UETVAction::Init(AETVShip* OwnerShipPtr, AETVWeapon* OwnerWeaponPtr)
 	OwnerWeapon = OwnerWeaponPtr;
 }
 
-
 bool UETVAction::CanPerform()
 {
 	// TODO Check range

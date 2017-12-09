@@ -1,10 +1,12 @@
-﻿// Copyright (C) Team13. All rights reserved.
+// Copyright (C) Team13. All rights reserved.
 
 #include "ETVGameModeBase.h"
 #include "ETVWeaponLaser.h"
 #include "ETVWeaponTorpedo.h"
 #include "ETVWeaponRepairArm.h"
 #include "ETVWeaponShieldBattery.h"
+#include "ETVActionTarget_Fire.h"
+#include "ETVActionTarget_Move.h"
 
 // Sets default values
 AETVGameModeBase::AETVGameModeBase()
@@ -90,7 +92,7 @@ void AETVGameModeBase::Tick(float DeltaTime)
 	}
 
 	// Targeting
-	if (bTargeting)
+	if (bTargeting && SelectedAction != nullptr)
 	{
 		FETVTile MouseOverTile;
 		GetMouseOverTile(MouseOverTile);
@@ -107,8 +109,21 @@ void AETVGameModeBase::Tick(float DeltaTime)
 			{
 				TileInfo.TileSet = TileSetTarget;
 			}
-			TileInfo.PackedTileIndex = SelectedAction != nullptr && SelectedAction->CanPerform() ? EETVTargetValidity::Valid : EETVTargetValidity::Invalid;
+
+			// Get ship on currently hovered tile
+			AActor* TargetActor = GetShipActor(CurrentTile.X, CurrentTile.Y);
+			// Get tile if no ship on that tile
+			if (TargetActor == nullptr)
+			{
+				TargetActor = TileMapActor;
+			}
+
+			// Set target
+			SelectedAction->SetTarget(TargetActor, CurrentTile.X, CurrentTile.Y);
+
+			TileInfo.PackedTileIndex =  SelectedAction->CanPerform() ? EETVTargetValidity::Valid : EETVTargetValidity::Invalid;
 			//TileInfo.PackedTileIndex = FMath::RandRange(0, 1); // Debug
+			//TileInfo.PackedTileIndex = EETVTargetValidity::Valid; // Debug
 			CurrentTile.Index = TileInfo.PackedTileIndex;
 			TileMapComp->SetTile(CurrentTile.X, CurrentTile.Y, EETVTileLayer::Target, TileInfo);
 
@@ -321,9 +336,7 @@ void AETVGameModeBase::SpawnShip(int32 x, int32 y, UPaperTileSet* type)
 		
 		// Setting sprite color to transparent
 		CapitalShip->GetRenderComponent()->SetSpriteColor(FLinearColor(1.0f, 1.0f, 1.0f, 0.0f));
-		Ships.Add(CapitalShip);
-		if (type == EnemyCapitalShip)
-			CapitalShip->SetTypeToEnemy();
+
 		for (int32 i = 0; i < 4; i++) {
 			if (i == 0)  // Laser
 			{
@@ -342,7 +355,12 @@ void AETVGameModeBase::SpawnShip(int32 x, int32 y, UPaperTileSet* type)
 				SpawnWeapon(x, y, CapitalShip, AETVWeapon::HealShield, 200);
 			}
 		}
-		CapitalShip->SetActionsForWeapons();
+
+		if (type == EnemyCapitalShip)
+			CapitalShip->SetTypeToEnemy();
+		else
+			SpawnActions(CapitalShip);
+
 		Ships.Add(CapitalShip);
 	}
 	else if (type == PlayerFighterShip || type == EnemyFighterShip) {
@@ -350,11 +368,11 @@ void AETVGameModeBase::SpawnShip(int32 x, int32 y, UPaperTileSet* type)
 		FighterShip->Init("Fighter", 100, 100, 100, 10, 10, 10, 10, 1.0f, 2.0f);
 		FighterShip->SetContextMenu(ContextMenu);
 		FighterShip->GetRenderComponent()->SetMobility(EComponentMobility::Movable);
-		FighterShip->GetRenderComponent()->SetSprite(Sprite);		
+		FighterShip->GetRenderComponent()->SetSprite(Sprite);
+
 		// Setting sprite color to transparent
 		FighterShip->GetRenderComponent()->SetSpriteColor(FLinearColor(1.0f, 1.0f, 1.0f, 0.0f));
-		if (type == EnemyFighterShip)
-			FighterShip->SetTypeToEnemy();
+
 		for (int32 i = 0; i < 3; i++) {
 			if (i == 0)  // Laser
 			{
@@ -369,7 +387,12 @@ void AETVGameModeBase::SpawnShip(int32 x, int32 y, UPaperTileSet* type)
 				SpawnWeapon(x, y, FighterShip, AETVWeapon::HealShield, 100);
 			}
 		}
-		FighterShip->SetActionsForWeapons();
+
+		if (type == EnemyFighterShip)
+			FighterShip->SetTypeToEnemy();
+		else
+			SpawnActions(FighterShip);
+
 		Ships.Add(FighterShip);
 	}
 }
@@ -434,7 +457,21 @@ void AETVGameModeBase::SpawnWeapon(int32 NewX, int32 NewY, AETVShip* Ship, int32
 	}
 }
 
-AETVShip * AETVGameModeBase::GetShipActor(int32 x, int32 y)
+void AETVGameModeBase::SpawnActions(AETVShip* Ship)
+{
+	for (UETVWeaponSlot* w : Ship->GetWeapons())
+	{
+		UETVActionTarget_Fire *Fire = NewObject<UETVActionTarget_Fire>();
+		Fire->Init(Ship, w->GetWeapon());
+		Ship->AddAction(Fire);
+	}
+
+	UETVActionTarget_Move *Move = NewObject<UETVActionTarget_Move>();
+	Move->Init(Ship, nullptr);
+	Ship->AddAction(Move);
+}
+
+AETVShip* AETVGameModeBase::GetShipActor(int32 x, int32 y)
 {
 	const FVector LocDim = GetPosition(x, y);
 
@@ -494,6 +531,11 @@ void AETVGameModeBase::NextTurn()
 float AETVGameModeBase::GetCurrentTurnPercentage()
 {
 	return 1.0f - CurrentTurnTime / static_cast<float>(TurnTime);
+}
+
+bool AETVGameModeBase::IsTargeting()
+{
+	return bTargeting;
 }
 
 void AETVGameModeBase::GetMouseOverTile(FETVTile& Tile)
@@ -571,9 +613,8 @@ void AETVGameModeBase::OnReleasedMapTile()
 
 }
 
-void AETVGameModeBase::StartTargeting(AETVShip* TargetingInstigator, UETVActionTarget* Action)
+void AETVGameModeBase::StartTargeting(UETVActionTarget* Action)
 {
-	TargetingInstigator = TargetingInstigator;
 	SelectedAction = Action;
 
 	bTargeting = true;
@@ -584,16 +625,17 @@ void AETVGameModeBase::StopTargeting()
 	bTargeting = false;
 
 	// Set previous tile variables to invalid
-	CurrentTile.Invalidate();
 	LastTile.Invalidate();
 
+	// Make sure nothing stopped targeting
 	if (SelectedAction != nullptr)
 	{
-		// TODO
-		// Get ship on last tile
-		FPaperTileInfo TileInfoShip = TileMapComp->GetTile(LastTile.X, LastTile.Y, EETVTileLayer::Ship);
-
-		//SelectedAction->SetTarget();
-		SelectedAction->Perform();
+		// Double check that if we can perform, then perform
+		if (SelectedAction->CanPerform())
+		{
+			SelectedAction->Perform();
+		}
 	}
+
+	CurrentTile.Invalidate();
 }

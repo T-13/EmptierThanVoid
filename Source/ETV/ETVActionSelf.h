@@ -19,13 +19,15 @@ public:
 	UETVActionSelf();
 
 protected:
-    // Required distance from any enemy
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Action|Self", meta = (ClampMin = "0.0"))
-    int32 RequiredSafetyDistance;
+	// Required distance from any enemy
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Action|Self", meta = (ClampMin = "0.0"))
+	int32 RequiredSafetyDistance;
 
 public:
-    UFUNCTION()
-    virtual bool IsSafe();
+	UFUNCTION()
+	virtual bool IsSafe();
 
-    bool CanPerform() override;
+	bool CanPerform() override;
+
+	bool Activate() override;
 };

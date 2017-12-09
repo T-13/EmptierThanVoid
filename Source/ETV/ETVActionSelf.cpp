@@ -11,7 +11,12 @@ UETVActionSelf::UETVActionSelf(): Super()
 
 bool UETVActionSelf::CanPerform()
 {
-    return Super::CanPerform() && IsSafe();
+	return Super::CanPerform() && IsSafe();
+}
+
+bool UETVActionSelf::Activate()
+{
+	return Super::Activate();
 }
 
 

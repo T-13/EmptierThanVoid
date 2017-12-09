@@ -1,4 +1,4 @@
-﻿// Copyright (C) Team13. All rights reserved.
+// Copyright (C) Team13. All rights reserved.
 
 #pragma once
 
@@ -12,7 +12,6 @@
 #include "ETVShipFighter.h"
 #include "ETVShipRepairShip.h"
 #include "ETVStructTile.h"
-#include "EngineUtils.h"
 #include "GameFramework/GameModeBase.h"
 #include "ETVGameModeBase.generated.h"
 
@@ -60,7 +59,6 @@ class ETV_API AETVGameModeBase : public AGameModeBase
 	FETVTile PreDelayTile; // Reset this tile when click animation stops
 
 	UETVActionTarget* SelectedAction;
-	AETVShip* TargetingInstigator;
 
 	// Ship Tiles
 	UPaperTileSet* PlayerCapitalShip;
@@ -164,6 +162,10 @@ public:
 	UFUNCTION()
 	void SpawnWeapon(int32 NewX, int32 NewY, AETVShip* Ship, int32 type, int32 level);
 
+	// Spawn Actions for Ship and Weapons
+	UFUNCTION()
+	void SpawnActions(AETVShip* Ship);
+
 	// Get Ships Actor from passing in Tiles x and y
 	UFUNCTION()
 	AETVShip* GetShipActor(int32 x, int32 y);
@@ -188,8 +190,12 @@ public:
 
 
 	/* Targeting */
+	// Get targeting enabled
+	UFUNCTION(BlueprintCallable, Category = "ETV Targeting")
+	bool IsTargeting();
+
 	// Get tile position below mouse pointer
-	UFUNCTION(BlueprintCallable, Category = "ETV Map")
+	UFUNCTION(BlueprintCallable, Category = "ETV Targeting")
 	void GetMouseOverTile(/*out*/ FETVTile& Tile);
 
 	// Target selection effect (Tile Maps don't support animations at this time)
@@ -202,7 +208,7 @@ public:
 
 	// Starts targeting, handles ETV Action calls and stops targeting after target is selected
 	UFUNCTION(BlueprintCallable, Category = "ETV Targeting")
-	void StartTargeting(UPARAM(ref) AETVShip* ActionInstigator, UPARAM(ref) UETVActionTarget* Action);
+	void StartTargeting(UPARAM(ref) UETVActionTarget* Action);
 
 	// Stops targeting, resetting targeting mode
 	UFUNCTION(BlueprintCallable, Category = "ETV Targeting")

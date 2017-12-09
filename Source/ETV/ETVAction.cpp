@@ -6,11 +6,10 @@
 // Sets default values
 UETVAction::UETVAction()
 {
-	Name = FName(TEXT("UnknownAction"));
+	OwnerShip = nullptr;
+	OwnerWeapon = nullptr;
 
-	// Fits 0 to 100 size assets
-	MinAttachSize = 0;
-	MaxAttachSize = 100;
+	Name = FName(TEXT("UnknownAction"));
 
 	// Range of 0 to 100 tiles
 	MinRange = 0;
@@ -23,9 +22,27 @@ UETVAction::UETVAction()
 	bEndsTurn = false;
 }
 
+void UETVAction::Init(AETVShip* OwnerShipPtr, AETVWeapon* OwnerWeaponPtr)
+{
+	OwnerShip = OwnerShipPtr;
+	OwnerWeapon = OwnerWeaponPtr;
+}
+
 bool UETVAction::CanPerform()
 {
-	return Available == EETVActionAvailability::ActionAvailable;
+	// TODO Check range
+	return Available == EETVActionAvailability::ActionAvailable && OwnerShip != nullptr;
+}
+
+bool UETVAction::Activate()
+{
+	// Double check if we can perform, then perform
+	if (CanPerform())
+	{
+		Perform();
+		return true;
+	}
+	return false;
 }
 
 void UETVAction::Perform()

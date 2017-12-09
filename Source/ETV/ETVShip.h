@@ -1,8 +1,7 @@
-﻿// Copyright (C) Team13. All rights reserved.
+// Copyright (C) Team13. All rights reserved.
 
 #pragma once
 
-#include "ETVAction.h"
 #include "ETVWeaponSlot.h"
 #include "CoreMinimal.h"
 #include "PaperSpriteActor.h"
@@ -37,7 +36,7 @@ class ETV_API AETVShip : public APaperSpriteActor
 public:
 	// Sets default values for this actor's properties
 	AETVShip();
-	virtual void Init(FName NewName, int32 HP, int32 MaxHP, int32 ShieldP, int32 NewShieldRechargeTime, int32 NewSize, int32 NewMoveRange, int32 Speed);
+	void Init(FName NewName, int32 HP, int32 MaxHP, int32 ShieldP, int32 NewShieldRechargeTime, int32 NewSize, int32 NewMoveRange, int32 Speed);
 
 
 protected:
@@ -98,7 +97,7 @@ protected:
 
 	// The widget class for the ContextMenu
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ETV Ship", meta = (BlueprintProtected = "true"))
-	TSubclassOf<class UETVShipContextMenuWidget> ContextMenuClass;
+	TSubclassOf<UETVShipContextMenuWidget> ContextMenuClass;
 
 	// Instance of our ContextMenu
 	UPROPERTY()
@@ -131,7 +130,10 @@ public:
 	void AddWeapon(UETVWeaponSlot* Weapon);
 
 	UFUNCTION()
-	void SetActionsForWeapons();
+	void AddAction(UETVAction* Action);
+
+	UFUNCTION()
+	TArray<UETVWeaponSlot*> GetWeapons();
 
 	UFUNCTION()
 	virtual void RechargeShields();
@@ -153,6 +155,12 @@ public:
 
 	UFUNCTION()
 	void SetShields(int32 newValue);
+
+	UFUNCTION()
+	bool CanMove();
+
+	UFUNCTION()
+	bool IsEnemy();
 
 
 	// Returns a multiplier for the effectiveness of ship's actions depending on its status

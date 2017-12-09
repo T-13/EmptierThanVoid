@@ -1,11 +1,10 @@
-﻿// Copyright (C) Team13. All rights reserved.
+// Copyright (C) Team13. All rights reserved.
 
 #include "ETVShip.h"
 #include "UserWidget.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
-#include "ETVActionTarget_Fire.h"
-#include "ETVActionTarget_Move.h"
+#include "ETVGameModeBase.h"
 
 // Sets default values
 AETVShip::AETVShip() : Super()
@@ -45,15 +44,14 @@ void AETVShip::AddWeapon(UETVWeaponSlot * Weapon)
 	Weapons.Add(Weapon);
 }
 
-void AETVShip::SetActionsForWeapons()
+void AETVShip::AddAction(UETVAction* Action)
 {
-	for (UETVWeaponSlot* w : Weapons) {
-		UETVActionTarget_Fire *Fire = NewObject<UETVActionTarget_Fire>();
-		Actions.Add(Fire);
-		// TODO::Add weapon to Action
-	}
-	UETVActionTarget_Move *Move = NewObject<UETVActionTarget_Move>();
-	Actions.Add(Move);
+	Actions.Add(Action);
+}
+
+TArray<UETVWeaponSlot*> AETVShip::GetWeapons()
+{
+	return Weapons;
 }
 
 void AETVShip::RechargeShields()
@@ -66,8 +64,9 @@ void AETVShip::GetReport()
 
 void AETVShip::SpawnContextMenu(AActor *Actor, FKey Key)
 {
+	AETVGameModeBase* GameMode = (AETVGameModeBase*)GetWorld()->GetAuthGameMode();
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-	if (ContextMenuClass != nullptr && !IsContextMenuOpen && !PlayerController->IsPaused())
+	if (ContextMenuClass != nullptr && !GameMode->IsTargeting() && !IsContextMenuOpen && !PlayerController->IsPaused())
 	{
 		CurrentContextMenu = CreateWidget<UETVShipContextMenuWidget>(GetWorld(), ContextMenuClass);
 		CurrentContextMenu->AssignShip(this);
@@ -111,6 +110,16 @@ void AETVShip::SetShields(int32 newValue)
 		ShieldPoints = 0;
 	else
 		ShieldPoints = newValue;
+}
+
+bool AETVShip::CanMove()
+{
+	return ShipSpeed != 0;
+}
+
+bool AETVShip::IsEnemy()
+{
+	return Type == EETVShipType::EnemyShip;
 }
 
 float AETVShip::GetMultiplier()

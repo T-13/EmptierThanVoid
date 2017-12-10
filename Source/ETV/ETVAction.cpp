@@ -20,12 +20,26 @@ UETVAction::UETVAction()
 
 	// Does not end turn
 	bEndsTurn = false;
+
+	// Takes at most one turn to complete
+	MaxPerforms = 1;
+	CurrentPerform = 0;
 }
 
 void UETVAction::Init(AETVShip* OwnerShipPtr, AETVWeapon* OwnerWeaponPtr)
 {
 	OwnerShip = OwnerShipPtr;
 	OwnerWeapon = OwnerWeaponPtr;
+}
+
+bool UETVAction::IsFirstPerform()
+{
+	return CurrentPerform == 1;
+}
+
+bool UETVAction::IsLastPerform()
+{
+	return CurrentPerform >= MaxPerforms;
 }
 
 bool UETVAction::CanPerform()
@@ -47,12 +61,25 @@ bool UETVAction::Activate()
 
 void UETVAction::Perform()
 {
-	ApplyEffectsSelf();
+	++CurrentPerform;
+
+	AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
+
+	if (IsFirstPerform())
+	{
+		GameMode->AddMultiTurnAction(this);
+	}
+
+	if (IsLastPerform())
+	{
+		GameMode->RemoveMultiTurnAction(this);
+
+		ApplyEffectsSelf();
+	}
 
 	if (bEndsTurn)
 	{
 		// TODO Delay this if necessary
-		AETVGameModeBase* GameMode = (AETVGameModeBase*)GetWorld()->GetAuthGameMode();
 		GameMode->EndTurn();
 	}
 }

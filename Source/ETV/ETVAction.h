@@ -29,6 +29,8 @@ public:
 	AETVShip* OwnerShip;
 	AETVWeapon* OwnerWeapon;
 
+	int32 CurrentPerform;
+
 protected:
 	// Display name of the action
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Action")
@@ -50,9 +52,19 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Action")
 	bool bEndsTurn;
 
+	// Maximum amount of performs the action will trigger before dying (activates multi-turn handling with partial performs)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Action")
+	int32 MaxPerforms;
+
 public:
 	UFUNCTION()
 	virtual void Init(AETVShip* OwnerShipPtr, AETVWeapon* OwnerWeaponPtr = nullptr);
+
+	UFUNCTION()
+	virtual bool IsFirstPerform();
+
+	UFUNCTION()
+	virtual bool IsLastPerform();
 
 	UFUNCTION()
 	virtual bool CanPerform();

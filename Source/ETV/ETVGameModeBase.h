@@ -52,6 +52,10 @@ class ETV_API AETVGameModeBase : public AGameModeBase
 	TArray<AETVShip*> Ships;
 
 
+	/* Game Loop */
+	TArray<UETVAction*> MultiTurnActions;
+
+
 	/* Targeting */
 	bool bTargeting;
 	FETVTile CurrentTile;
@@ -188,6 +192,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ETV Game")
 	float GetCurrentTurnPercentage();
 
+	// Add multi-turn action for execution in subsequent turns automatically
+	UFUNCTION(BlueprintCallable, Category = "ETV Game")
+	void AddMultiTurnAction(UETVAction* Action);
+
+	// Remove multi-turn action to stop execution in subsequent turns automatically
+	UFUNCTION(BlueprintCallable, Category = "ETV Game")
+	void RemoveMultiTurnAction(UETVAction* Action);
+
 
 	/* Targeting */
 	// Get targeting enabled
@@ -208,7 +220,7 @@ public:
 
 	// Starts targeting, handles ETV Action calls and stops targeting after target is selected
 	UFUNCTION(BlueprintCallable, Category = "ETV Targeting")
-	void StartTargeting(UPARAM(ref) UETVActionTarget* Action);
+	void StartTargeting(UETVActionTarget* Action);
 
 	// Stops targeting, resetting targeting mode
 	UFUNCTION(BlueprintCallable, Category = "ETV Targeting")

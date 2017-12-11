@@ -526,11 +526,27 @@ void AETVGameModeBase::NextTurn()
 	// Unpause
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 	PlayerController->SetPause(false);
+
+	// Perform multi-turn actions
+	for (auto &MultiTurnAction : MultiTurnActions)
+	{
+		MultiTurnAction->Perform();
+	}
 }
 
 float AETVGameModeBase::GetCurrentTurnPercentage()
 {
 	return 1.0f - CurrentTurnTime / static_cast<float>(TurnTime);
+}
+
+void AETVGameModeBase::AddMultiTurnAction(UETVAction* Action)
+{
+	MultiTurnActions.Add(Action);
+}
+
+void AETVGameModeBase::RemoveMultiTurnAction(UETVAction* Action)
+{
+	MultiTurnActions.Remove(Action);
 }
 
 bool AETVGameModeBase::IsTargeting()

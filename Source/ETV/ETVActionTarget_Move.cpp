@@ -20,6 +20,9 @@ bool UETVActionTarget_Move::CanPerform()
 
 void UETVActionTarget_Move::ApplyEffectsSelf()
 {
-	Super::ApplyEffectsSelf();
-	// TODO Move from current tile to target tile, do flipbook animations and all that
+	if (IsLastPerform())
+	{
+		Super::ApplyEffectsSelf();
+		// TODO Move from current tile to target tile, do flipbook animations and all that
+	}
 }

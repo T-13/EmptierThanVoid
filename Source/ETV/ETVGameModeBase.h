@@ -43,7 +43,6 @@ class ETV_API AETVGameModeBase : public AGameModeBase
 	APaperTileMapActor* TileMapActor;
 	UPaperTileMapComponent* TileMapComp;
 	TArray<FETVTileData> TileData;
-	int32 TileHeight;
 
 	AETVShip* Ship;
 	AETVShipCapital* CapitalShip;
@@ -65,6 +64,7 @@ class ETV_API AETVGameModeBase : public AGameModeBase
 	UETVActionTarget* SelectedAction;
 
 	// Ship Tiles
+
 	UPaperTileSet* PlayerCapitalShip;
 	UPaperTileSet* PlayerFighterShip;
 	UPaperTileSet* EnemyCapitalShip;
@@ -176,7 +176,7 @@ public:
 
 	// Get Ships location from Tiles x and y
 	UFUNCTION()
-	FVector GetPosition(int32 x, int32 y, int32 z = -449);
+	FVector GetPosition(int32 x, int32 y, float z = 0.1f);
 
 
 	/* Game Loop */
@@ -205,6 +205,10 @@ public:
 	// Get targeting enabled
 	UFUNCTION(BlueprintCallable, Category = "ETV Targeting")
 	bool IsTargeting();
+
+	// Return if mouse is over the tile map
+	UFUNCTION(BlueprintCallable, Category = "ETV Targeting")
+	bool IsPositionOnTileMap(const FVector Location);
 
 	// Get tile position below mouse pointer
 	UFUNCTION(BlueprintCallable, Category = "ETV Targeting")

@@ -61,7 +61,7 @@ bool UETVAction::Activate()
 
 void UETVAction::Perform()
 {
-	++CurrentPerform;
+	OnBeginPerform();
 
 	AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
 
@@ -77,9 +77,20 @@ void UETVAction::Perform()
 		ApplyEffectsSelf();
 	}
 
+	OnEndPerform();
+}
+
+void UETVAction::OnBeginPerform()
+{
+	++CurrentPerform;
+}
+
+void UETVAction::OnEndPerform()
+{
 	if (bEndsTurn)
 	{
-		// TODO Delay this if necessary
+		AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
+		// TODO Delay this until all effects are done
 		GameMode->EndTurn();
 	}
 }

@@ -73,8 +73,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ETV Action")
 	virtual bool Activate();
 
-    UFUNCTION()
+	UFUNCTION()
 	virtual void Perform();
+
+	UFUNCTION()
+	virtual void OnBeginPerform();
+
+	UFUNCTION()
+	virtual void OnEndPerform();
 
     UFUNCTION()
 	virtual void ApplyEffectsSelf() {}

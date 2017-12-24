@@ -12,6 +12,9 @@
 #include "ETVShipFighter.h"
 #include "ETVShipRepairShip.h"
 #include "ETVStructTile.h"
+#include "ETVActionLogWidget.h"
+#include "ETVActionLogEntryWidget.h"
+#include "Engine.h"
 #include "GameFramework/GameModeBase.h"
 #include "ETVGameModeBase.generated.h"
 
@@ -135,6 +138,13 @@ protected:
 	// Start with targeting enabled (debug)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV Map")
 	bool bTargetingOnStart;
+
+	// For AttackLog UI
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV ActionLog")
+	TSubclassOf<class UETVActionLogWidget> ActionLogWidget;
+
+	UPROPERTY()
+	class UETVActionLogWidget* ActionLogClass;
 	
 public:
 	// Called every frame
@@ -188,7 +198,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ETV Game")
 	float GetCurrentTurnPercentage();
 
-
 	/* Targeting */
 	// Get targeting enabled
 	UFUNCTION(BlueprintCallable, Category = "ETV Targeting")
@@ -213,4 +222,8 @@ public:
 	// Stops targeting, resetting targeting mode
 	UFUNCTION(BlueprintCallable, Category = "ETV Targeting")
 	void StopTargeting();
+
+	// Get Widget
+	UFUNCTION()
+	UETVActionLogWidget* GetLogWidget();
 };

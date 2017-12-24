@@ -1,6 +1,7 @@
 // Copyright (C) Team13. All rights reserved.
 
 #include "ETVCalculator.h"
+#include "ETVGameModeBase.h"
 
 void UETVCalculator::CalculateWeaponEffect(AETVShip *User, AETVWeapon *WeaponUsed, AETVShip *Target)
 {
@@ -13,38 +14,50 @@ void UETVCalculator::CalculateWeaponEffect(AETVShip *User, AETVWeapon *WeaponUse
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *Msg);
 	/**/
 
+	// For ActionLog
+	FString ActionHP = "";
+	FString ActionShields = "";
+
 	// Calculate the value of change for this effect
 	int32 ChangeValue = User->GetMultiplier()*WeaponUsed->GetDMG();
 
 	// Weapon ignores shields
-	if(WeaponUsed->GetType() == AETVWeapon::DamageHull)
+	if (WeaponUsed->GetType() == AETVWeapon::DamageHull)
 	{
 		Target->SetHP(Target->GetHP() - ChangeValue);
-	}	
+		ActionHP = " Damaged ";
+	}
 	// Weapon can't bypass shields
-	else if(WeaponUsed->GetType() == AETVWeapon::DamageShieldThenHull)
+	else if (WeaponUsed->GetType() == AETVWeapon::DamageShieldThenHull)
 	{
 		// Calculate the value of shields after the attack
-		int32 ShieldValue = Target->GetShields() - ChangeValue;	
-		if(ShieldValue <= 0)
+		int32 ShieldValue = Target->GetShields() - ChangeValue;
+		if (ShieldValue <= 0)
 		{
 			// Calculate the amount of dmg that shields absorbed
 			ChangeValue -= Target->GetShields();
 			// The rest of the dmg is aplied to the Hull
 			Target->SetHP(Target->GetHP() - ChangeValue);
+
+			ActionHP = " Damaged ";
+		}
+		else {
+			ActionShields = " Damaged Shields ";
 		}
 		//Apply the new shield value
 		Target->SetShields(ShieldValue);
-	}	
+	}
 	// Weapon is a support type that heals HealthPoints
-	else if(WeaponUsed->GetType() == AETVWeapon::HealHull)
+	else if (WeaponUsed->GetType() == AETVWeapon::HealHull)
 	{
-		Target->SetHP(Target->GetHP() + ChangeValue);		
-	}	
+		Target->SetHP(Target->GetHP() + ChangeValue);
+		ActionHP = " Healed Hull ";
+	}
 	// Weapon is a support type that heals ShieldPoints
-	else if(WeaponUsed->GetType() == AETVWeapon::HealShield)
+	else if (WeaponUsed->GetType() == AETVWeapon::HealShield)
 	{
 		Target->SetShields(Target->GetShields() + ChangeValue);
+		ActionHP = " Healed Shields ";
 	}
 
 	/*Printing for debugging*/
@@ -55,6 +68,19 @@ void UETVCalculator::CalculateWeaponEffect(AETVShip *User, AETVWeapon *WeaponUse
 	Msg2 = "Target Shields: " + FString::FromInt(Target->GetShields());
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *Msg2);
 	/**/
+
+	// Add new Message to UETVActionLogWidget
+	AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(User->GetWorld()->GetAuthGameMode());
+	UETVActionLogWidget *LogWidget = GameMode->GetLogWidget();
+	//UETVActionLogWidget *LogWidget = Log.GetDefaultObject();
+	if (ActionHP != "") {
+		FString Message = User->GetShipName() + ActionHP + "By " + FString::FromInt(ChangeValue) + " On " + Target->GetShipName() + "\n";
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *Message);
+		LogWidget->AssignMessage(Message);
+	}
+	if (ActionShields != "") {
+		FString Message = User->GetShipName() + ActionShields + "By " + FString::FromInt(ChangeValue) + " On " + Target->GetShipName() + "\n";
+		UE_LOG(LogTemp, Warning, TEXT("%s"), *Message);
+		LogWidget->AssignMessage(Message);
+	}
 }
-
-

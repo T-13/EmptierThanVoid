@@ -7,6 +7,9 @@
 #include "ETVWeaponShieldBattery.h"
 #include "ETVActionTarget_Fire.h"
 #include "ETVActionTarget_Move.h"
+#include "UserWidget.h"
+
+#include "ETVCalculator.h"
 
 // Sets default values
 AETVGameModeBase::AETVGameModeBase()
@@ -52,6 +55,12 @@ AETVGameModeBase::AETVGameModeBase()
 void AETVGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// Spawn Widget for Action Log
+	ActionLogClass = CreateWidget<UETVActionLogWidget>(GetWorld(), ActionLogWidget);
+	ActionLogClass->SetPositionInViewport(UKismetMathLibrary::MakeVector2D(0, 0));
+	ActionLogClass->SetDesiredSizeInViewport(FVector2D(GEngine->GameViewport->Viewport->GetSizeXY()));
+	ActionLogClass->AddToViewport();
 
 	if (TileSet != nullptr)
 	{
@@ -121,7 +130,7 @@ void AETVGameModeBase::Tick(float DeltaTime)
 			// Set target
 			SelectedAction->SetTarget(TargetActor, CurrentTile.X, CurrentTile.Y);
 
-			TileInfo.PackedTileIndex =  SelectedAction->CanPerform() ? EETVTargetValidity::Valid : EETVTargetValidity::Invalid;
+			TileInfo.PackedTileIndex = SelectedAction->CanPerform() ? EETVTargetValidity::Valid : EETVTargetValidity::Invalid;
 			//TileInfo.PackedTileIndex = FMath::RandRange(0, 1); // Debug
 			//TileInfo.PackedTileIndex = EETVTargetValidity::Valid; // Debug
 			CurrentTile.Index = TileInfo.PackedTileIndex;
@@ -237,7 +246,25 @@ void AETVGameModeBase::GenerateShips()
 	yArr.Push(ycoord);
 
 	SpawnShip(xcoord, ycoord, TileInfo.TileSet);
+	AETVShip *Test = GetShipActor(xcoord, ycoord);
+	UETVCalculator *calc;
+	AETVWeaponLaser* Laser;
+	AETVWeaponTorpedo* Torpedo;
+	const FVector LocDim = GetPosition(xcoord, ycoord);
 
+	// Actor spawn parameters
+	const FActorSpawnParameters SpawnInfo;
+
+	// Rotate upwards to face the top-down camera
+	const FRotator Rotator(0, 0, -90);
+	Laser = GetWorld()->SpawnActor<AETVWeaponLaser>(LocDim, Rotator, SpawnInfo);
+	Torpedo = GetWorld()->SpawnActor<AETVWeaponTorpedo>(LocDim, Rotator, SpawnInfo);
+	Torpedo->InitRandom("Torpedo", 100);
+	Laser->InitRandom("Laser", 100);
+	calc->CalculateWeaponEffect(Test, Laser, Test);
+	calc->CalculateWeaponEffect(Test, Torpedo, Test);
+	calc->CalculateWeaponEffect(Test, Torpedo, Test);
+	calc->CalculateWeaponEffect(Test, Torpedo, Test);
 
 	// Spawning Capital Ship for Enemy
 	TileInfo.TileSet = EnemyCapitalShip;
@@ -333,7 +360,7 @@ void AETVGameModeBase::SpawnShip(int32 x, int32 y, UPaperTileSet* type)
 		CapitalShip->SetContextMenu(ContextMenu);
 		CapitalShip->GetRenderComponent()->SetMobility(EComponentMobility::Movable);
 		CapitalShip->GetRenderComponent()->SetSprite(Sprite);
-		
+
 		// Setting sprite color to transparent
 		CapitalShip->GetRenderComponent()->SetSpriteColor(FLinearColor(1.0f, 1.0f, 1.0f, 0.0f));
 
@@ -421,6 +448,8 @@ void AETVGameModeBase::SpawnWeapon(int32 NewX, int32 NewY, AETVShip* Ship, int32
 		} while (!WeaponSlot->DoesWeaponFit(Laser));
 		WeaponSlot->FitWeapon(Laser);
 		Ship->AddWeapon(WeaponSlot);
+
+
 	}
 	else if (type == AETVWeapon::DamageHull)
 	{
@@ -464,6 +493,7 @@ void AETVGameModeBase::SpawnActions(AETVShip* Ship)
 		UETVActionTarget_Fire *Fire = NewObject<UETVActionTarget_Fire>();
 		Fire->Init(Ship, w->GetWeapon());
 		Ship->AddAction(Fire);
+		SelectedAction = Fire;
 	}
 
 	UETVActionTarget_Move *Move = NewObject<UETVActionTarget_Move>();
@@ -638,4 +668,8 @@ void AETVGameModeBase::StopTargeting()
 	}
 
 	CurrentTile.Invalidate();
+}
+
+UETVActionLogWidget* AETVGameModeBase::GetLogWidget() {
+	return ActionLogClass;
 }

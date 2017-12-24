@@ -7,6 +7,8 @@
 #include "ETVWeaponShieldBattery.h"
 #include "ETVActionTarget_Fire.h"
 #include "ETVActionTarget_Move.h"
+#include "Engine/Engine.h"
+#include "WidgetLayoutLibrary.h"
 
 // Sets default values
 AETVGameModeBase::AETVGameModeBase()
@@ -64,6 +66,26 @@ void AETVGameModeBase::BeginPlay()
 		}
 
 		GenerateShips();
+
+		// Spawn ShipStatus UI
+		ShipStatusUI = CreateWidget<UETVShipStatusUIWidget>(GetWorld(), ShipStatusUIClass);
+		// Pass ships to the ShipStatus UI
+		ShipStatusUI->AssignShips(Ships);
+		
+		// Define the size of the element
+		int32 WidthOfShipStatusUI = 1200;
+		int32 HeightOfShipStatusUI = 180;
+
+		// Set the location to bottom left corner
+		FVector2D temp = UWidgetLayoutLibrary::GetViewportSize(GetWorld());
+		temp.X = 0;
+		temp.Y = temp.Y - HeightOfShipStatusUI*0.6;
+		ShipStatusUI->SetPositionInViewport(temp);
+
+		// Resize to correct size
+		ShipStatusUI->SetDesiredSizeInViewport(UKismetMathLibrary::MakeVector2D(WidthOfShipStatusUI, HeightOfShipStatusUI));
+
+		ShipStatusUI->AddToViewport();
 
 		// Start game lopp
 		ElapsedTime = 0.0f;

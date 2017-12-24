@@ -12,6 +12,7 @@
 #include "ETVShipFighter.h"
 #include "ETVShipRepairShip.h"
 #include "ETVStructTile.h"
+#include "ETVShipStatusUIWidget.h"
 #include "GameFramework/GameModeBase.h"
 #include "ETVGameModeBase.generated.h"
 
@@ -135,6 +136,15 @@ protected:
 	// Start with targeting enabled (debug)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV Map")
 	bool bTargetingOnStart;
+
+	// The widget class for the ShipStatusUI
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ETV UI", meta = (BlueprintProtected = "true"))
+	TSubclassOf<UETVShipStatusUIWidget> ShipStatusUIClass;
+
+	// The pointer to accses the ShipStatusUI Widget
+	UPROPERTY()
+	UETVShipStatusUIWidget* ShipStatusUI;
+
 	
 public:
 	// Called every frame

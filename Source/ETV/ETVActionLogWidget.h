@@ -6,9 +6,6 @@
 #include "Blueprint/UserWidget.h"
 #include "ETVActionLogWidget.generated.h"
 
-class AETVShip;
-class AETVAction;
-
 /**
  * 
  */
@@ -17,10 +14,6 @@ class ETV_API UETVActionLogWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
-protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV ActionLogWidget")
-	FString msg;
-
 public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "ETV ActionLogWidget")
 	void NewLogEntry(const FString& Message);

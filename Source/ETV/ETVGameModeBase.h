@@ -138,7 +138,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV Map")
 	bool bTargetingOnStart;
 
-	// For AttackLog UI
+	// For ActionLog UI
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV ActionLog")
 	TSubclassOf<class UETVActionLogWidget> ActionLogWidget;
 

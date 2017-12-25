@@ -8,7 +8,7 @@
 #include "ETVActionTarget_Fire.h"
 #include "ETVActionTarget_Move.h"
 #include "UserWidget.h"
-
+#include "WidgetLayoutLibrary.h"
 #include "ETVCalculator.h"
 
 // Sets default values
@@ -59,7 +59,7 @@ void AETVGameModeBase::BeginPlay()
 	// Spawn Widget for Action Log
 	ActionLogClass = CreateWidget<UETVActionLogWidget>(GetWorld(), ActionLogWidget);
 	ActionLogClass->SetPositionInViewport(UKismetMathLibrary::MakeVector2D(0, 0));
-	ActionLogClass->SetDesiredSizeInViewport(FVector2D(GEngine->GameViewport->Viewport->GetSizeXY()));
+	ActionLogClass->SetDesiredSizeInViewport(FVector2D(UWidgetLayoutLibrary::GetViewportSize(GetWorld())));
 	ActionLogClass->AddToViewport();
 
 	if (TileSet != nullptr)
@@ -474,7 +474,6 @@ void AETVGameModeBase::SpawnActions(AETVShip* Ship)
 		UETVActionTarget_Fire *Fire = NewObject<UETVActionTarget_Fire>();
 		Fire->Init(Ship, w->GetWeapon());
 		Ship->AddAction(Fire);
-		SelectedAction = Fire;
 	}
 
 	UETVActionTarget_Move *Move = NewObject<UETVActionTarget_Move>();

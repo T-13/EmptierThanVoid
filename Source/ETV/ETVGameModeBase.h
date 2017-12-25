@@ -14,7 +14,6 @@
 #include "ETVStructTile.h"
 #include "ETVActionLogWidget.h"
 #include "ETVActionLogEntryWidget.h"
-#include "Engine.h"
 #include "GameFramework/GameModeBase.h"
 #include "ETVGameModeBase.generated.h"
 

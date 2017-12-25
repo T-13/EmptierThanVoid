@@ -1,4 +1,4 @@
-﻿// Copyright (C) Team13. All rights reserved.
+// Copyright (C) Team13. All rights reserved.
 
 #include "ETVShip.h"
 #include "UserWidget.h"
@@ -176,10 +176,10 @@ void AETVShip::SetTypeToEnemy()
 
 FString AETVShip::GetShipType()
 {
-		if (Type == EETVShipType::PlayerShip)
-			return "Player";
-		else if (Type == EETVShipType::EnemyShip)
-			return "Enemy";
+	if (Type == EETVShipType::PlayerShip)
+		return "Player";
+	else if (Type == EETVShipType::EnemyShip)
+		return "Enemy";
 	return "";
 }
 

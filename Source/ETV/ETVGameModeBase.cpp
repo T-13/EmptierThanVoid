@@ -265,6 +265,16 @@ void AETVGameModeBase::GenerateShips()
 	calc->CalculateWeaponEffect(Test, Torpedo, Test);
 	calc->CalculateWeaponEffect(Test, Torpedo, Test);
 	calc->CalculateWeaponEffect(Test, Torpedo, Test);
+	calc->CalculateWeaponEffect(Test, Laser, Test);
+	calc->CalculateWeaponEffect(Test, Torpedo, Test);
+	calc->CalculateWeaponEffect(Test, Torpedo, Test);
+	calc->CalculateWeaponEffect(Test, Torpedo, Test);
+	calc->CalculateWeaponEffect(Test, Laser, Test);
+	calc->CalculateWeaponEffect(Test, Torpedo, Test);
+	calc->CalculateWeaponEffect(Test, Torpedo, Test);
+	calc->CalculateWeaponEffect(Test, Torpedo, Test);
+	calc->CalculateWeaponEffect(Test, Torpedo, Test);
+	calc->CalculateWeaponEffect(Test, Torpedo, Test);
 
 	// Spawning Capital Ship for Enemy
 	TileInfo.TileSet = EnemyCapitalShip;

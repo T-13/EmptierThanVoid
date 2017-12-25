@@ -68,7 +68,7 @@ void UETVCalculator::CalculateWeaponEffect(AETVShip *User, AETVWeapon *WeaponUse
 	Msg2 = "Target Shields: " + FString::FromInt(Target->GetShields());
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *Msg2);
 	/**/
-
+	int test = 0;
 	// Add new Message to UETVActionLogWidget
 	AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(User->GetWorld()->GetAuthGameMode());
 	UETVActionLogWidget *LogWidget = GameMode->GetLogWidget();

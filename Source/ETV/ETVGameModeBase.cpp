@@ -337,6 +337,7 @@ void AETVGameModeBase::SpawnShip(int32 x, int32 y, UPaperTileSet* type)
 	// Spawning ShipActor based on class
 	if (type == PlayerCapitalShip || type == EnemyCapitalShip) {
 		CapitalShip = GetWorld()->SpawnActor<AETVShipCapital>(LocDim, Rotator, SpawnInfo);
+		CapitalShip->Init("Cap", 100, 100, 100, 10, 10, 10, 10, true, 1.0f, 1);
 		CapitalShip->SetContextMenu(ContextMenu);
 		CapitalShip->GetRenderComponent()->SetMobility(EComponentMobility::Movable);
 		CapitalShip->GetRenderComponent()->SetSprite(Sprite);

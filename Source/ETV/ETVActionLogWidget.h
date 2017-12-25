@@ -22,8 +22,6 @@ protected:
 	FString msg;
 
 public:
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void AssignMsg();
 
 	UFUNCTION(BlueprintCallable)
 	void AssignMessage(FString Entry);

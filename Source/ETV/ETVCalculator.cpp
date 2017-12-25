@@ -57,7 +57,7 @@ void UETVCalculator::CalculateWeaponEffect(AETVShip *User, AETVWeapon *WeaponUse
 	else if (WeaponUsed->GetType() == AETVWeapon::HealShield)
 	{
 		Target->SetShields(Target->GetShields() + ChangeValue);
-		ActionHP = " Healed Shields ";
+		ActionShields = " Healed Shields ";
 	}
 
 	/*Printing for debugging*/

@@ -22,7 +22,7 @@ protected:
 	FString msg;
 
 public:
+	UFUNCTION(BlueprintImplementableEvent, Category = "ETV ActionLogWidget")
+	void NewLogEntry(const FString& Message);
 
-	UFUNCTION(BlueprintCallable)
-	void AssignMessage(FString Entry);
 };

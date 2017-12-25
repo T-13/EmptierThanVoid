@@ -22,5 +22,4 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetMsg(FString Message);
 	
-	
 };

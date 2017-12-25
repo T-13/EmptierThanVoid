@@ -246,35 +246,6 @@ void AETVGameModeBase::GenerateShips()
 	yArr.Push(ycoord);
 
 	SpawnShip(xcoord, ycoord, TileInfo.TileSet);
-	AETVShip *Test = GetShipActor(xcoord, ycoord);
-	UETVCalculator *calc;
-	AETVWeaponLaser* Laser;
-	AETVWeaponTorpedo* Torpedo;
-	const FVector LocDim = GetPosition(xcoord, ycoord);
-
-	// Actor spawn parameters
-	const FActorSpawnParameters SpawnInfo;
-
-	// Rotate upwards to face the top-down camera
-	const FRotator Rotator(0, 0, -90);
-	Laser = GetWorld()->SpawnActor<AETVWeaponLaser>(LocDim, Rotator, SpawnInfo);
-	Torpedo = GetWorld()->SpawnActor<AETVWeaponTorpedo>(LocDim, Rotator, SpawnInfo);
-	Torpedo->InitRandom("Torpedo", 100);
-	Laser->InitRandom("Laser", 100);
-	calc->CalculateWeaponEffect(Test, Laser, Test);
-	calc->CalculateWeaponEffect(Test, Torpedo, Test);
-	calc->CalculateWeaponEffect(Test, Torpedo, Test);
-	calc->CalculateWeaponEffect(Test, Torpedo, Test);
-	calc->CalculateWeaponEffect(Test, Laser, Test);
-	calc->CalculateWeaponEffect(Test, Torpedo, Test);
-	calc->CalculateWeaponEffect(Test, Torpedo, Test);
-	calc->CalculateWeaponEffect(Test, Torpedo, Test);
-	calc->CalculateWeaponEffect(Test, Laser, Test);
-	calc->CalculateWeaponEffect(Test, Torpedo, Test);
-	calc->CalculateWeaponEffect(Test, Torpedo, Test);
-	calc->CalculateWeaponEffect(Test, Torpedo, Test);
-	calc->CalculateWeaponEffect(Test, Torpedo, Test);
-	calc->CalculateWeaponEffect(Test, Torpedo, Test);
 
 	// Spawning Capital Ship for Enemy
 	TileInfo.TileSet = EnemyCapitalShip;
@@ -366,7 +337,6 @@ void AETVGameModeBase::SpawnShip(int32 x, int32 y, UPaperTileSet* type)
 	// Spawning ShipActor based on class
 	if (type == PlayerCapitalShip || type == EnemyCapitalShip) {
 		CapitalShip = GetWorld()->SpawnActor<AETVShipCapital>(LocDim, Rotator, SpawnInfo);
-		CapitalShip->Init("Cap", 100, 100, 100, 10, 10, 10, 10, true, 1.0f, 1);
 		CapitalShip->SetContextMenu(ContextMenu);
 		CapitalShip->GetRenderComponent()->SetMobility(EComponentMobility::Movable);
 		CapitalShip->GetRenderComponent()->SetSprite(Sprite);
@@ -527,7 +497,7 @@ AETVShip* AETVGameModeBase::GetShipActor(int32 x, int32 y)
 
 FVector AETVGameModeBase::GetPosition(int32 x, int32 y, int32 z)
 {
-	return FVector(-(TileSize / 2)*MapWidth + x*TileSize, -(TileSize / 2)*MapHeight + y*TileSize, z);
+	return FVector(-(TileSize / 2)*MapWidth + x * TileSize, -(TileSize / 2)*MapHeight + y * TileSize, z);
 }
 
 void AETVGameModeBase::EndTurn()

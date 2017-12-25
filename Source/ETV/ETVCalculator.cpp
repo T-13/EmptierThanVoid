@@ -68,19 +68,16 @@ void UETVCalculator::CalculateWeaponEffect(AETVShip *User, AETVWeapon *WeaponUse
 	Msg2 = "Target Shields: " + FString::FromInt(Target->GetShields());
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *Msg2);
 	/**/
-	int test = 0;
+
 	// Add new Message to UETVActionLogWidget
 	AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(User->GetWorld()->GetAuthGameMode());
 	UETVActionLogWidget *LogWidget = GameMode->GetLogWidget();
-	//UETVActionLogWidget *LogWidget = Log.GetDefaultObject();
 	if (ActionHP != "") {
 		FString Message = User->GetShipName() + ActionHP + "By " + FString::FromInt(ChangeValue) + " On " + Target->GetShipName() + "\n";
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *Message);
 		LogWidget->AssignMessage(Message);
 	}
 	if (ActionShields != "") {
 		FString Message = User->GetShipName() + ActionShields + "By " + FString::FromInt(ChangeValue) + " On " + Target->GetShipName() + "\n";
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *Message);
 		LogWidget->AssignMessage(Message);
 	}
 }

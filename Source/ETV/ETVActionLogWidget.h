@@ -26,5 +26,5 @@ public:
 	void AssignMsg();
 
 	UFUNCTION(BlueprintCallable)
-	void AssignMessage(FString entry);
+	void AssignMessage(FString Entry);
 };

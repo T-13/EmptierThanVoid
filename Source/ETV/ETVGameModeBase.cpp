@@ -7,7 +7,6 @@
 #include "ETVWeaponShieldBattery.h"
 #include "ETVActionTarget_Fire.h"
 #include "ETVActionTarget_Move.h"
-#include "Engine/Engine.h"
 #include "WidgetLayoutLibrary.h"
 
 // Sets default values

@@ -121,7 +121,7 @@ void AETVGameModeBase::Tick(float DeltaTime)
 
 			// Get ship on currently hovered tile
 			AActor* TargetActor = GetShipActor(CurrentTile.X, CurrentTile.Y);
-			// Get tile if no ship on that tile
+			// Get tile if no ship on that location
 			if (TargetActor == nullptr)
 			{
 				TargetActor = TileMapActor;
@@ -477,7 +477,7 @@ void AETVGameModeBase::SpawnActions(AETVShip* Ship)
 	}
 
 	UETVActionTarget_Move *Move = NewObject<UETVActionTarget_Move>();
-	Move->Init(Ship, nullptr);
+	Move->Init(Ship);
 	Ship->AddAction(Move);
 }
 
@@ -536,11 +536,27 @@ void AETVGameModeBase::NextTurn()
 	// Unpause
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 	PlayerController->SetPause(false);
+
+	// Perform multi-turn actions
+	for (auto &MultiTurnAction : MultiTurnActions)
+	{
+		MultiTurnAction->Perform();
+	}
 }
 
 float AETVGameModeBase::GetCurrentTurnPercentage()
 {
 	return 1.0f - CurrentTurnTime / static_cast<float>(TurnTime);
+}
+
+void AETVGameModeBase::AddMultiTurnAction(UETVAction* Action)
+{
+	MultiTurnActions.Add(Action);
+}
+
+void AETVGameModeBase::RemoveMultiTurnAction(UETVAction* Action)
+{
+	MultiTurnActions.Remove(Action);
 }
 
 bool AETVGameModeBase::IsTargeting()
@@ -636,6 +652,7 @@ void AETVGameModeBase::StopTargeting()
 
 	// Set previous tile variables to invalid
 	LastTile.Invalidate();
+	CurrentTile.Invalidate();
 
 	// Make sure nothing stopped targeting
 	if (SelectedAction != nullptr)
@@ -646,8 +663,6 @@ void AETVGameModeBase::StopTargeting()
 			SelectedAction->Perform();
 		}
 	}
-
-	CurrentTile.Invalidate();
 }
 
 UETVActionLogWidget* AETVGameModeBase::GetLogWidget() {

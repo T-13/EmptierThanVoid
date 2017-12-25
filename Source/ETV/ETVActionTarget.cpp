@@ -10,6 +10,11 @@ UETVActionTarget::UETVActionTarget() : Super()
 	FailureChance = 0.0f;
 }
 
+AActor* UETVActionTarget::GetSelectedTarget()
+{
+	return SelectedTarget;
+}
+
 void UETVActionTarget::SetTarget(AActor* Target, int32 X, int32 Y)
 {
 	SelectedTarget = Target;
@@ -39,7 +44,7 @@ bool UETVActionTarget::Activate()
 	if (Super::Activate())
 	{
 		// Start targeting system
-		AETVGameModeBase* GameMode = (AETVGameModeBase*)GetWorld()->GetAuthGameMode();
+		AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
 		GameMode->StartTargeting(this);
 
 		return true;
@@ -52,5 +57,8 @@ void UETVActionTarget::Perform()
 {
 	Super::Perform();
 
-	ApplyEffectsTarget();
+	if (IsLastPerform())
+	{
+		ApplyEffectsTarget();
+	}
 }

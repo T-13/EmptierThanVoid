@@ -12,6 +12,9 @@
 #include "ETVShipFighter.h"
 #include "ETVShipRepairShip.h"
 #include "ETVStructTile.h"
+#include "ETVShipStatusUIWidget.h"
+#include "ETVActionLogWidget.h"
+#include "ETVActionLogEntryWidget.h"
 #include "GameFramework/GameModeBase.h"
 #include "ETVGameModeBase.generated.h"
 
@@ -43,7 +46,6 @@ class ETV_API AETVGameModeBase : public AGameModeBase
 	APaperTileMapActor* TileMapActor;
 	UPaperTileMapComponent* TileMapComp;
 	TArray<FETVTileData> TileData;
-	int32 TileHeight;
 
 	AETVShip* Ship;
 	AETVShipCapital* CapitalShip;
@@ -65,6 +67,7 @@ class ETV_API AETVGameModeBase : public AGameModeBase
 	UETVActionTarget* SelectedAction;
 
 	// Ship Tiles
+
 	UPaperTileSet* PlayerCapitalShip;
 	UPaperTileSet* PlayerFighterShip;
 	UPaperTileSet* EnemyCapitalShip;
@@ -139,6 +142,21 @@ protected:
 	// Start with targeting enabled (debug)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV Map")
 	bool bTargetingOnStart;
+
+	// The widget class for the ShipStatusUI
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ETV UI", meta = (BlueprintProtected = "true"))
+	TSubclassOf<UETVShipStatusUIWidget> ShipStatusUIClass;
+
+	// The pointer to accses the ShipStatusUI Widget
+	UPROPERTY()
+	UETVShipStatusUIWidget* ShipStatusUI;
+
+	// For ActionLog UI
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV ActionLog")
+	TSubclassOf<class UETVActionLogWidget> ActionLogWidget;
+
+	UPROPERTY()
+	class UETVActionLogWidget* ActionLogClass;
 	
 public:
 	// Called every frame
@@ -176,7 +194,7 @@ public:
 
 	// Get Ships location from Tiles x and y
 	UFUNCTION()
-	FVector GetPosition(int32 x, int32 y, int32 z = -449);
+	FVector GetPosition(int32 x, int32 y, float z = 0.1f);
 
 
 	/* Game Loop */
@@ -206,6 +224,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ETV Targeting")
 	bool IsTargeting();
 
+	// Return if mouse is over the tile map
+	UFUNCTION(BlueprintCallable, Category = "ETV Targeting")
+	bool IsPositionOnTileMap(const FVector Location);
+
 	// Get tile position below mouse pointer
 	UFUNCTION(BlueprintCallable, Category = "ETV Targeting")
 	void GetMouseOverTile(/*out*/ FETVTile& Tile);
@@ -225,4 +247,8 @@ public:
 	// Stops targeting, resetting targeting mode
 	UFUNCTION(BlueprintCallable, Category = "ETV Targeting")
 	void StopTargeting();
+
+	// Get Widget
+	UFUNCTION()
+	UETVActionLogWidget* GetLogWidget();
 };

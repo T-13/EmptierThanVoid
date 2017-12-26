@@ -1,4 +1,4 @@
-// Copyright (C) Team13. All rights reserved.
+﻿// Copyright (C) Team13. All rights reserved.
 
 #pragma once
 
@@ -36,7 +36,7 @@ class ETV_API AETVShip : public APaperSpriteActor
 public:
 	// Sets default values for this actor's properties
 	AETVShip();
-	void Init(FName NewName, int32 HP, int32 MaxHP, int32 ShieldP, int32 NewShieldRechargeTime, int32 NewSize, int32 NewMoveRange, int32 Speed);
+	void Init(FString NewName, int32 HP, int32 MaxHP, int32 ShieldP, int32 NewShieldRechargeTime, int32 NewSize, int32 NewMoveRange, int32 Speed);
 
 
 protected:
@@ -47,7 +47,7 @@ protected:
 
 	// Name of the ship
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship")
-	FName Name;
+	FString Name;
 
 	// Health points of the ship
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship", meta = (ClampMin = "0.0"))
@@ -159,7 +159,7 @@ public:
 	UFUNCTION()
 	bool CanMove();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	bool IsEnemy();
 
 
@@ -176,5 +176,12 @@ public:
 	// Set Ship Type to Enemy
 	UFUNCTION()
 	void SetTypeToEnemy();
+
+	// Just for checking in LOG
+	UFUNCTION()
+	FString GetShipType();
+
+	UFUNCTION()
+	FString GetShipName();
 
 };

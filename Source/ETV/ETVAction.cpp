@@ -26,6 +26,15 @@ UETVAction::UETVAction()
 	CurrentPerform = 0;
 }
 
+UWorld* UETVAction::GetWorld() const
+{
+	if (OwnerShip != nullptr)
+	{
+		return OwnerShip->GetWorld();
+	}
+	return nullptr;
+}
+
 void UETVAction::Init(AETVShip* OwnerShipPtr, AETVWeapon* OwnerWeaponPtr)
 {
 	OwnerShip = OwnerShipPtr;

@@ -14,7 +14,7 @@ AETVShip::AETVShip() : Super()
 	Type = EETVShipType::PlayerShip;
 }
 
-void AETVShip::Init(FName NewName, int32 HP, int32 MaxHP, int32 ShieldP, int32 NewShieldRechargeTime, int32 NewSize, int32 NewMoveRange, int32 Speed)
+void AETVShip::Init(FString NewName, int32 HP, int32 MaxHP, int32 ShieldP, int32 NewShieldRechargeTime, int32 NewSize, int32 NewMoveRange, int32 Speed)
 {
 	Name = NewName;
 	HealthPoints = HP;
@@ -172,4 +172,18 @@ void AETVShip::SetContextMenu(TSubclassOf<class UETVShipContextMenuWidget> Conte
 void AETVShip::SetTypeToEnemy()
 {
 	Type = EETVShipType::EnemyShip;
+}
+
+FString AETVShip::GetShipType()
+{
+	if (Type == EETVShipType::PlayerShip)
+		return "Player";
+	else if (Type == EETVShipType::EnemyShip)
+		return "Enemy";
+	return "";
+}
+
+FString AETVShip::GetShipName()
+{
+	return Name;
 }

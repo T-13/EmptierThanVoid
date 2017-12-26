@@ -41,6 +41,11 @@ void UETVAction::Init(AETVShip* OwnerShipPtr, AETVWeapon* OwnerWeaponPtr)
 	OwnerWeapon = OwnerWeaponPtr;
 }
 
+bool UETVAction::IsMultiTurn()
+{
+	return MaxPerforms > 1;
+}
+
 bool UETVAction::IsFirstPerform()
 {
 	return CurrentPerform == 1;
@@ -70,25 +75,36 @@ bool UETVAction::Activate()
 
 void UETVAction::Perform()
 {
-	++CurrentPerform;
+	OnBeginPerform();
 
 	AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
 
-	if (IsFirstPerform())
+	if (IsFirstPerform() && !IsMultiTurn())
 	{
 		GameMode->AddMultiTurnAction(this);
 	}
 
-	if (IsLastPerform())
+	if (IsLastPerform() && !IsMultiTurn())
 	{
 		GameMode->RemoveMultiTurnAction(this);
 
 		ApplyEffectsSelf();
 	}
 
+	OnEndPerform();
+}
+
+void UETVAction::OnBeginPerform()
+{
+	++CurrentPerform;
+}
+
+void UETVAction::OnEndPerform()
+{
 	if (bEndsTurn)
 	{
-		// TODO Delay this if necessary
+		AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
+		// TODO Delay this until all effects are done
 		GameMode->EndTurn();
 	}
 }

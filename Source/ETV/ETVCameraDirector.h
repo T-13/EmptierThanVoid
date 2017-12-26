@@ -6,7 +6,6 @@
 #include "GameFramework/Pawn.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
-#include "ETVGameModeBase.h"
 #include "ETVCameraDirector.generated.h"
 
 UCLASS()
@@ -70,6 +69,10 @@ public:
 
 	UFUNCTION()
 	void OnMoveVertical(float AxisValue);
+
+	// Returns current zoom level (spring arm length, distance from RootComponent to Camera)
+	UFUNCTION(BlueprintCallable)
+	float GetZoom();
 
 	// Move camera above given tile with specified zoom (keep current by default)
 	UFUNCTION(BlueprintCallable, Category = "ETV Camera")

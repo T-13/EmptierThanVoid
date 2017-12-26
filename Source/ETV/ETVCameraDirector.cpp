@@ -3,6 +3,7 @@
 #include "ETVCameraDirector.h"
 #include "ConstructorHelpers.h"
 #include <algorithm>
+#include "ETVGameModeBase.h"
 
 // Sets default values
 AETVCameraDirector::AETVCameraDirector()
@@ -30,10 +31,10 @@ AETVCameraDirector::AETVCameraDirector()
 	}
 	*/
 
-	// Use a spring arm to give the camera smooth, natural-feeling motion.
+	// Use a spring arm to give the camera smooth, natural-feeling motion
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArm->SetupAttachment(RootComponent);
-	SpringArm->SetRelativeRotation(FRotator(-90.0f, -90.0f, 0.0f)); // Orient to tile map
+	SpringArm->SetRelativeRotation(FRotator(-90.0f, 0.0f, -90.0f)); // Orient to tile map (pitch, yaw, roll vs editor's roll, pitch, yaw)
 	SpringArm->TargetArmLength = 300.0f;
 	SpringArm->bEnableCameraLag = true;
 
@@ -98,6 +99,11 @@ void AETVCameraDirector::OnMoveVertical(float AxisValue)
 			AddActorLocalOffset(FVector(0.0f, AxisValue, 0.0f));
 		}
 	}
+}
+
+float AETVCameraDirector::GetZoom()
+{
+	return SpringArm->TargetArmLength;
 }
 
 void AETVCameraDirector::MoveAboveTile(int32 X, int32 Y, float ZoomPercentage)

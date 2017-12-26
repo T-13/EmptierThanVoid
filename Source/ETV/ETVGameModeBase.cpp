@@ -11,6 +11,7 @@
 #include "WidgetLayoutLibrary.h"
 #include "UserWidget.h"
 #include "ETVCalculator.h"
+//#include "DrawDebugHelpers.h" // Uncomment for debug drawing
 
 // Sets default values
 AETVGameModeBase::AETVGameModeBase()
@@ -500,8 +501,6 @@ void AETVGameModeBase::SpawnActions(AETVShip* Ship)
 	UETVActionTarget_Move *Move = NewObject<UETVActionTarget_Move>();
 	Move->Init(Ship);
 	Ship->AddAction(Move);
-
-	SelectedAction = Move;
 }
 
 AETVShip* AETVGameModeBase::GetShipActor(int32 x, int32 y)
@@ -603,8 +602,15 @@ void AETVGameModeBase::GetMouseOverTile(FETVTile& Tile)
 	FVector WorldDirection;
 	if (PlayerController->DeprojectMousePositionToWorld(WorldLocation, WorldDirection))
 	{
+		AETVCameraDirector* Camera = Cast<AETVCameraDirector>(PlayerController->GetPawn());
+		if (Camera == nullptr)
+		{
+			UE_LOG(LogTemp, Error, TEXT("GetMouseOverTile(): Pawn not set to AETVCameraDirector!"))
+			return;
+		}
+
 		// Add height to tile map
-		WorldDirection *= abs(WorldDirection.Z + WorldLocation.Z);
+		WorldDirection *= abs((Camera->GetZoom() + 10.0f) / WorldDirection.Z); // Add 10.0f due to #68 (start is 20 UU higher, but for some reason half is taken)
 		WorldLocation += WorldDirection;
 
 		// Check if on tile at all
@@ -617,7 +623,14 @@ void AETVGameModeBase::GetMouseOverTile(FETVTile& Tile)
 				bool bInRangeY = UKismetMathLibrary::InRange_FloatFloat(WorldLocation.Y, CurrentTileData.PointLeftTop.Y, CurrentTileData.PointRightBottom.Y, false, false);
 				if (bInRangeX && bInRangeY)
 				{
-					UE_LOG(LogTemp, Warning, TEXT("Loc (%s) -- Dir (%s)"), *WorldLocation.ToString(), *WorldDirection.ToString())
+					/* Uncomment to enable visual representation of targeting (debug), "DrawDebugHelpers.h" include required
+					DrawDebugPoint(GetWorld(), WorldLocation, 5.0f, FColor(255, 0, 255), false); // Current mouse position
+					FVector DebugPointTileCenter = FVector(CurrentTileData.PointLeftTop.X, CurrentTileData.PointLeftTop.Y, 0.0f) * 0.5f + FVector(CurrentTileData.PointRightBottom.X, CurrentTileData.PointRightBottom.Y, 0.0f) * 0.5f;
+					DrawDebugPoint(GetWorld(), DebugPointTileCenter, 5.0f, FColor(255, 0, 0), false);
+					DrawDebugLine(GetWorld(), WorldLocation, DebugPointTileCenter, FColor(255, 0, 0), false);
+					UE_LOG(LogTemp, Warning, TEXT("Loc (%s) -- Dir (%s) -- Zoom %g"), *WorldLocation.ToString(), *WorldDirection.ToString(), Camera->GetZoom())
+					*/
+
 					Tile.Set(CurrentTileData.Tile);
 					return;
 				}

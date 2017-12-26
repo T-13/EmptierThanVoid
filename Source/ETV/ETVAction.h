@@ -64,6 +64,9 @@ public:
 	virtual void Init(AETVShip* OwnerShipPtr, AETVWeapon* OwnerWeaponPtr = nullptr);
 
 	UFUNCTION()
+	virtual bool IsMultiTurn();
+
+	UFUNCTION()
 	virtual bool IsFirstPerform();
 
 	UFUNCTION()

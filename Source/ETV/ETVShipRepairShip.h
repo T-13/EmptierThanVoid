@@ -18,7 +18,7 @@ class ETV_API AETVShipRepairShip : public AETVShip
 public:
 	// Sets default values for this actor's properties
 	AETVShipRepairShip();
-	void Init(FName NewName, int32 HP, int32 MaxHP, int32 ShieldP, int32 NewShieldRechargeTime, int32 NewSize, int32 NewMoveRange, int32 Speed, int32 NewRepairPower);
+	void Init(FString NewName, int32 HP, int32 MaxHP, int32 ShieldP, int32 NewShieldRechargeTime, int32 NewSize, int32 NewMoveRange, int32 Speed, int32 NewRepairPower);
 
 protected:
 	// Maximum how much health can be regained when repairing some other Ship

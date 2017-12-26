@@ -8,6 +8,9 @@
 #include "ETVActionTarget_Fire.h"
 #include "ETVActionTarget_Move.h"
 #include "ETVCameraDirector.h"
+#include "WidgetLayoutLibrary.h"
+#include "UserWidget.h"
+#include "ETVCalculator.h"
 
 // Sets default values
 AETVGameModeBase::AETVGameModeBase()
@@ -54,6 +57,12 @@ void AETVGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// Spawn Widget for Action Log
+	ActionLogClass = CreateWidget<UETVActionLogWidget>(GetWorld(), ActionLogWidget);
+	ActionLogClass->SetPositionInViewport(UKismetMathLibrary::MakeVector2D(0, 0));
+	ActionLogClass->SetDesiredSizeInViewport(FVector2D(UWidgetLayoutLibrary::GetViewportSize(GetWorld())));
+	ActionLogClass->AddToViewport();
+
 	if (TileSet != nullptr)
 	{
 		MapGeneration();
@@ -65,6 +74,26 @@ void AETVGameModeBase::BeginPlay()
 		}
 
 		GenerateShips();
+
+		// Spawn ShipStatus UI
+		ShipStatusUI = CreateWidget<UETVShipStatusUIWidget>(GetWorld(), ShipStatusUIClass);
+		// Pass ships to the ShipStatus UI
+		ShipStatusUI->AssignShips(Ships);
+		
+		// Define the size of the element
+		int32 WidthOfShipStatusUI = 1200;
+		int32 HeightOfShipStatusUI = 180;
+
+		// Set the location to bottom left corner
+		FVector2D temp = UWidgetLayoutLibrary::GetViewportSize(GetWorld());
+		temp.X = 0;
+		temp.Y = temp.Y - HeightOfShipStatusUI*0.6;
+		ShipStatusUI->SetPositionInViewport(temp);
+
+		// Resize to correct size
+		ShipStatusUI->SetDesiredSizeInViewport(UKismetMathLibrary::MakeVector2D(WidthOfShipStatusUI, HeightOfShipStatusUI));
+
+		ShipStatusUI->AddToViewport();
 
 		// Start game lopp
 		ElapsedTime = 0.0f;
@@ -122,7 +151,7 @@ void AETVGameModeBase::Tick(float DeltaTime)
 			// Set target
 			SelectedAction->SetTarget(TargetActor, CurrentTile.X, CurrentTile.Y);
 
-			TileInfo.PackedTileIndex =  SelectedAction->CanPerform() ? EETVTargetValidity::Valid : EETVTargetValidity::Invalid;
+			TileInfo.PackedTileIndex = SelectedAction->CanPerform() ? EETVTargetValidity::Valid : EETVTargetValidity::Invalid;
 			//TileInfo.PackedTileIndex = FMath::RandRange(0, 1); // Debug
 			//TileInfo.PackedTileIndex = EETVTargetValidity::Valid; // Debug
 			CurrentTile.Index = TileInfo.PackedTileIndex;
@@ -238,7 +267,6 @@ void AETVGameModeBase::GenerateShips()
 
 	SpawnShip(xcoord, ycoord, TileInfo.TileSet);
 
-
 	// Spawning Capital Ship for Enemy
 	TileInfo.TileSet = EnemyCapitalShip;
 	ycoord = FMath::FRandRange(0, MapWidth);
@@ -334,7 +362,7 @@ void AETVGameModeBase::SpawnShip(int32 x, int32 y, UPaperTileSet* type)
 		CapitalShip->SetContextMenu(ContextMenu);
 		CapitalShip->GetRenderComponent()->SetMobility(EComponentMobility::Movable);
 		CapitalShip->GetRenderComponent()->SetSprite(Sprite);
-		
+
 		// Setting sprite color to transparent
 		CapitalShip->GetRenderComponent()->SetSpriteColor(FLinearColor(1.0f, 1.0f, 1.0f, 0.0f));
 
@@ -422,6 +450,8 @@ void AETVGameModeBase::SpawnWeapon(int32 NewX, int32 NewY, AETVShip* Ship, int32
 		} while (!WeaponSlot->DoesWeaponFit(Laser));
 		WeaponSlot->FitWeapon(Laser);
 		Ship->AddWeapon(WeaponSlot);
+
+
 	}
 	else if (type == AETVWeapon::DamageHull)
 	{
@@ -490,7 +520,7 @@ AETVShip* AETVGameModeBase::GetShipActor(int32 x, int32 y)
 
 FVector AETVGameModeBase::GetPosition(int32 x, int32 y, float z)
 {
-	return FVector(-(TileSize / 2)*MapWidth + x*TileSize, -(TileSize / 2)*MapHeight + y*TileSize, z);
+	return FVector(-(TileSize / 2)*MapWidth + x * TileSize, -(TileSize / 2)*MapHeight + y * TileSize, z);
 }
 
 void AETVGameModeBase::EndTurn()
@@ -662,4 +692,8 @@ void AETVGameModeBase::StopTargeting()
 			SelectedAction->Perform();
 		}
 	}
+}
+
+UETVActionLogWidget* AETVGameModeBase::GetLogWidget() {
+	return ActionLogClass;
 }

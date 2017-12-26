@@ -12,6 +12,9 @@
 #include "ETVShipFighter.h"
 #include "ETVShipRepairShip.h"
 #include "ETVStructTile.h"
+#include "ETVShipStatusUIWidget.h"
+#include "ETVActionLogWidget.h"
+#include "ETVActionLogEntryWidget.h"
 #include "GameFramework/GameModeBase.h"
 #include "ETVGameModeBase.generated.h"
 
@@ -139,6 +142,21 @@ protected:
 	// Start with targeting enabled (debug)
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV Map")
 	bool bTargetingOnStart;
+
+	// The widget class for the ShipStatusUI
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ETV UI", meta = (BlueprintProtected = "true"))
+	TSubclassOf<UETVShipStatusUIWidget> ShipStatusUIClass;
+
+	// The pointer to accses the ShipStatusUI Widget
+	UPROPERTY()
+	UETVShipStatusUIWidget* ShipStatusUI;
+
+	// For ActionLog UI
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV ActionLog")
+	TSubclassOf<class UETVActionLogWidget> ActionLogWidget;
+
+	UPROPERTY()
+	class UETVActionLogWidget* ActionLogClass;
 	
 public:
 	// Called every frame
@@ -229,4 +247,8 @@ public:
 	// Stops targeting, resetting targeting mode
 	UFUNCTION(BlueprintCallable, Category = "ETV Targeting")
 	void StopTargeting();
+
+	// Get Widget
+	UFUNCTION()
+	UETVActionLogWidget* GetLogWidget();
 };

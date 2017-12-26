@@ -7,9 +7,11 @@
 #include "ETVWeaponShieldBattery.h"
 #include "ETVActionTarget_Fire.h"
 #include "ETVActionTarget_Move.h"
+#include "ETVCameraDirector.h"
 #include "WidgetLayoutLibrary.h"
 #include "UserWidget.h"
 #include "ETVCalculator.h"
+//#include "DrawDebugHelpers.h" // Uncomment for debug drawing
 
 // Sets default values
 AETVGameModeBase::AETVGameModeBase()
@@ -173,8 +175,7 @@ void AETVGameModeBase::Tick(float DeltaTime)
 void AETVGameModeBase::MapGeneration()
 {
 	// Vector for spawn location (takes into account height, width and tile size)
-	TileHeight = -450; // TODO Scale dynamically based on size
-	const FVector LocDim(-(MapHeight * TileSize / 2), -(MapWidth * TileSize / 2), TileHeight);
+	const FVector LocDim(-(MapHeight * TileSize / 2), -(MapWidth * TileSize / 2), 0);
 
 	// Actor spawn parameters
 	const FActorSpawnParameters SpawnInfo;
@@ -346,7 +347,8 @@ void AETVGameModeBase::GenerateShips()
 void AETVGameModeBase::SpawnShip(int32 x, int32 y, UPaperTileSet* type)
 {
 	// Vector for spawn location based on where TileSet is in TileMap
-	const FVector LocDim = GetPosition(x, y);
+	FVector LocDim = GetPosition(x, y);
+	LocDim.Z = 0.1f;
 
 	// Actor spawn parameters
 	const FActorSpawnParameters SpawnInfo;
@@ -515,7 +517,7 @@ AETVShip* AETVGameModeBase::GetShipActor(int32 x, int32 y)
 	return nullptr;
 }
 
-FVector AETVGameModeBase::GetPosition(int32 x, int32 y, int32 z)
+FVector AETVGameModeBase::GetPosition(int32 x, int32 y, float z)
 {
 	return FVector(-(TileSize / 2)*MapWidth + x * TileSize, -(TileSize / 2)*MapHeight + y * TileSize, z);
 }
@@ -584,6 +586,14 @@ bool AETVGameModeBase::IsTargeting()
 	return bTargeting;
 }
 
+bool AETVGameModeBase::IsPositionOnTileMap(const FVector Location)
+{
+	bool bInRangeX = UKismetMathLibrary::InRange_FloatFloat(Location.X, TileData[0].PointLeftTop.X, TileData.Last().PointRightBottom.X, false, false);
+	bool bInRangeY = UKismetMathLibrary::InRange_FloatFloat(Location.Y, TileData[0].PointLeftTop.Y, TileData.Last().PointRightBottom.Y, false, false);
+
+	return bInRangeX && bInRangeY;
+}
+
 void AETVGameModeBase::GetMouseOverTile(FETVTile& Tile)
 {
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
@@ -592,23 +602,35 @@ void AETVGameModeBase::GetMouseOverTile(FETVTile& Tile)
 	FVector WorldDirection;
 	if (PlayerController->DeprojectMousePositionToWorld(WorldLocation, WorldDirection))
 	{
+		AETVCameraDirector* Camera = Cast<AETVCameraDirector>(PlayerController->GetPawn());
+		if (Camera == nullptr)
+		{
+			UE_LOG(LogTemp, Error, TEXT("GetMouseOverTile(): Pawn not set to AETVCameraDirector!"))
+			return;
+		}
+
 		// Add height to tile map
-		WorldDirection *= abs(TileHeight / WorldDirection.Z + WorldLocation.Z);
+		WorldDirection *= abs((Camera->GetZoom() + 10.0f) / WorldDirection.Z); // Add 10.0f due to #68 (start is 20 UU higher, but for some reason half is taken)
 		WorldLocation += WorldDirection;
 
 		// Check if on tile at all
-		bool bInRangeX = UKismetMathLibrary::InRange_FloatFloat(WorldLocation.X, TileData[0].PointLeftTop.X, TileData.Last().PointRightBottom.X, false, false);
-		bool bInRangeY = UKismetMathLibrary::InRange_FloatFloat(WorldLocation.Y, TileData[0].PointLeftTop.Y, TileData.Last().PointRightBottom.Y, false, false);
-		if (bInRangeX && bInRangeY)
+		if (IsPositionOnTileMap(WorldLocation))
 		{
 			// Check each tile if in range
 			for (auto &CurrentTileData : TileData)
 			{
-				bInRangeX = UKismetMathLibrary::InRange_FloatFloat(WorldLocation.X, CurrentTileData.PointLeftTop.X, CurrentTileData.PointRightBottom.X, false, false);
-				bInRangeY = UKismetMathLibrary::InRange_FloatFloat(WorldLocation.Y, CurrentTileData.PointLeftTop.Y, CurrentTileData.PointRightBottom.Y, false, false);
+				bool bInRangeX = UKismetMathLibrary::InRange_FloatFloat(WorldLocation.X, CurrentTileData.PointLeftTop.X, CurrentTileData.PointRightBottom.X, false, false);
+				bool bInRangeY = UKismetMathLibrary::InRange_FloatFloat(WorldLocation.Y, CurrentTileData.PointLeftTop.Y, CurrentTileData.PointRightBottom.Y, false, false);
 				if (bInRangeX && bInRangeY)
 				{
-					//UE_LOG(LogTemp, Warning, TEXT("Loc (%s) -- Dir (%s)"), *WorldLocation.ToString(), *WorldDirection.ToString())
+					/* Uncomment to enable visual representation of targeting (debug), "DrawDebugHelpers.h" include required
+					DrawDebugPoint(GetWorld(), WorldLocation, 5.0f, FColor(255, 0, 255), false); // Current mouse position
+					FVector DebugPointTileCenter = FVector(CurrentTileData.PointLeftTop.X, CurrentTileData.PointLeftTop.Y, 0.0f) * 0.5f + FVector(CurrentTileData.PointRightBottom.X, CurrentTileData.PointRightBottom.Y, 0.0f) * 0.5f;
+					DrawDebugPoint(GetWorld(), DebugPointTileCenter, 5.0f, FColor(255, 0, 0), false);
+					DrawDebugLine(GetWorld(), WorldLocation, DebugPointTileCenter, FColor(255, 0, 0), false);
+					UE_LOG(LogTemp, Warning, TEXT("Loc (%s) -- Dir (%s) -- Zoom %g"), *WorldLocation.ToString(), *WorldDirection.ToString(), Camera->GetZoom())
+					*/
+
 					Tile.Set(CurrentTileData.Tile);
 					return;
 				}

@@ -57,6 +57,9 @@ protected:
 	int32 MaxPerforms;
 
 public:
+	// Override path to world (through AActor) - UObject has no reference to the world it is in by itself (requires a path to it)
+	UWorld* GetWorld() const override;
+
 	UFUNCTION()
 	virtual void Init(AETVShip* OwnerShipPtr, AETVWeapon* OwnerWeaponPtr = nullptr);
 

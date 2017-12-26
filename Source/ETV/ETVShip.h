@@ -159,7 +159,7 @@ public:
 	UFUNCTION()
 	bool CanMove();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	bool IsEnemy();
 
 

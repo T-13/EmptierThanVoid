@@ -33,6 +33,9 @@ protected:
 
 public:
 	UFUNCTION()
+	virtual AActor* GetSelectedTarget();
+
+	UFUNCTION()
 	virtual void ApplyEffectsTarget() {}
 
 	virtual void SetTarget(AActor* Target, int32 X, int32 Y);

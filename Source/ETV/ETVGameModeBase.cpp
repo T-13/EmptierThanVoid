@@ -8,6 +8,8 @@
 #include "ETVActionTarget_Fire.h"
 #include "ETVActionTarget_Move.h"
 #include "WidgetLayoutLibrary.h"
+#include "UserWidget.h"
+#include "ETVCalculator.h"
 
 // Sets default values
 AETVGameModeBase::AETVGameModeBase()
@@ -53,6 +55,12 @@ AETVGameModeBase::AETVGameModeBase()
 void AETVGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// Spawn Widget for Action Log
+	ActionLogClass = CreateWidget<UETVActionLogWidget>(GetWorld(), ActionLogWidget);
+	ActionLogClass->SetPositionInViewport(UKismetMathLibrary::MakeVector2D(0, 0));
+	ActionLogClass->SetDesiredSizeInViewport(FVector2D(UWidgetLayoutLibrary::GetViewportSize(GetWorld())));
+	ActionLogClass->AddToViewport();
 
 	if (TileSet != nullptr)
 	{
@@ -133,7 +141,7 @@ void AETVGameModeBase::Tick(float DeltaTime)
 
 			// Get ship on currently hovered tile
 			AActor* TargetActor = GetShipActor(CurrentTile.X, CurrentTile.Y);
-			// Get tile if no ship on that tile
+			// Get tile if no ship on that location
 			if (TargetActor == nullptr)
 			{
 				TargetActor = TileMapActor;
@@ -142,7 +150,7 @@ void AETVGameModeBase::Tick(float DeltaTime)
 			// Set target
 			SelectedAction->SetTarget(TargetActor, CurrentTile.X, CurrentTile.Y);
 
-			TileInfo.PackedTileIndex =  SelectedAction->CanPerform() ? EETVTargetValidity::Valid : EETVTargetValidity::Invalid;
+			TileInfo.PackedTileIndex = SelectedAction->CanPerform() ? EETVTargetValidity::Valid : EETVTargetValidity::Invalid;
 			//TileInfo.PackedTileIndex = FMath::RandRange(0, 1); // Debug
 			//TileInfo.PackedTileIndex = EETVTargetValidity::Valid; // Debug
 			CurrentTile.Index = TileInfo.PackedTileIndex;
@@ -259,7 +267,6 @@ void AETVGameModeBase::GenerateShips()
 
 	SpawnShip(xcoord, ycoord, TileInfo.TileSet);
 
-
 	// Spawning Capital Ship for Enemy
 	TileInfo.TileSet = EnemyCapitalShip;
 	ycoord = FMath::FRandRange(0, MapWidth);
@@ -354,7 +361,7 @@ void AETVGameModeBase::SpawnShip(int32 x, int32 y, UPaperTileSet* type)
 		CapitalShip->SetContextMenu(ContextMenu);
 		CapitalShip->GetRenderComponent()->SetMobility(EComponentMobility::Movable);
 		CapitalShip->GetRenderComponent()->SetSprite(Sprite);
-		
+
 		// Setting sprite color to transparent
 		CapitalShip->GetRenderComponent()->SetSpriteColor(FLinearColor(1.0f, 1.0f, 1.0f, 0.0f));
 
@@ -442,6 +449,8 @@ void AETVGameModeBase::SpawnWeapon(int32 NewX, int32 NewY, AETVShip* Ship, int32
 		} while (!WeaponSlot->DoesWeaponFit(Laser));
 		WeaponSlot->FitWeapon(Laser);
 		Ship->AddWeapon(WeaponSlot);
+
+
 	}
 	else if (type == AETVWeapon::DamageHull)
 	{
@@ -488,7 +497,7 @@ void AETVGameModeBase::SpawnActions(AETVShip* Ship)
 	}
 
 	UETVActionTarget_Move *Move = NewObject<UETVActionTarget_Move>();
-	Move->Init(Ship, nullptr);
+	Move->Init(Ship);
 	Ship->AddAction(Move);
 }
 
@@ -508,7 +517,7 @@ AETVShip* AETVGameModeBase::GetShipActor(int32 x, int32 y)
 
 FVector AETVGameModeBase::GetPosition(int32 x, int32 y, int32 z)
 {
-	return FVector(-(TileSize / 2)*MapWidth + x*TileSize, -(TileSize / 2)*MapHeight + y*TileSize, z);
+	return FVector(-(TileSize / 2)*MapWidth + x * TileSize, -(TileSize / 2)*MapHeight + y * TileSize, z);
 }
 
 void AETVGameModeBase::EndTurn()
@@ -547,11 +556,27 @@ void AETVGameModeBase::NextTurn()
 	// Unpause
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 	PlayerController->SetPause(false);
+
+	// Perform multi-turn actions
+	for (auto &MultiTurnAction : MultiTurnActions)
+	{
+		MultiTurnAction->Perform();
+	}
 }
 
 float AETVGameModeBase::GetCurrentTurnPercentage()
 {
 	return 1.0f - CurrentTurnTime / static_cast<float>(TurnTime);
+}
+
+void AETVGameModeBase::AddMultiTurnAction(UETVAction* Action)
+{
+	MultiTurnActions.Add(Action);
+}
+
+void AETVGameModeBase::RemoveMultiTurnAction(UETVAction* Action)
+{
+	MultiTurnActions.Remove(Action);
 }
 
 bool AETVGameModeBase::IsTargeting()
@@ -647,6 +672,7 @@ void AETVGameModeBase::StopTargeting()
 
 	// Set previous tile variables to invalid
 	LastTile.Invalidate();
+	CurrentTile.Invalidate();
 
 	// Make sure nothing stopped targeting
 	if (SelectedAction != nullptr)
@@ -657,6 +683,8 @@ void AETVGameModeBase::StopTargeting()
 			SelectedAction->Perform();
 		}
 	}
+}
 
-	CurrentTile.Invalidate();
+UETVActionLogWidget* AETVGameModeBase::GetLogWidget() {
+	return ActionLogClass;
 }

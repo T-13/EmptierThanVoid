@@ -1,4 +1,4 @@
-﻿// Copyright (C) Team13. All rights reserved.
+// Copyright (C) Team13. All rights reserved.
 
 #pragma once
 
@@ -18,7 +18,11 @@ class ETV_API AETVShipCapital : public AETVShip
 public:
 	// Sets default values for this actor's properties
 	AETVShipCapital();
-	void Init(FString NewName, int32 HP, int32 MaxHP, int32 ShieldP, int32 NewShieldRechargeTime, int32 NewSize, int32 NewMoveRange, int32 Speed, bool HyperDrive, float NewLaserResistance, int32 Hangars);
+	void Init(FString NewName, int32 MaxHP, int32 ShieldP, int32 NewShieldRechargeTime, int32 NewMoveRange, int32 Speed, bool HyperDrive, float NewLaserResistance, int32 Hangars);
+
+	void InitRandom(FString NewName);
+
+	void InitRandomWithLevel(FString NewName, int32 PowerLvl);
 
 
 protected:

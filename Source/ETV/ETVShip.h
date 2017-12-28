@@ -1,4 +1,4 @@
-﻿// Copyright (C) Team13. All rights reserved.
+// Copyright (C) Team13. All rights reserved.
 
 #pragma once
 
@@ -161,6 +161,12 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	bool IsEnemy();
+
+	UFUNCTION(BlueprintCallable)
+	int32 getX() const { return X; }
+
+	UFUNCTION(BlueprintCallable)
+	int32 getY() const { return Y; }
 
 
 	// Returns a multiplier for the effectiveness of ship's actions depending on its status

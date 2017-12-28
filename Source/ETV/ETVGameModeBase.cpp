@@ -80,15 +80,16 @@ void AETVGameModeBase::BeginPlay()
 		ShipStatusUI = CreateWidget<UETVShipStatusUIWidget>(GetWorld(), ShipStatusUIClass);
 		// Pass ships to the ShipStatus UI
 		ShipStatusUI->AssignShips(Ships);
+
+		FVector2D temp = UWidgetLayoutLibrary::GetViewportSize(GetWorld());
 		
 		// Define the size of the element
-		int32 WidthOfShipStatusUI = 1200;
+		int32 WidthOfShipStatusUI = temp.X*0.5;
 		int32 HeightOfShipStatusUI = 180;
 
 		// Set the location to bottom left corner
-		FVector2D temp = UWidgetLayoutLibrary::GetViewportSize(GetWorld());
-		temp.X = 0;
-		temp.Y = temp.Y - HeightOfShipStatusUI*0.6;
+		temp.X = temp.X*0.02;
+		temp.Y = temp.Y*0.995 - HeightOfShipStatusUI;
 		ShipStatusUI->SetPositionInViewport(temp);
 
 		// Resize to correct size

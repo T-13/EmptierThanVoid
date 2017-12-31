@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
-#include "ETVWeapon.h"
 #include "ETVAction.generated.h"
 
 UENUM(BlueprintType)
@@ -27,18 +26,15 @@ public:
 	// Sets default values for this actor's properties
 	UETVAction();
 
+	AETVShip* OwnerShip;
+	AETVWeapon* OwnerWeapon;
+
+	int32 CurrentPerform;
+
 protected:
 	// Display name of the action
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Action")
 	FName Name;
-	
-	// Minimal size of the asset using the action
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Action", meta = (ClampMin = "0.0"))
-	int32 MinAttachSize;
-
-	// Maximal size of the asset using the action
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Action", meta = (ClampMin = "100.0"))
-	int32 MaxAttachSize;
 
 	// Minimal range of the action
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Action", meta = (ClampMin = "0.0"))
@@ -48,7 +44,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Action", meta = (ClampMin = "100.0"))
 	int32 MaxRange;
 
-	// Availability of the action (0 = greyed out, 1 = available
+	// [NOT YET IMPLEMENTED] Availability of the action (0 = not shown in UI, 1 = shown in UI)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Action", meta = (ClampMin = "0.0", ClampMax = "1.0"))
 	EETVActionAvailability Available;
 
@@ -56,16 +52,41 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Action")
 	bool bEndsTurn;
 
-	// Required weapon for the action to be available
+	// Maximum amount of performs the action will trigger before dying (activates multi-turn handling with partial performs)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Action")
-	TSubclassOf<AETVWeapon> RequiredWeapon;
+	int32 MaxPerforms;
 
 public:
+	// Override path to world (through AActor) - UObject has no reference to the world it is in by itself (requires a path to it)
+	UWorld* GetWorld() const override;
+
+	UFUNCTION()
+	virtual void Init(AETVShip* OwnerShipPtr, AETVWeapon* OwnerWeaponPtr = nullptr);
+
+	UFUNCTION()
+	virtual bool IsMultiTurn();
+
+	UFUNCTION()
+	virtual bool IsFirstPerform();
+
+	UFUNCTION()
+	virtual bool IsLastPerform();
+
 	UFUNCTION()
 	virtual bool CanPerform();
 
-    UFUNCTION()
+	// Activates the action (double checking if can perform, starts targeting if required), returns activation success
+	UFUNCTION(BlueprintCallable, Category = "ETV Action")
+	virtual bool Activate();
+
+	UFUNCTION()
 	virtual void Perform();
+
+	UFUNCTION()
+	virtual void OnBeginPerform();
+
+	UFUNCTION()
+	virtual void OnEndPerform();
 
     UFUNCTION()
 	virtual void ApplyEffectsSelf() {}

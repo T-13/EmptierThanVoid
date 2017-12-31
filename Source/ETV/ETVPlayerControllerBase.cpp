@@ -9,3 +9,10 @@ AETVPlayerControllerBase::AETVPlayerControllerBase()
 	bEnableClickEvents = true;
 	bEnableMouseOverEvents = true;
 }
+
+// Called to bind functionality to input
+void AETVPlayerControllerBase::SetupInputComponent()
+{
+	Super::SetupInputComponent();
+
+}

@@ -53,8 +53,7 @@ void AETVCameraDirector::BeginPlay()
 
 	InputComponent->BindAction("CameraZoomIn", IE_Pressed, this, &AETVCameraDirector::OnZoomIn);
 	InputComponent->BindAction("CameraZoomOut", IE_Pressed, this, &AETVCameraDirector::OnZoomOut);
-	FInputActionBinding MoveModifierBinding = InputComponent->BindAction("CameraMoveModifier", IE_Pressed, this, &AETVCameraDirector::OnMoveModifier);
-	MoveModifierBinding.bConsumeInput = false;
+	InputComponent->BindAction("CameraMoveModifier", IE_Pressed, this, &AETVCameraDirector::OnMoveModifier);
 	InputComponent->BindAction("CameraMoveModifier", IE_Released, this, &AETVCameraDirector::OnMoveModifier);
 	InputComponent->BindAxis("CameraMoveHorizontal", this, &AETVCameraDirector::OnMoveHorizontal);
 	InputComponent->BindAxis("CameraMoveVertical", this, &AETVCameraDirector::OnMoveVertical);

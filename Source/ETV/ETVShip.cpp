@@ -12,6 +12,8 @@ AETVShip::AETVShip() : Super()
 	IsContextMenuOpen = false;
 
 	Type = EETVShipType::PlayerShip;
+
+	SensorRange = 8;
 }
 
 void AETVShip::Init(FString NewName, int32 HP, int32 MaxHP, int32 ShieldP, int32 NewShieldRechargeTime, int32 NewSize, int32 NewMoveRange, int32 Speed)

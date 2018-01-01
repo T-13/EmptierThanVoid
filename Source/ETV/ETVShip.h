@@ -1,4 +1,4 @@
-﻿// Copyright (C) Team13. All rights reserved.
+// Copyright (C) Team13. All rights reserved.
 
 #pragma once
 
@@ -82,6 +82,10 @@ protected:
 	// Area that ship is allowed to move to
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship", meta = (ClampMin = "1.0"))
 	int32 MoveRange;
+
+	// Area ship's sensors can see
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship", meta = (ClampMin = "1.0"))
+	int32 SensorRange;
 
 	// Integers (x,y) for possible fields that ship can move to
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship")

@@ -15,6 +15,7 @@ UETVActionTarget_Move::UETVActionTarget_Move() : Super()
 
 bool UETVActionTarget_Move::CanPerform()
 {
+	// TODO Check distance (Ship's MoveRange vs distance)
 	return Super::CanPerform() && OwnerShip->CanMove();
 }
 

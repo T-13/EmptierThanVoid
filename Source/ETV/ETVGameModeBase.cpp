@@ -708,6 +708,21 @@ void AETVGameModeBase::StopTargeting()
 	}
 }
 
+void AETVGameModeBase::ShipClicked(AETVShip * ClickedShip)
+{
+	LastClickedShip = ClickedShip;
+}
+
+bool AETVGameModeBase::WasShipClickedRecently()
+{
+	return (LastClickedShip != nullptr);
+}
+
+AETVShip * const AETVGameModeBase::GetLastClickedShip()
+{
+	return LastClickedShip;
+}
+
 UETVActionLogWidget* AETVGameModeBase::GetLogWidget() {
 	return ActionLogClass;
 }

@@ -157,6 +157,10 @@ protected:
 
 	UPROPERTY()
 	class UETVActionLogWidget* ActionLogClass;
+
+	// Reference to THE ONE ship with the opened context menu
+	UPROPERTY()
+	class AETVShip* LastClickedShip;
 	
 public:
 	// Called every frame
@@ -247,6 +251,18 @@ public:
 	// Stops targeting, resetting targeting mode
 	UFUNCTION(BlueprintCallable, Category = "ETV Targeting")
 	void StopTargeting();
+
+	/*Player Action handling*/
+	// Update last clicked ship
+	UFUNCTION(BlueprintCallable, Category = "ETV Click")
+	void ShipClicked(AETVShip* ClickedShip);
+
+	// Has a ship opened context menu
+	UFUNCTION(BlueprintCallable, Category = "ETV Click")
+	bool WasShipClickedRecently();
+
+	UFUNCTION()
+	AETVShip* const GetLastClickedShip();
 
 	// Get Widget
 	UFUNCTION()

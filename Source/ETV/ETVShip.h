@@ -168,6 +168,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	int32 getY() const { return Y; }
 
+	UFUNCTION()
+	void CloseContextMenu();
+
+	UFUNCTION()
+	void UnconditionallyCloseContextMenu();
+
 
 	// Returns a multiplier for the effectiveness of ship's actions depending on its status
 	UFUNCTION()

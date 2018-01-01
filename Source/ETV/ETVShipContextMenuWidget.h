@@ -1,4 +1,4 @@
-﻿// Copyright (C) Team13. All rights reserved.
+// Copyright (C) Team13. All rights reserved.
 
 #pragma once
 
@@ -22,7 +22,17 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV ShipContextMenu")
 	AETVShip *ParentShip;
 
+	// Tells the context menu if it can stay open
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV ShipContextMenu")
+	bool bCanStayOpen = true;
+
 public:
 	UFUNCTION(BlueprintCallable)
-	void AssignShip(AETVShip *ParamShip);	
+	void AssignShip(AETVShip *ParamShip);
+	
+	UFUNCTION(BlueprintCallable)
+	void ShouldNotReOpen();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ETV Click")
+	void Close();
 };

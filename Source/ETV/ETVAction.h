@@ -72,7 +72,7 @@ public:
 	UFUNCTION()
 	virtual bool IsLastPerform();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	virtual bool CanPerform();
 
 	// Activates the action (double checking if can perform, starts targeting if required), returns activation success

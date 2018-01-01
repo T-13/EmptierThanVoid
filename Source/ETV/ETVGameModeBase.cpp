@@ -60,9 +60,24 @@ void AETVGameModeBase::BeginPlay()
 
 	// Spawn Widget for Action Log
 	ActionLogClass = CreateWidget<UETVActionLogWidget>(GetWorld(), ActionLogWidget);
-	ActionLogClass->SetPositionInViewport(UKismetMathLibrary::MakeVector2D(0, 0));
-	ActionLogClass->SetDesiredSizeInViewport(FVector2D(UWidgetLayoutLibrary::GetViewportSize(GetWorld())));
+	//ActionLogClass->SetPositionInViewport(UKismetMathLibrary::MakeVector2D(0, 0));
+	//ActionLogClass->SetDesiredSizeInViewport(FVector2D(UWidgetLayoutLibrary::GetViewportSize(GetWorld())));
+	//ActionLogClass->AddToViewport();
+	FVector2D temp = UWidgetLayoutLibrary::GetViewportSize(GetWorld());
+	UE_LOG(LogTemp, Warning, TEXT("Screen size: %f, %f"), temp.X, temp.Y);
+	int32 WidthOfActionLog = temp.X * 0.4;
+	int32 HeightOfActionLog = 150;
+	UE_LOG(LogTemp, Warning, TEXT("W&H: %d, %d"), WidthOfActionLog, HeightOfActionLog);
+	temp.X = temp.X - WidthOfActionLog-30;
+	temp.Y = temp.Y - HeightOfActionLog-60;
+	UE_LOG(LogTemp, Warning, TEXT("Where to spawn: %f, %f"), temp.X, temp.Y);
+	ActionLogClass->SetPositionInViewport(temp, false);
+	ActionLogClass->SetDesiredSizeInViewport(UKismetMathLibrary::MakeVector2D(WidthOfActionLog, HeightOfActionLog));
 	ActionLogClass->AddToViewport();
+	
+	FGeometry cachedGeometry = ActionLogClass->GetCachedGeometry();
+	FVector2D currentSize = cachedGeometry.GetLocalSize();
+	UE_LOG(LogTemp, Warning, TEXT("Where to spawn: %f, %f"), currentSize.X, currentSize.Y);
 
 	if (TileSet != nullptr)
 	{
@@ -80,17 +95,18 @@ void AETVGameModeBase::BeginPlay()
 		ShipStatusUI = CreateWidget<UETVShipStatusUIWidget>(GetWorld(), ShipStatusUIClass);
 		// Pass ships to the ShipStatus UI
 		ShipStatusUI->AssignShips(Ships);
-		
-		// Define the size of the element
-		int32 WidthOfShipStatusUI = 1200;
-		int32 HeightOfShipStatusUI = 180;
 
-		// Set the location to bottom left corner
 		FVector2D temp = UWidgetLayoutLibrary::GetViewportSize(GetWorld());
-		temp.X = 0;
-		temp.Y = temp.Y - HeightOfShipStatusUI*0.6;
-		ShipStatusUI->SetPositionInViewport(temp);
-
+		// Define the size of the element
+		int32 WidthOfShipStatusUI = temp.X * 0.5;
+		int32 HeightOfShipStatusUI = 165;
+		UE_LOG(LogTemp, Warning, TEXT("Screen size: %f, %f"), temp.X, temp.Y);
+		UE_LOG(LogTemp, Warning, TEXT("W&H: %d, %d"), WidthOfShipStatusUI, HeightOfShipStatusUI);
+		// Set the location to bottom left corner	
+		temp.X = 30;
+		temp.Y = temp.Y - HeightOfShipStatusUI - 45;
+		ShipStatusUI->SetPositionInViewport(temp, false);
+		UE_LOG(LogTemp, Warning, TEXT("Where to spawn: %f, %f"), temp.X, temp.Y);
 		// Resize to correct size
 		ShipStatusUI->SetDesiredSizeInViewport(UKismetMathLibrary::MakeVector2D(WidthOfShipStatusUI, HeightOfShipStatusUI));
 
@@ -267,6 +283,26 @@ void AETVGameModeBase::GenerateShips()
 	yArr.Push(ycoord);
 
 	SpawnShip(xcoord, ycoord, TileInfo.TileSet);
+
+	//AETVShip *Test = GetShipActor(xcoord, ycoord);
+	//UETVCalculator * calc;
+	//AETVWeaponLaser * Laser;
+	//AETVWeaponTorpedo * Torpedo;
+	//const FVector LocDim = GetPosition(xcoord, ycoord);
+	//
+	//// Actor spawn parameters
+	//const FActorSpawnParameters SpawnInfo;
+
+	//// Rotate upwards to face the top-down camera
+	//const FRotator Rotator(0, 0, -90);
+	//Laser = GetWorld()->SpawnActor<AETVWeaponLaser>(LocDim, Rotator, SpawnInfo);
+	//Torpedo = GetWorld()->SpawnActor<AETVWeaponTorpedo>(LocDim, Rotator, SpawnInfo);
+	//Torpedo->InitRandom("Torpedo", 100);
+	//Laser->InitRandom("Laser", 100);
+	//calc->CalculateWeaponEffect(Test, Laser, Test);
+	//calc->CalculateWeaponEffect(Test, Torpedo, Test);
+	//calc->CalculateWeaponEffect(Test, Torpedo, Test);
+	//calc->CalculateWeaponEffect(Test, Torpedo, Test);
 
 	// Spawning Capital Ship for Enemy
 	TileInfo.TileSet = EnemyCapitalShip;
@@ -606,7 +642,7 @@ void AETVGameModeBase::GetMouseOverTile(FETVTile& Tile)
 		if (Camera == nullptr)
 		{
 			UE_LOG(LogTemp, Error, TEXT("GetMouseOverTile(): Pawn not set to AETVCameraDirector!"))
-			return;
+				return;
 		}
 
 		// Add height to tile map

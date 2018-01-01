@@ -63,11 +63,11 @@ class ETV_API AETVGameModeBase : public AGameModeBase
 	FETVTile CurrentTile;
 	FETVTile LastTile; // Reset this tile when mouse leaves it
 	FETVTile PreDelayTile; // Reset this tile when click animation stops
+	FETVTile ConfirmationTile; // Clicked once tile, waiting for another click (confirmation)
 
 	UETVActionTarget* SelectedAction;
 
 	// Ship Tiles
-
 	UPaperTileSet* PlayerCapitalShip;
 	UPaperTileSet* PlayerFighterShip;
 	UPaperTileSet* EnemyCapitalShip;
@@ -234,11 +234,15 @@ public:
 
 	// Target selection effect (Tile Maps don't support animations at this time)
 	UFUNCTION()
-	void OnClickedMapTile();
+	void OnClickedSelectMapTile();
 
 	// Target deselection effect (Tile Maps don't support animations at this time)
 	UFUNCTION()
-	void OnReleasedMapTile();
+	void OnReleasedSelectMapTile();
+
+	// Targeting cancelation
+	UFUNCTION()
+	void OnClickedCancelTargeting();
 
 	// Starts targeting, handles ETV Action calls and stops targeting after target is selected
 	UFUNCTION(BlueprintCallable, Category = "ETV Targeting")
@@ -246,7 +250,7 @@ public:
 
 	// Stops targeting, resetting targeting mode
 	UFUNCTION(BlueprintCallable, Category = "ETV Targeting")
-	void StopTargeting();
+	void StopTargeting(bool bSuccess = true);
 
 	// Get Widget
 	UFUNCTION()

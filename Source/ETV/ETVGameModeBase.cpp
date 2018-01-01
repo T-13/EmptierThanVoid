@@ -159,8 +159,8 @@ void AETVGameModeBase::Tick(float DeltaTime)
 			CurrentTile.Index = TileInfo.PackedTileIndex;
 			TileMapComp->SetTile(CurrentTile.X, CurrentTile.Y, EETVTileLayer::Target, TileInfo);
 
-			// Reset previous tile (only if not in click phase)
-			if (LastTile.IsValid())
+			// Reset previous tile (only if tile not in confirmation phase)
+			if (LastTile.IsValid() && ConfirmationTile != LastTile)
 			{
 				FPaperTileInfo LastTileInfo;
 				LastTileInfo.PackedTileIndex = LastTile.Index;
@@ -235,8 +235,9 @@ void AETVGameModeBase::MapGeneration()
 
 	// Bind click
 	UInputComponent* InputComponent = GetWorld()->GetFirstPlayerController()->InputComponent;
-	InputComponent->BindAction("ClickTile", IE_Pressed, this, &AETVGameModeBase::OnClickedMapTile);
-	InputComponent->BindAction("ClickTile", IE_Released, this, &AETVGameModeBase::OnReleasedMapTile);
+	InputComponent->BindAction("SelectTile", IE_Pressed, this, &AETVGameModeBase::OnClickedSelectMapTile);
+	InputComponent->BindAction("SelectTile", IE_Released, this, &AETVGameModeBase::OnReleasedSelectMapTile);
+	InputComponent->BindAction("CancelTargeting", IE_Pressed, this, &AETVGameModeBase::OnClickedCancelTargeting);
 }
 
 void AETVGameModeBase::GenerateShips()
@@ -642,7 +643,7 @@ void AETVGameModeBase::GetMouseOverTile(FETVTile& Tile)
 	Tile.Invalidate();
 }
 
-void AETVGameModeBase::OnClickedMapTile()
+void AETVGameModeBase::OnClickedSelectMapTile()
 {
 	// Make sure we are still targeting (in case of race conditions)
 	if (bTargeting && !PreDelayTile.IsValid() && TileSetTargetClick != nullptr)
@@ -657,13 +658,25 @@ void AETVGameModeBase::OnClickedMapTile()
 		// Stop targeting if valid target
 		if (PreDelayTile.Index == EETVTargetValidity::Valid)
 		{
-			StopTargeting();
+			// Reset previous tile
+			FPaperTileInfo LastTileInfo;
+			LastTileInfo.PackedTileIndex = ConfirmationTile.Index;
+			TileMapComp->SetTile(ConfirmationTile.X, ConfirmationTile.Y, EETVTileLayer::Target, LastTileInfo);
+
+			if (ConfirmationTile.IsValid() && PreDelayTile == ConfirmationTile)
+			{
+				ConfirmationTile.Invalidate();
+				StopTargeting();
+			}
+			else
+			{
+				ConfirmationTile.Set(CurrentTile);
+			}
 		}
 	}
-
 }
 
-void AETVGameModeBase::OnReleasedMapTile()
+void AETVGameModeBase::OnReleasedSelectMapTile()
 {
 	if (PreDelayTile.IsValid())
 	{
@@ -679,7 +692,11 @@ void AETVGameModeBase::OnReleasedMapTile()
 		// Set pre-delay tile variable to invalid
 		PreDelayTile.Invalidate();
 	}
+}
 
+void AETVGameModeBase::OnClickedCancelTargeting()
+{
+	StopTargeting(false);
 }
 
 void AETVGameModeBase::StartTargeting(UETVActionTarget* Action)
@@ -689,16 +706,27 @@ void AETVGameModeBase::StartTargeting(UETVActionTarget* Action)
 	bTargeting = true;
 }
 
-void AETVGameModeBase::StopTargeting()
+void AETVGameModeBase::StopTargeting(bool bSuccess)
 {
 	bTargeting = false;
+
+	// Reset current and confirmation (if it exists) tiles
+	FPaperTileInfo LastTileInfo;
+	LastTileInfo.PackedTileIndex = CurrentTile.Index;
+	TileMapComp->SetTile(CurrentTile.X, CurrentTile.Y, EETVTileLayer::Target, LastTileInfo);
+
+	if (ConfirmationTile.IsValid())
+	{
+		LastTileInfo.PackedTileIndex = ConfirmationTile.Index;
+		TileMapComp->SetTile(ConfirmationTile.X, ConfirmationTile.Y, EETVTileLayer::Target, LastTileInfo);
+	}
 
 	// Set previous tile variables to invalid
 	LastTile.Invalidate();
 	CurrentTile.Invalidate();
 
 	// Make sure nothing stopped targeting
-	if (SelectedAction != nullptr)
+	if (bSuccess && SelectedAction != nullptr)
 	{
 		// Double check that if we can perform, then perform
 		if (SelectedAction->CanPerform())
@@ -706,6 +734,8 @@ void AETVGameModeBase::StopTargeting()
 			SelectedAction->Perform();
 		}
 	}
+
+	SelectedAction = nullptr;
 }
 
 void AETVGameModeBase::ShipClicked(AETVShip * ClickedShip)

@@ -9,7 +9,7 @@
 AETVCameraDirector::AETVCameraDirector()
 {
 	bCanMove = false;
-	MoveSpeed = 5.0f;
+	MoveSpeed = 10.0f;
 
 	ZoomStep = 25.0f;
 	ZoomMin = 100.0f;
@@ -43,17 +43,20 @@ AETVCameraDirector::AETVCameraDirector()
 	Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
 }
 
-// Called to bind functionality to input
-void AETVCameraDirector::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+// Called when the game starts or when spawned
+void AETVCameraDirector::BeginPlay()
 {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	Super::BeginPlay();
 
-	PlayerInputComponent->BindAction("CameraZoomIn", IE_Pressed, this, &AETVCameraDirector::OnZoomIn);
-	PlayerInputComponent->BindAction("CameraZoomOut", IE_Pressed, this, &AETVCameraDirector::OnZoomOut);
-	PlayerInputComponent->BindAction("CameraMoveModifier", IE_Pressed, this, &AETVCameraDirector::OnMoveModifier);
-	PlayerInputComponent->BindAction("CameraMoveModifier", IE_Released, this, &AETVCameraDirector::OnMoveModifier);
-	PlayerInputComponent->BindAxis("CameraMoveHorizontal", this, &AETVCameraDirector::OnMoveHorizontal);
-	PlayerInputComponent->BindAxis("CameraMoveVertical", this, &AETVCameraDirector::OnMoveVertical);
+	// Setup binds through player controller input component
+	UInputComponent* InputComponent = GetWorld()->GetFirstPlayerController()->InputComponent;
+
+	InputComponent->BindAction("CameraZoomIn", IE_Pressed, this, &AETVCameraDirector::OnZoomIn);
+	InputComponent->BindAction("CameraZoomOut", IE_Pressed, this, &AETVCameraDirector::OnZoomOut);
+	InputComponent->BindAction("CameraMoveModifier", IE_Pressed, this, &AETVCameraDirector::OnMoveModifier);
+	InputComponent->BindAction("CameraMoveModifier", IE_Released, this, &AETVCameraDirector::OnMoveModifier);
+	InputComponent->BindAxis("CameraMoveHorizontal", this, &AETVCameraDirector::OnMoveHorizontal);
+	InputComponent->BindAxis("CameraMoveVertical", this, &AETVCameraDirector::OnMoveVertical);
 }
 
 void AETVCameraDirector::OnZoomIn()
@@ -77,7 +80,7 @@ void AETVCameraDirector::OnMoveHorizontal(float AxisValue)
 	{
 		AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
 		
-		AxisValue *= -MoveSpeed;
+		AxisValue *= -MoveSpeed * std::max(GetZoom(true), 0.2f);
 		FVector Location = GetActorLocation();
 		Location.X += AxisValue;
 		if (GameMode->IsPositionOnTileMap(Location)) {
@@ -92,7 +95,7 @@ void AETVCameraDirector::OnMoveVertical(float AxisValue)
 	{
 		AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
 
-		AxisValue *= MoveSpeed;
+		AxisValue *= MoveSpeed * std::max(GetZoom(true), 0.2f);
 		FVector Location = GetActorLocation();
 		Location.Y += AxisValue;
 		if (GameMode->IsPositionOnTileMap(Location)) {
@@ -101,8 +104,13 @@ void AETVCameraDirector::OnMoveVertical(float AxisValue)
 	}
 }
 
-float AETVCameraDirector::GetZoom()
+float AETVCameraDirector::GetZoom(bool bInPercentage)
 {
+	if (bInPercentage)
+	{
+		return (SpringArm->TargetArmLength - ZoomMin) / (ZoomMax - ZoomMin);
+	}
+
 	return SpringArm->TargetArmLength;
 }
 

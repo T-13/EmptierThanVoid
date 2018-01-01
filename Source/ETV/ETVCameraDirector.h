@@ -20,6 +20,9 @@ public:
 	bool bCanMove;
 
 protected:
+	// Called when the game starts or when spawned
+	void BeginPlay() override;
+
 	// Scene component (Root Component)
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "ETV Camera")
 	USceneComponent* SceneComponent;
@@ -52,9 +55,6 @@ protected:
 	float ZoomMax;
 
 public:	
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
 	UFUNCTION()
 	void OnZoomIn();
 
@@ -72,7 +72,7 @@ public:
 
 	// Returns current zoom level (spring arm length, distance from RootComponent to Camera)
 	UFUNCTION(BlueprintCallable)
-	float GetZoom();
+	float GetZoom(bool bInPercentage = false);
 
 	// Move camera above given tile with specified zoom (keep current by default)
 	UFUNCTION(BlueprintCallable, Category = "ETV Camera")

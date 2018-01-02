@@ -2,7 +2,6 @@
 
 #include "ETVActionTarget_Fire.h"
 #include "ETVCalculator.h"
-#include "ETVGameModeBase.h"
 
 // Sets default values
 UETVActionTarget_Fire::UETVActionTarget_Fire() : Super()
@@ -39,9 +38,6 @@ void UETVActionTarget_Fire::ApplyEffectsTarget()
 
 	AETVShip* SelectedShip = Cast<AETVShip>(SelectedTarget); // Required type is ship (checked in parent) so casting is safe
 	UETVCalculator::CalculateWeaponEffect(OwnerShip, OwnerWeapon, SelectedShip);
-
-	AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
-	GameMode->GetShipListWidget()->Update();
 }
 
 void UETVActionTarget_Fire::ApplyEffectsSelf()

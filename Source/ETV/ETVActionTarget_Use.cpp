@@ -2,7 +2,6 @@
 
 #include "ETVActionTarget_Use.h"
 #include "ETVCalculator.h"
-#include "ETVGameModeBase.h"
 
 // Sets default values
 UETVActionTarget_Use::UETVActionTarget_Use() : Super()
@@ -27,9 +26,6 @@ void UETVActionTarget_Use::ApplyEffectsTarget()
 
 	AETVShip* SelectedShip = Cast<AETVShip>(SelectedTarget); // Required type is ship (checked in parent) so casting is safe
 	UETVCalculator::CalculateWeaponEffect(OwnerShip, OwnerWeapon, SelectedShip);
-
-	AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
-	GameMode->GetShipListWidget()->Update();
 }
 
 void UETVActionTarget_Use::ApplyEffectsSelf()

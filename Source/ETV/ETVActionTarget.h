@@ -53,4 +53,5 @@ public:
 	bool CanPerform() override;
 	bool Activate() override;
 	bool Perform() override;
+	void OnEndPerform() override;
 };

@@ -74,8 +74,16 @@ bool UETVActionTarget::Perform()
 	{
 		ApplyEffectsTarget();
 
+		OnEndPerform();
+
 		return true;
 	}
 
 	return false;
+}
+
+void UETVActionTarget::OnEndPerform()
+{
+	AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
+	GameMode->GetShipListWidget()->Update();
 }

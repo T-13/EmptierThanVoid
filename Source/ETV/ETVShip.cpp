@@ -80,12 +80,19 @@ void AETVShip::SpawnContextMenu(AActor *Actor, FKey Key)
 		CurrentContextMenu->AssignShip(this);
 		if (CurrentContextMenu != nullptr)
 		{
-			const FVector WorldTilePos = GameMode->GetPosition(X, Y);
-			// Uncomment when X and Y are correctly set -> Now it spawns it outside of view and insta closes it...
-			//CurrentContextMenu->SetPositionInViewport(UKismetMathLibrary::MakeVector2D(WorldTilePos.X, WorldTilePos.Y));
-			CurrentContextMenu->SetDesiredSizeInViewport(UKismetMathLibrary::MakeVector2D(320, 280));
-			CurrentContextMenu->AddToViewport();
-			IsContextMenuOpen = true;
+			const FVector WorldTilePos = GetActorLocation();
+			FVector2D ScreenTilePos;
+			if (PlayerController->ProjectWorldLocationToScreen(WorldTilePos, ScreenTilePos))
+			{
+				CurrentContextMenu->SetPositionInViewport(ScreenTilePos);
+				CurrentContextMenu->SetDesiredSizeInViewport(FVector2D(320, 280));
+				CurrentContextMenu->AddToViewport();
+				IsContextMenuOpen = true;
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("AETVShip::SpawnContextMenu(): Out of screen location!"))
+			}
 		}
 	}
 }

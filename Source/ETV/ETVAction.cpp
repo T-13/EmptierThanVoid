@@ -2,6 +2,7 @@
 
 #include "ETVAction.h"
 #include "ETVGameModeBase.h" // Not in .h due to circular dependency
+#include "ETVShipStatusUIWidget.h"
 
 // Sets default values
 UETVAction::UETVAction() : Super()
@@ -112,7 +113,6 @@ void UETVAction::OnEndPerform()
 
 	if (bEndsTurn)
 	{
-		AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
 		// TODO Delay this until all effects are done
 		GameMode->EndTurn();
 	}

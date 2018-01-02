@@ -273,6 +273,7 @@ public:
 	UFUNCTION()
 	AETVShip* GetLastClickedShip();
 
+
 	/* Get Widgets */
 	// Get log widget
 	UFUNCTION(BlueprintCallable, Category = "ETV UI")

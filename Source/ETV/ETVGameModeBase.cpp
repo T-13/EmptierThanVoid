@@ -769,7 +769,7 @@ UETVActionLogWidget* AETVGameModeBase::GetLogWidget() {
 	return ActionLogClass;
 }
 
-UETVShipStatusUIWidget * AETVGameModeBase::GetShipListWidget()
+UETVShipStatusUIWidget* AETVGameModeBase::GetShipListWidget()
 {
 	return ShipStatusUI;
 }

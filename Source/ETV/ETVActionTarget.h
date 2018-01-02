@@ -41,6 +41,8 @@ protected:
 	float FailureChance;
 
 public:
+	void Init(AETVShip* OwnerShipPtr, AETVWeapon* OwnerWeaponPtr = nullptr) override;
+
 	UFUNCTION()
 	virtual void ApplyEffectsTarget() {}
 

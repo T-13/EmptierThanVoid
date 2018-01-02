@@ -7,6 +7,7 @@
 #include "ETVWeaponShieldBattery.h"
 #include "ETVActionTarget_Fire.h"
 #include "ETVActionTarget_Move.h"
+#include "ETVActionTarget_Use.h"
 #include "ETVCameraDirector.h"
 #include "WidgetLayoutLibrary.h"
 #include "UserWidget.h"
@@ -475,7 +476,7 @@ void AETVGameModeBase::SpawnWeapon(int32 NewX, int32 NewY, AETVShip* Ship, int32
 		RepairArm = GetWorld()->SpawnActor<AETVWeaponRepairArm>(LocDim, Rotator, SpawnInfo);
 
 		do {
-			RepairArm->InitRandom("RepairArm", level);
+			RepairArm->InitRandom("Repair Arm", level);
 		} while (!WeaponSlot->DoesWeaponFit(RepairArm));
 		WeaponSlot->FitWeapon(RepairArm);
 		Ship->AddWeapon(WeaponSlot);
@@ -486,7 +487,7 @@ void AETVGameModeBase::SpawnWeapon(int32 NewX, int32 NewY, AETVShip* Ship, int32
 		ShieldBattery = GetWorld()->SpawnActor<AETVWeaponShieldBattery>(LocDim, Rotator, SpawnInfo);
 
 		do {
-			ShieldBattery->InitRandom("ShieldBattery", level);
+			ShieldBattery->InitRandom("Shield Bat", level); // Abbreviated "Battery" as "Bat" to fit in Context Menu
 		} while (!WeaponSlot->DoesWeaponFit(ShieldBattery));
 		WeaponSlot->FitWeapon(ShieldBattery);
 		Ship->AddWeapon(WeaponSlot);
@@ -497,7 +498,15 @@ void AETVGameModeBase::SpawnActions(AETVShip* Ship)
 {
 	for (UETVWeaponSlot* w : Ship->GetWeapons())
 	{
-		UETVActionTarget_Fire *Fire = NewObject<UETVActionTarget_Fire>();
+		UETVActionTarget *Fire;
+		if (w->GetWeapon()->GetType() == AETVWeapon::HealHull || w->GetWeapon()->GetType() == AETVWeapon::HealShield)
+		{
+			Fire = NewObject<UETVActionTarget_Use>();
+		}
+		else
+		{
+			Fire = NewObject<UETVActionTarget_Fire>();
+		}
 		Fire->Init(Ship, w->GetWeapon());
 		Ship->AddAction(Fire);
 	}

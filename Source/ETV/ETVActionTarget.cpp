@@ -14,6 +14,17 @@ UETVActionTarget::UETVActionTarget() : Super()
 	TileY = -1;
 }
 
+void UETVActionTarget::Init(AETVShip* OwnerShipPtr, AETVWeapon* OwnerWeaponPtr)
+{
+	Super::Init(OwnerShipPtr, OwnerWeaponPtr);
+
+	if (OwnerWeapon != nullptr)
+	{
+		FString NameWithWeapon = Name.ToString() + " " + OwnerWeapon->GetDisplayString();
+		Name = FName(*NameWithWeapon);
+	}
+}
+
 void UETVActionTarget::SetTarget(AActor* Target, int32 X, int32 Y)
 {
 	SelectedTarget = Target;

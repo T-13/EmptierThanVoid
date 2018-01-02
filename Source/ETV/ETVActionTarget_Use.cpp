@@ -1,37 +1,25 @@
 // Copyright (C) Team13. All rights reserved.
 
-#include "ETVActionTarget_Fire.h"
+#include "ETVActionTarget_Use.h"
 #include "ETVCalculator.h"
 #include "ETVGameModeBase.h"
 
 // Sets default values
-UETVActionTarget_Fire::UETVActionTarget_Fire() : Super()
+UETVActionTarget_Use::UETVActionTarget_Use() : Super()
 {
-	Name = FName(TEXT("Fire"));
+	Name = FName(TEXT("Use"));
 
 	// Set required target type to general ship
 	RequiredTargetType = AETVShip::StaticClass();
 }
 
-bool UETVActionTarget_Fire::CanActivate()
+bool UETVActionTarget_Use::CanActivate()
 {
 	// Check if a weapon is set
 	return Super::CanActivate() && OwnerWeapon != nullptr;
 }
 
-bool UETVActionTarget_Fire::CanPerform()
-{
-	if (Super::CanPerform())
-	{
-		// Check if enemy
-		AETVShip* SelectedShip = Cast<AETVShip>(SelectedTarget); // Required type is ship (checked in parent) so casting is safe
-		return SelectedShip->IsEnemy();
-	}
-
-	return false;
-}
-
-void UETVActionTarget_Fire::ApplyEffectsTarget()
+void UETVActionTarget_Use::ApplyEffectsTarget()
 {
 	Super::ApplyEffectsTarget();
 
@@ -44,7 +32,7 @@ void UETVActionTarget_Fire::ApplyEffectsTarget()
 	GameMode->GetShipListWidget()->Update();
 }
 
-void UETVActionTarget_Fire::ApplyEffectsSelf()
+void UETVActionTarget_Use::ApplyEffectsSelf()
 {
 	Super::ApplyEffectsSelf();
 

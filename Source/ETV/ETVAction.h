@@ -17,7 +17,7 @@ enum class EETVActionAvailability : uint8
  * Abstract base Action class.
  * Actions are attached to assets (eg. ships, weapons).
  */
-UCLASS(Abstract)
+UCLASS(Abstract, Blueprintable)
 class ETV_API UETVAction : public UObject
 {
 	GENERATED_BODY()

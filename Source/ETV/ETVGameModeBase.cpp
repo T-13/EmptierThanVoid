@@ -738,7 +738,7 @@ void AETVGameModeBase::StopTargeting(bool bSuccess)
 	SelectedAction = nullptr;
 }
 
-void AETVGameModeBase::ShipClicked(AETVShip * ClickedShip)
+void AETVGameModeBase::ShipClicked(AETVShip *ClickedShip)
 {
 	LastClickedShip = ClickedShip;
 }
@@ -748,7 +748,7 @@ bool AETVGameModeBase::WasShipClickedRecently()
 	return (LastClickedShip != nullptr);
 }
 
-AETVShip * const AETVGameModeBase::GetLastClickedShip()
+AETVShip* AETVGameModeBase::GetLastClickedShip()
 {
 	return LastClickedShip;
 }

@@ -163,10 +163,10 @@ public:
 	bool IsEnemy();
 
 	UFUNCTION(BlueprintCallable)
-	int32 getX() const { return X; }
+	int32 GetX() const { return X; }
 
 	UFUNCTION(BlueprintCallable)
-	int32 getY() const { return Y; }
+	int32 GetY() const { return Y; }
 
 	UFUNCTION()
 	void CloseContextMenu();

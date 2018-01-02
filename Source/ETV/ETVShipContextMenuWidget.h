@@ -16,6 +16,9 @@ class ETV_API UETVShipContextMenuWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
+public:
+	// Sets default values for this actor's properties
+	UETVShipContextMenuWidget(const FObjectInitializer& ObjectInitializer);
 
 protected:
 	// Pointer to the ship for the ContextMenu
@@ -24,7 +27,7 @@ protected:
 
 	// Tells the context menu if it can stay open
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV ShipContextMenu")
-	bool bCanStayOpen = true;
+	bool bCanStayOpen;
 
 public:
 	UFUNCTION(BlueprintCallable)

@@ -26,12 +26,19 @@ public:
 	// Sets default values for this actor's properties
 	UETVAction();
 
+protected:
+	// Ship this action is part of
+	UPROPERTY(BlueprintReadOnly, Category = "ETV Action")
 	AETVShip* OwnerShip;
+
+	// Weapon this action is part of
+	UPROPERTY(BlueprintReadOnly, Category = "ETV Action")
 	AETVWeapon* OwnerWeapon;
 
+	// Current turn of the perform
+	UPROPERTY(BlueprintReadOnly, Category = "ETV Action")
 	int32 CurrentPerform;
 
-protected:
 	// Display name of the action
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Action")
 	FName Name;

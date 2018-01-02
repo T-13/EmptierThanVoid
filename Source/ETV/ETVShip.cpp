@@ -69,11 +69,12 @@ void AETVShip::SpawnContextMenu(AActor *Actor, FKey Key)
 	if (ContextMenuClass != nullptr && !GameMode->IsTargeting() && !IsContextMenuOpen && !PlayerController->IsPaused())
 	{
 		// If another menu is in focus close it
-		if(GameMode->WasShipClickedRecently())
+		if (GameMode->WasShipClickedRecently())
 		{
 			GameMode->GetLastClickedShip()->UnconditionallyCloseContextMenu();
 		}
 		GameMode->ShipClicked(this);
+
 		CurrentContextMenu = CreateWidget<UETVShipContextMenuWidget>(GetWorld(), ContextMenuClass);
 		CurrentContextMenu->AssignShip(this);
 		if (CurrentContextMenu != nullptr)
@@ -125,7 +126,7 @@ bool AETVShip::IsEnemy()
 
 void AETVShip::CloseContextMenu()
 {
-	if(CurrentContextMenu != nullptr)
+	if (CurrentContextMenu != nullptr)
 	{
 		CurrentContextMenu->Close();
 	}
@@ -177,12 +178,13 @@ float AETVShip::GetMultiplier()
 void AETVShip::ClosingContextMenu()
 {
 	// If this is the current focused menu tell gameMode it has closed
-	AETVGameModeBase* GameMode = (AETVGameModeBase*)GetWorld()->GetAuthGameMode();
-	if(GameMode->GetLastClickedShip() == this)
+	AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
+	if (GameMode->GetLastClickedShip() == this)
 	{
 		GameMode->ShipClicked(nullptr);
 	}
-	// Tell the ship its' ContextMenu is closed 
+
+	// Tell the ship its ContextMenu is closed 
 	IsContextMenuOpen = false;
 	// Remove the reference to the Closed Menu
 	CurrentContextMenu = nullptr;

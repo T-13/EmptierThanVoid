@@ -256,7 +256,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ETV Targeting")
 	void StopTargeting(bool bSuccess = true);
 
-	/*Player Action handling*/
+
+	/* Player Action Handling */
 	// Update last clicked ship
 	UFUNCTION(BlueprintCallable, Category = "ETV Click")
 	void ShipClicked(AETVShip* ClickedShip);
@@ -266,7 +267,7 @@ public:
 	bool WasShipClickedRecently();
 
 	UFUNCTION()
-	AETVShip* const GetLastClickedShip();
+	AETVShip* GetLastClickedShip();
 
 	// Get Widget
 	UFUNCTION()

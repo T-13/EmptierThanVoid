@@ -125,7 +125,8 @@ void AETVCameraDirector::MoveAboveTile(int32 X, int32 Y, float ZoomPercentage)
 	SetActorLocation(WorldTilePos);
 
 	// Set zoom
-	if (ZoomPercentage > 0.0f && ZoomPercentage <= 1.0f)
+	FMath::Clamp(ZoomPercentage, 0.0f, 1.0f);
+	if (ZoomPercentage >= 0.0f)
 	{
 		SpringArm->TargetArmLength = ZoomMax * ZoomPercentage;
 	}

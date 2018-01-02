@@ -726,3 +726,8 @@ AETVShip * const AETVGameModeBase::GetLastClickedShip()
 UETVActionLogWidget* AETVGameModeBase::GetLogWidget() {
 	return ActionLogClass;
 }
+
+UETVShipStatusUIWidget * AETVGameModeBase::GetShipListWidget()
+{
+	return ShipStatusUI;
+}

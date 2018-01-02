@@ -264,7 +264,12 @@ public:
 	UFUNCTION()
 	AETVShip* const GetLastClickedShip();
 
-	// Get Widget
-	UFUNCTION()
+	/* Get Widgets */
+	// Get log widget
+	UFUNCTION(BlueprintCallable, Category = "ETV UI")
 	UETVActionLogWidget* GetLogWidget();
+
+	// Get Ship List widget
+	UFUNCTION(BlueprintCallable, Category = "ETV UI")
+	UETVShipStatusUIWidget* GetShipListWidget();
 };

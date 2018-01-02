@@ -44,7 +44,15 @@ void AETVShip::Tick(float DeltaTime)
 	// Invoke custom Tick (from this/owned Actor) due to UE-22374
 	if (IsContextMenuOpen && CurrentContextMenu != nullptr)
 	{
-		CurrentContextMenu->Ticked();
+		if (WasRecentlyRendered())
+		{
+			CurrentContextMenu->Ticked();
+		}
+		else
+		{
+			// Close if off-screen (prevent close animation from restarting/pausing mid-way)
+			ClosingContextMenu();
+		}
 	}
 }
 

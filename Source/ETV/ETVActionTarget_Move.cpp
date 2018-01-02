@@ -13,9 +13,15 @@ UETVActionTarget_Move::UETVActionTarget_Move() : Super()
 	RequiredTargetType = APaperTileMapActor::StaticClass();
 }
 
+bool UETVActionTarget_Move::CanActivate()
+{
+	return Super::CanActivate() && OwnerShip->CanMove();
+}
+
 bool UETVActionTarget_Move::CanPerform()
 {
-	return Super::CanPerform() && OwnerShip->CanMove();
+	// TODO Check distance (Ship's MoveRange vs distance)
+	return true;
 }
 
 void UETVActionTarget_Move::ApplyEffectsSelf()

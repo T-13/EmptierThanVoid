@@ -8,11 +8,8 @@ UETVActionTarget::UETVActionTarget() : Super()
 {
 	// No failure possibility
 	FailureChance = 0.0f;
-}
 
-AActor* UETVActionTarget::GetSelectedTarget()
-{
-	return SelectedTarget;
+	SelectedTarget = nullptr;
 }
 
 void UETVActionTarget::SetTarget(AActor* Target, int32 X, int32 Y)
@@ -34,6 +31,11 @@ bool UETVActionTarget::IsTargetValid()
 	return SelectedTarget->IsA(RequiredTargetType);
 }
 
+bool UETVActionTarget::CanActivate()
+{
+	return Super::CanActivate();
+}
+
 bool UETVActionTarget::CanPerform()
 {
 	return Super::CanPerform() && IsTargetValid();
@@ -53,12 +55,17 @@ bool UETVActionTarget::Activate()
 	return false;
 }
 
-void UETVActionTarget::Perform()
+bool UETVActionTarget::Perform()
 {
-	Super::Perform();
-
-	if (IsLastPerform())
+	if (Super::Perform())
 	{
-		ApplyEffectsTarget();
+		if (IsLastPerform())
+		{
+			ApplyEffectsTarget();
+		}
+
+		return true;
 	}
+
+	return false;
 }

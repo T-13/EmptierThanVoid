@@ -79,15 +79,20 @@ public:
 	UFUNCTION()
 	virtual bool IsLastPerform();
 
-	UFUNCTION(BlueprintCallable)
+	// Returns if action can be activated
+	UFUNCTION(BlueprintCallable, Category = "ETV Action")
+	virtual bool CanActivate();
+
+	// Returns if action can be performed (post action selection parameters set correctly)
+	UFUNCTION()
 	virtual bool CanPerform();
 
-	// Activates the action (double checking if can perform, starts targeting if required), returns activation success
+	// Activates the action (double checking if can activate, starts targeting if required), returns activation success
 	UFUNCTION(BlueprintCallable, Category = "ETV Action")
 	virtual bool Activate();
 
 	UFUNCTION()
-	virtual void Perform();
+	virtual bool Perform();
 
 	UFUNCTION()
 	virtual void OnBeginPerform();

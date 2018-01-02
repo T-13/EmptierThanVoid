@@ -9,16 +9,15 @@ UETVActionSelf::UETVActionSelf(): Super()
 	RequiredSafetyDistance = 2;
 }
 
-bool UETVActionSelf::CanPerform()
+bool UETVActionSelf::CanActivate()
 {
-	return Super::CanPerform() && IsSafe();
+	return Super::CanActivate() && IsSafe();
 }
 
 bool UETVActionSelf::Activate()
 {
 	return Super::Activate();
 }
-
 
 bool UETVActionSelf::IsSafe()
 {

@@ -21,6 +21,7 @@ public:
 public:
 	void Init(AETVShip* OwnerShipPtr, AETVWeapon* OwnerWeaponPtr) override;
 
+	bool CanActivate() override;
 	bool CanPerform() override;
 
 	void ApplyEffectsTarget() override;

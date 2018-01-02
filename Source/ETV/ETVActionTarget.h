@@ -14,7 +14,6 @@ class ETV_API UETVActionTarget : public UETVAction
 {
 	GENERATED_BODY()
 
-	AActor* SelectedTarget;
 	int32 TileX;
 	int32 TileY;
 	
@@ -23,6 +22,10 @@ public:
 	UETVActionTarget();
 
 protected:
+	// Currently selected target (nullptr if none)
+	UPROPERTY(BlueprintReadOnly, Category = "ETV Action|Target")
+	AActor* SelectedTarget;
+
 	// Required type of target
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Action|Target")
 	TSubclassOf<AActor> RequiredTargetType;
@@ -33,15 +36,13 @@ protected:
 
 public:
 	UFUNCTION()
-	virtual AActor* GetSelectedTarget();
-
-	UFUNCTION()
 	virtual void ApplyEffectsTarget() {}
 
 	virtual void SetTarget(AActor* Target, int32 X, int32 Y);
 	virtual bool IsTargetValid();
 
+	bool CanActivate() override;
 	bool CanPerform() override;
 	bool Activate() override;
-	void Perform() override;
+	bool Perform() override;
 };

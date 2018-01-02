@@ -56,42 +56,49 @@ bool UETVAction::IsLastPerform()
 	return CurrentPerform >= MaxPerforms;
 }
 
-bool UETVAction::CanPerform()
+bool UETVAction::CanActivate()
 {
 	// TODO Check range
 	return Available == EETVActionAvailability::ActionAvailable && OwnerShip != nullptr;
 }
 
-bool UETVAction::Activate()
+bool UETVAction::CanPerform()
 {
-	// Double check if we can perform, then perform
-	if (CanPerform())
-	{
-		Perform();
-		return true;
-	}
-	return false;
+	return true;
 }
 
-void UETVAction::Perform()
+bool UETVAction::Activate()
 {
-	OnBeginPerform();
+	// Double check if we can activate
+	return CanActivate();
+}
 
-	AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
-
-	if (IsFirstPerform() && !IsMultiTurn())
+bool UETVAction::Perform()
+{
+	if (CanPerform())
 	{
-		GameMode->AddMultiTurnAction(this);
+		OnBeginPerform();
+
+		AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
+
+		if (IsFirstPerform() && !IsMultiTurn())
+		{
+			GameMode->AddMultiTurnAction(this);
+		}
+
+		if (IsLastPerform() && !IsMultiTurn())
+		{
+			GameMode->RemoveMultiTurnAction(this);
+
+			ApplyEffectsSelf();
+		}
+
+		OnEndPerform();
+
+		return true;
 	}
 
-	if (IsLastPerform() && !IsMultiTurn())
-	{
-		GameMode->RemoveMultiTurnAction(this);
-
-		ApplyEffectsSelf();
-	}
-
-	OnEndPerform();
+	return false;
 }
 
 void UETVAction::OnBeginPerform()

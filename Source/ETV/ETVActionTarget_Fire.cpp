@@ -1,7 +1,7 @@
 // Copyright (C) Team13. All rights reserved.
 
 #include "ETVActionTarget_Fire.h"
-#include "ETVShip.h"
+#include "ETVCalculator.h"
 
 // Sets default values
 UETVActionTarget_Fire::UETVActionTarget_Fire() : Super()
@@ -33,8 +33,8 @@ bool UETVActionTarget_Fire::CanPerform()
 {
 	if (Super::CanPerform())
 	{
-		// Check if enemy, required type is ship (checked in Super) so casting is safe
-		AETVShip* SelectedShip = Cast<AETVShip>(SelectedTarget);
+		// Check if enemy
+		AETVShip* SelectedShip = Cast<AETVShip>(SelectedTarget); // Required type is ship (checked in parent) so casting is safe
 		return SelectedShip->IsEnemy();
 	}
 
@@ -45,7 +45,10 @@ void UETVActionTarget_Fire::ApplyEffectsTarget()
 {
 	Super::ApplyEffectsTarget();
 
-	// TODO Lower health, show explosion animation
+	// TODO Show explosion animation
+
+	AETVShip* SelectedShip = Cast<AETVShip>(SelectedTarget); // Required type is ship (checked in parent) so casting is safe
+	UETVCalculator::CalculateWeaponEffect(OwnerShip, OwnerWeapon, SelectedShip);
 }
 
 void UETVActionTarget_Fire::ApplyEffectsSelf()

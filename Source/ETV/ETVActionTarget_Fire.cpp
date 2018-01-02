@@ -43,18 +43,14 @@ bool UETVActionTarget_Fire::CanPerform()
 
 void UETVActionTarget_Fire::ApplyEffectsTarget()
 {
-	if (IsLastPerform())
-	{
-		Super::ApplyEffectsTarget();
-		// TODO Lower health, show explosion animation
-	}
+	Super::ApplyEffectsTarget();
+
+	// TODO Lower health, show explosion animation
 }
 
 void UETVActionTarget_Fire::ApplyEffectsSelf()
 {
-	if (IsLastPerform())
-	{
-		Super::ApplyEffectsSelf();
-		// TODO Lower ammo count, recharge or similar
-	}
+	Super::ApplyEffectsSelf();
+
+	// TODO Lower ammo count, recharge or similar
 }

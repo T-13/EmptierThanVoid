@@ -21,14 +21,18 @@ bool UETVActionTarget_Move::CanActivate()
 bool UETVActionTarget_Move::CanPerform()
 {
 	// TODO Check distance (Ship's MoveRange vs distance)
-	return true;
+	return Super::CanPerform() && TileX != -1 && TileY != -1;
 }
 
 void UETVActionTarget_Move::ApplyEffectsSelf()
 {
+	Super::ApplyEffectsSelf();
+
 	if (IsLastPerform())
 	{
-		Super::ApplyEffectsSelf();
-		// TODO Move from current tile to target tile, do flipbook animations and all that
+		// TODO Do animation
+
+		// Move ship
+		OwnerShip->MoveToTile(TileX, TileY);
 	}
 }

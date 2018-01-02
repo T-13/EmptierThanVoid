@@ -158,6 +158,9 @@ public:
 	UFUNCTION()
 	bool CanMove();
 
+	UFUNCTION()
+	void MoveToTile(int32 NewX, int32 NewY);
+
 	UFUNCTION(BlueprintCallable)
 	bool IsEnemy();
 

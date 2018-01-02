@@ -10,6 +10,8 @@ UETVActionTarget::UETVActionTarget() : Super()
 	FailureChance = 0.0f;
 
 	SelectedTarget = nullptr;
+	TileX = -1;
+	TileY = -1;
 }
 
 void UETVActionTarget::SetTarget(AActor* Target, int32 X, int32 Y)
@@ -59,10 +61,7 @@ bool UETVActionTarget::Perform()
 {
 	if (Super::Perform())
 	{
-		if (IsLastPerform())
-		{
-			ApplyEffectsTarget();
-		}
+		ApplyEffectsTarget();
 
 		return true;
 	}

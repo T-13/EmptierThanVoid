@@ -362,6 +362,7 @@ void AETVGameModeBase::SpawnShip(int32 x, int32 y, UPaperTileSet* type)
 	if (type == PlayerCapitalShip || type == EnemyCapitalShip) {
 		CapitalShip = GetWorld()->SpawnActor<AETVShipCapital>(LocDim, Rotator, SpawnInfo);
 		CapitalShip->Init("Cap", 100, 100, 100, 10, 10, 10, 10, true, 1.0f, 1);
+		CapitalShip->SetCurrentPosition(x, y);
 		CapitalShip->SetContextMenu(ContextMenu);
 		CapitalShip->GetRenderComponent()->SetMobility(EComponentMobility::Movable);
 		CapitalShip->GetRenderComponent()->SetSprite(Sprite);
@@ -398,6 +399,7 @@ void AETVGameModeBase::SpawnShip(int32 x, int32 y, UPaperTileSet* type)
 	else if (type == PlayerFighterShip || type == EnemyFighterShip) {
 		FighterShip = GetWorld()->SpawnActor<AETVShipFighter>(LocDim, Rotator, SpawnInfo);
 		FighterShip->Init("Fighter", 100, 100, 100, 10, 10, 10, 10, 1.0f, 2.0f);
+		FighterShip->SetCurrentPosition(x, y);
 		FighterShip->SetContextMenu(ContextMenu);
 		FighterShip->GetRenderComponent()->SetMobility(EComponentMobility::Movable);
 		FighterShip->GetRenderComponent()->SetSprite(Sprite);
@@ -524,13 +526,23 @@ FVector AETVGameModeBase::GetPosition(int32 x, int32 y, float z)
 	return FVector(-(TileSize / 2)*MapWidth + x * TileSize, -(TileSize / 2)*MapHeight + y * TileSize, z);
 }
 
+void AETVGameModeBase::SetPosition(int32 ToX, int32 ToY, int32 FromX, int32 FromY)
+{
+	// Set new tile
+	FPaperTileInfo ToTileInfo = TileMapComp->GetTile(FromX, FromY, EETVTileLayer::Ship);
+	TileMapComp->SetTile(ToX, ToY, EETVTileLayer::Ship, ToTileInfo);
+
+	// Reset old tile
+	TileMapComp->SetTile(FromX, FromY, EETVTileLayer::Ship, FPaperTileInfo());
+}
+
 void AETVGameModeBase::EndTurn()
 {
 	// Close context menu if any is open
+	// TODO Optimize by closing the only open context menu as there can't be more than one open
 	for (AETVShip* CurShip : Ships)
 	{
-		// TODO Close context menu
-		//CurShip->CloseMenu();
+		CurShip->UnconditionallyCloseContextMenu();
 	}
 
 	// Handle turn end

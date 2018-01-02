@@ -196,9 +196,13 @@ public:
 	UFUNCTION()
 	AETVShip* GetShipActor(int32 x, int32 y);
 
-	// Get Ships location from Tiles x and y
+	// Get Ship's world location from tile
 	UFUNCTION()
 	FVector GetPosition(int32 x, int32 y, float z = 0.1f);
+
+	// Set Ship's tile location
+	UFUNCTION()
+	void SetPosition(int32 ToX, int32 ToY, int32 FromX, int32 FromY);
 
 
 	/* Game Loop */

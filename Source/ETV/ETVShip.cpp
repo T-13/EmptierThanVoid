@@ -35,6 +35,7 @@ void AETVShip::BeginPlay()
 
 void AETVShip::SetCurrentPosition(int32 NewX, int32 NewY)
 {
+	// Update references
 	X = NewX;
 	Y = NewY;
 }
@@ -64,7 +65,7 @@ void AETVShip::GetReport()
 
 void AETVShip::SpawnContextMenu(AActor *Actor, FKey Key)
 {
-	AETVGameModeBase* GameMode = (AETVGameModeBase*)GetWorld()->GetAuthGameMode();
+	AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 	if (ContextMenuClass != nullptr && !GameMode->IsTargeting() && !IsContextMenuOpen && !PlayerController->IsPaused())
 	{
@@ -117,6 +118,20 @@ void AETVShip::SetShields(int32 newValue)
 bool AETVShip::CanMove()
 {
 	return ShipSpeed != 0;
+}
+
+void AETVShip::MoveToTile(int32 NewX, int32 NewY)
+{
+	AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
+
+	// Move tile
+	GameMode->SetPosition(NewX, NewY, X, Y);
+
+	// Move actor
+	SetActorLocation(GameMode->GetPosition(NewX, NewY));
+
+	// Update references
+	SetCurrentPosition(NewX, NewY);
 }
 
 bool AETVShip::IsEnemy()

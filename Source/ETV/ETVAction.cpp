@@ -79,19 +79,18 @@ bool UETVAction::Perform()
 	{
 		OnBeginPerform();
 
+		// Handle multi-turn actions
 		AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
-
-		if (IsFirstPerform() && !IsMultiTurn())
+		if (IsMultiTurn() && IsFirstPerform())
 		{
 			GameMode->AddMultiTurnAction(this);
 		}
-
-		if (IsLastPerform() && !IsMultiTurn())
+		if (IsMultiTurn() && IsLastPerform())
 		{
 			GameMode->RemoveMultiTurnAction(this);
-
-			ApplyEffectsSelf();
 		}
+
+		ApplyEffectsSelf();
 
 		OnEndPerform();
 

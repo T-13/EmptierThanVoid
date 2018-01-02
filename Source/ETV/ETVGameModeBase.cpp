@@ -11,6 +11,7 @@
 #include "WidgetLayoutLibrary.h"
 #include "UserWidget.h"
 #include "ETVCalculator.h"
+#include "Runtime/Engine/Classes/Engine/UserInterfaceSettings.h"
 //#include "DrawDebugHelpers.h" // Uncomment for debug drawing
 
 // Sets default values
@@ -70,8 +71,22 @@ void AETVGameModeBase::BeginPlay()
 	temp.X = temp.X - WidthOfActionLog - 45;
 	temp.Y = temp.Y - HeightOfActionLog - 45;
 
-	ActionLogClass->SetPositionInViewport(temp, false);
-	ActionLogClass->SetDesiredSizeInViewport(UKismetMathLibrary::MakeVector2D(WidthOfActionLog, HeightOfActionLog));
+	/*DPI TEST*/
+	FVector2D viewportSize = UWidgetLayoutLibrary::GetViewportSize(GetWorld());;
+
+	// we need to floor the float values of the viewport size so we can pass those into the GetDPIScaleBasedOnSize function
+	int32 X = FGenericPlatformMath::FloorToInt(viewportSize.X);
+	int32 Y = FGenericPlatformMath::FloorToInt(viewportSize.Y);
+
+	// the GetDPIScaleBasedOnSize function takes an FIntPoint, so we construct one out of the floored floats of the viewport
+	// the fuction returns a float, so we can return the value out of our function here
+	float dpi = GetDefault<UUserInterfaceSettings>(UUserInterfaceSettings::StaticClass())->GetDPIScaleBasedOnSize(FIntPoint(X, Y));
+	UE_LOG(LogTemp, Warning, TEXT("%f"), dpi);
+	/*END OF DPI TEST*/
+
+
+	ActionLogClass->SetPositionInViewport(temp/dpi, false);
+	ActionLogClass->SetDesiredSizeInViewport(UKismetMathLibrary::MakeVector2D(WidthOfActionLog/dpi, HeightOfActionLog/dpi));
 	ActionLogClass->AddToViewport();
 
 
@@ -100,9 +115,9 @@ void AETVGameModeBase::BeginPlay()
 		// Set the location to bottom left corner	
 		temp.X = 30;
 		temp.Y = temp.Y - HeightOfShipStatusUI - 45;
-		ShipStatusUI->SetPositionInViewport(temp, false);
+		ShipStatusUI->SetPositionInViewport(temp/dpi, false);
 		// Resize to correct size
-		ShipStatusUI->SetDesiredSizeInViewport(UKismetMathLibrary::MakeVector2D(WidthOfShipStatusUI, HeightOfShipStatusUI));
+		ShipStatusUI->SetDesiredSizeInViewport(UKismetMathLibrary::MakeVector2D(WidthOfShipStatusUI/dpi, HeightOfShipStatusUI/dpi));
 
 		ShipStatusUI->AddToViewport();
 

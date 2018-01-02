@@ -63,22 +63,24 @@ protected:
     int32 FiringRange;
 
 public:
+	UFUNCTION()
+	FString GetDisplayString() const { return Name.ToString(); }
 
-    // TODO Get the angle at which the weapon can fire 
-    // UFUNCTION(BlueprintCallable)
-    // TArray<int32> GetAngle(); 
+	// TODO Get the angle at which the weapon can fire
+	// UFUNCTION(BlueprintCallable)
+	// TArray<int32> GetAngle();
 
-    // Gives the Weight requirment for the weapon slot
-    UFUNCTION(BlueprintCallable)
-    float GetWeight();
+	// Gives the Weight requirment for the weapon slot
+	UFUNCTION(BlueprintCallable)
+	float GetWeight();
 
 	// Gives the Size requirments for the weapon slot
 	UFUNCTION(BlueprintCallable)
 	float GetSize();
 
-    // Get current status
-    UFUNCTION(BlueprintCallable)
-    virtual int32 GetReport(); // TODO-Object REPORT not yet defined
+	// Get current status
+	UFUNCTION(BlueprintCallable)
+	virtual int32 GetReport(); // TODO-Object REPORT not yet defined
 
 	// Get current status
 	UFUNCTION(BlueprintCallable)

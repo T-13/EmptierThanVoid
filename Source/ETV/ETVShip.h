@@ -44,7 +44,6 @@ protected:
 	void BeginPlay() override;
 
 protected:
-
 	// Name of the ship
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship")
 	FString Name;

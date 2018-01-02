@@ -12,6 +12,17 @@ UETVActionTarget_Fire::UETVActionTarget_Fire() : Super()
 	RequiredTargetType = AETVShip::StaticClass();
 }
 
+void UETVActionTarget_Fire::Init(AETVShip* OwnerShipPtr, AETVWeapon* OwnerWeaponPtr)
+{
+	Super::Init(OwnerShipPtr, OwnerWeaponPtr);
+
+	if (OwnerWeapon != nullptr)
+	{
+		FString NameWithWeapon = Name.ToString() + " " + OwnerWeapon->GetDisplayString();
+		Name = FName(*NameWithWeapon);
+	}
+}
+
 bool UETVActionTarget_Fire::CanPerform()
 {
 	// Check if a weapon is set

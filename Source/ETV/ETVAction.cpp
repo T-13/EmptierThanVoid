@@ -4,7 +4,7 @@
 #include "ETVGameModeBase.h" // Not in .h due to circular dependency
 
 // Sets default values
-UETVAction::UETVAction()
+UETVAction::UETVAction() : Super()
 {
 	OwnerShip = nullptr;
 	OwnerWeapon = nullptr;

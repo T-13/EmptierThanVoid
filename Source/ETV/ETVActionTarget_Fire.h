@@ -19,6 +19,8 @@ public:
 	UETVActionTarget_Fire();
 
 public:
+	void Init(AETVShip* OwnerShipPtr, AETVWeapon* OwnerWeaponPtr) override;
+
 	bool CanPerform() override;
 
 	void ApplyEffectsTarget() override;

@@ -107,7 +107,8 @@ void UETVAction::OnBeginPerform()
 
 void UETVAction::OnEndPerform()
 {
-	// TODO Update Ship List
+	AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
+	GameMode->GetShipListWidget()->Update();
 
 	if (bEndsTurn)
 	{

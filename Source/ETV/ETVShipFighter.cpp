@@ -15,7 +15,7 @@ void AETVShipFighter::Init(FString NewName, int32 MaxHP, int32 ShieldP, int32 Ne
 
 void AETVShipFighter::InitRandom(FString NewName)
 {
-	Level = FMath::RandRange(125, 225);
+	Level = FMath::RandRange(50, 200);
 	InitRandomWithLevel(NewName, Level);
 }
 

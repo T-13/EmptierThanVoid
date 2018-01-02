@@ -18,7 +18,7 @@ class ETV_API AETVShipCapital : public AETVShip
 public:
 	// Sets default values for this actor's properties
 	AETVShipCapital();
-	void Init(FString NewName, int32 MaxHP, int32 ShieldP, int32 NewShieldRechargeTime, int32 NewMoveRange, int32 Speed, bool HyperDrive, float NewLaserResistance, int32 Hangars);
+	void Init(FString NewName, int32 MaxHP, int32 ShieldP, int32 NewShieldRechargeTime, int32 NewMoveRange, int32 Speed, bool bHyperDrive, float NewLaserResistance, int32 Hangars);
 
 	void InitRandom(FString NewName);
 
@@ -28,7 +28,7 @@ public:
 protected:
 	// If ship has a hyperdrive
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship|Capital")
-	bool HasHyperdrive;
+	bool bHasHyperdrive;
 
 	// Affects damage done by laser
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship|Capital", meta = (ClampMin = "0.0"))

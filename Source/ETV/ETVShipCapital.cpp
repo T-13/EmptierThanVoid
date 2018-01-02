@@ -8,10 +8,10 @@ AETVShipCapital::AETVShipCapital() : Super()
 	Class = EETVShipClass::Capital;
 }
 
-void AETVShipCapital::Init(FString NewName, int32 MaxHP, int32 ShieldP, int32 NewShieldRechargeTime, int32 NewMoveRange, int32 Speed, bool HyperDrive, float NewLaserResistance, int32 Hangars)
+void AETVShipCapital::Init(FString NewName, int32 MaxHP, int32 ShieldP, int32 NewShieldRechargeTime, int32 NewMoveRange, int32 Speed, bool bHyperDrive, float NewLaserResistance, int32 Hangars)
 {
 	Super::Init(NewName, MaxHP, ShieldP, NewShieldRechargeTime, NewMoveRange, Speed);
-	HasHyperdrive = HyperDrive;
+	bHasHyperdrive = bHyperDrive;
 	LaserResistance = NewLaserResistance;
 	NumOfHangars = Hangars;
 }
@@ -34,10 +34,8 @@ void AETVShipCapital::InitRandomWithLevel(FString NewName, int32 PowerLvl)
 
 	Super::InitRandomWithLevel(NewName, PowerLvl);
 
-	// Hyperdrive is more likely to be present in higher level Capital Ships
-	float chance = FMath::RandRange(PowerLvl / 200, 1);
-	if (chance > 0.85)
-		HasHyperdrive = true;
+	// Only one Capital per side, so both get Hyperdrive
+	bHasHyperdrive = true;
 
 	LaserResistance = FMath::RandRange(PowerLvl / 200, 1);
 

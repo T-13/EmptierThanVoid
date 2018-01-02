@@ -9,6 +9,9 @@
 // Sets default values
 AETVShip::AETVShip() : Super()
 {
+	// Set this actor to call Tick() every frame
+	PrimaryActorTick.bCanEverTick = true;
+
 	IsContextMenuOpen = false;
 
 	Type = EETVShipType::PlayerShip;
@@ -31,6 +34,18 @@ void AETVShip::BeginPlay()
 	Super::BeginPlay();
 	// Assigns click event to Spawn the Ship's ContextMenu
 	OnClicked.AddDynamic(this, &AETVShip::SpawnContextMenu);
+}
+
+// Called every frame
+void AETVShip::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	// Invoke custom Tick (from this/owned Actor) due to UE-22374
+	if (IsContextMenuOpen && CurrentContextMenu != nullptr)
+	{
+		CurrentContextMenu->Ticked();
+	}
 }
 
 void AETVShip::SetCurrentPosition(int32 NewX, int32 NewY)

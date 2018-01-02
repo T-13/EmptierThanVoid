@@ -43,7 +43,7 @@ protected:
 	// Called when the game starts or when spawned
 	void BeginPlay() override;
 
-protected:
+
 	// Name of the ship
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship")
 	FString Name;
@@ -122,6 +122,10 @@ protected:
 	int32 Y;
 
 public:
+	// Called every frame
+	void Tick(float DeltaTime) override;
+
+
 	UFUNCTION()
 	void SetCurrentPosition(int32 NewX, int32 NewY);
 

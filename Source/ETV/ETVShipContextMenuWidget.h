@@ -38,4 +38,8 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ETV Click")
 	void Close();
+
+	// Custom Tick due to UE-22374
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ETV Click")
+	void Ticked();
 };

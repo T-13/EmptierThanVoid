@@ -62,18 +62,17 @@ void AETVGameModeBase::BeginPlay()
 	ActionLogClass = CreateWidget<UETVActionLogWidget>(GetWorld(), ActionLogWidget);
 	FVector2D temp = UWidgetLayoutLibrary::GetViewportSize(GetWorld());
 
+	// Define the size of the element
 	int32 WidthOfActionLog = temp.X * 0.4;
 	int32 HeightOfActionLog = 165;
 
+	// Set the location to bottom left corner
 	temp.X = temp.X - WidthOfActionLog - 45;
 	temp.Y = temp.Y - HeightOfActionLog - 45;
 
 	ActionLogClass->SetPositionInViewport(temp, false);
 	ActionLogClass->SetDesiredSizeInViewport(UKismetMathLibrary::MakeVector2D(WidthOfActionLog, HeightOfActionLog));
 	ActionLogClass->AddToViewport();
-
-	FGeometry cachedGeometry = ActionLogClass->GetCachedGeometry();
-	FVector2D currentSize = cachedGeometry.GetLocalSize();
 
 
 	if (TileSet != nullptr)

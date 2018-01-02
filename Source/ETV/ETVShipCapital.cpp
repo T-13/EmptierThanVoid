@@ -37,7 +37,7 @@ void AETVShipCapital::InitRandomWithLevel(FString NewName, int32 PowerLvl)
 	// Only one Capital per side, so both get Hyperdrive
 	bHasHyperdrive = true;
 
-	LaserResistance = FMath::RandRange(PowerLvl / 200, 1);
+	LaserResistance = FMath::RandRange(PowerLvl / 500, 0.5);
 
 	// The better the level the lower the time (min 1)
 	int32 MinHangars = 200 / PowerLvl;

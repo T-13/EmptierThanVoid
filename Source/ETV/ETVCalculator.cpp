@@ -5,7 +5,7 @@
 
 void UETVCalculator::CalculateWeaponEffect(AETVShip *User, AETVWeapon *WeaponUsed, AETVShip *Target)
 {
-	/*Printing for debugging*/
+	/*Printing for debugging
 	FString Msg = "User HP: " + FString::FromInt(User->GetHP());
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *Msg);
 	Msg = "Target HP: " + FString::FromInt(Target->GetHP());
@@ -25,7 +25,7 @@ void UETVCalculator::CalculateWeaponEffect(AETVShip *User, AETVWeapon *WeaponUse
 	if (WeaponUsed->GetType() == AETVWeapon::DamageHull)
 	{
 		Target->SetHP(Target->GetHP() - ChangeValue);
-		ActionHP = " Damaged ";
+		ActionHP = "Damaged Hull";
 	}
 	// Weapon can't bypass shields
 	else if (WeaponUsed->GetType() == AETVWeapon::DamageShieldThenHull)
@@ -39,10 +39,10 @@ void UETVCalculator::CalculateWeaponEffect(AETVShip *User, AETVWeapon *WeaponUse
 			// The rest of the dmg is aplied to the Hull
 			Target->SetHP(Target->GetHP() - ChangeValue);
 
-			ActionHP = " Damaged ";
+			ActionHP = "Damaged Hull";
 		}
 		else {
-			ActionShields = " Damaged Shields ";
+			ActionShields = "Damaged Shields";
 		}
 		//Apply the new shield value
 		Target->SetShields(ShieldValue);
@@ -51,16 +51,16 @@ void UETVCalculator::CalculateWeaponEffect(AETVShip *User, AETVWeapon *WeaponUse
 	else if (WeaponUsed->GetType() == AETVWeapon::HealHull)
 	{
 		Target->SetHP(Target->GetHP() + ChangeValue);
-		ActionHP = " Healed Hull ";
+		ActionHP = "Healed Hull";
 	}
 	// Weapon is a support type that heals ShieldPoints
 	else if (WeaponUsed->GetType() == AETVWeapon::HealShield)
 	{
 		Target->SetShields(Target->GetShields() + ChangeValue);
-		ActionShields = " Healed Shields ";
+		ActionShields = "Healed Shields";
 	}
 
-	/*Printing for debugging*/
+	/*Printing for debugging
 	FString Msg2 = "User HP: " + FString::FromInt(User->GetHP());
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *Msg2);
 	Msg2 = "Target HP: " + FString::FromInt(Target->GetHP());
@@ -73,11 +73,19 @@ void UETVCalculator::CalculateWeaponEffect(AETVShip *User, AETVWeapon *WeaponUse
 	AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(User->GetWorld()->GetAuthGameMode());
 	UETVActionLogWidget *LogWidget = GameMode->GetLogWidget();
 	if (ActionHP != "") {
-		FString Message = User->GetShipName() + ActionHP + "By " + FString::FromInt(ChangeValue) + " On " + Target->GetShipName();
+		FString ShipName = User->GetShipName();
+		FString ChangeValueS = FString::FromInt(ChangeValue);
+		FString TargetName = Target->GetShipName();
+
+		FString Message = ShipName + ";" + ActionHP + ";" + ChangeValueS + ";" + TargetName;
 		LogWidget->NewLogEntry(Message);
 	}
 	if (ActionShields != "") {
-		FString Message = User->GetShipName() + ActionShields + "By " + FString::FromInt(ChangeValue) + " On " + Target->GetShipName();
+		FString ShipName = User->GetShipName();
+		FString ChangeValueS = FString::FromInt(ChangeValue);
+		FString TargetName = Target->GetShipName();
+
+		FString Message = ShipName + ";" + ActionShields + ";" + ChangeValueS + ";" + TargetName;
 		LogWidget->NewLogEntry(Message);
 	}
 }

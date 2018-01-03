@@ -60,28 +60,31 @@ void AETVGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// Margin for UI Widgets
-	int32 Margin = 45;
-
 	// Spawn Widget for Action Log
 	ActionLogClass = CreateWidget<UETVActionLogWidget>(GetWorld(), ActionLogWidget);
 	FVector2D VeiwportSize = UWidgetLayoutLibrary::GetViewportSize(GetWorld());
 
-	// we need to floor the float values of the viewport size so we can pass those into the GetDPIScaleBasedOnSize function
+	// We need to floor the float values of the viewport size so we can pass those into the GetDPIScaleBasedOnSize function
 	int32 XOfViewport = FGenericPlatformMath::FloorToInt(VeiwportSize.X);
 	int32 YOfViewport = FGenericPlatformMath::FloorToInt(VeiwportSize.Y);
 	float DpiScale = GetDefault<UUserInterfaceSettings>(UUserInterfaceSettings::StaticClass())->GetDPIScaleBasedOnSize(FIntPoint(XOfViewport, YOfViewport));
 
+	// Marginand DesiredHeight for UI Widgets
+	int32 MarginY = (VeiwportSize.Y * 0.03) / DpiScale;
+	int32 MarginX = (VeiwportSize.X * 0.1) / DpiScale / 4; // Calculate the maximum possible margin to counteract the possibility of the widgets overlapping
+	int32 DesiredHeight = 165;
+
 	// Define the size of the element
-	int32 WidthOfActionLog = VeiwportSize.X * 0.4;
-	int32 HeightOfActionLog = 165;
+	int32 WidthOfActionLog = (VeiwportSize.X * 0.4) / DpiScale; // We always want the Log Widget to be 40% of the screen width
+	int32 HeightOfActionLog = DesiredHeight;
 
 	// Set the location to bottom left corner
-	VeiwportSize.X = VeiwportSize.X - WidthOfActionLog - Margin;
-	VeiwportSize.Y = VeiwportSize.Y - HeightOfActionLog - Margin;
+	VeiwportSize.X = (VeiwportSize.X / DpiScale) - WidthOfActionLog - MarginX;
+	VeiwportSize.Y = (VeiwportSize.Y / DpiScale) - HeightOfActionLog - MarginY;
 
-	ActionLogClass->SetPositionInViewport(VeiwportSize / DpiScale, false);
-	ActionLogClass->SetDesiredSizeInViewport(FVector2D(WidthOfActionLog / DpiScale, HeightOfActionLog / DpiScale));
+	ActionLogClass->SetPositionInViewport(VeiwportSize, false);
+	
+	ActionLogClass->SetDesiredSizeInViewport(FVector2D(WidthOfActionLog, HeightOfActionLog));
 	ActionLogClass->AddToViewport();
 
 
@@ -102,17 +105,17 @@ void AETVGameModeBase::BeginPlay()
 		// Pass ships to the ShipStatus UI
 		ShipStatusUI->AssignShips(Ships);
 
-		FVector2D VeiwportSize = UWidgetLayoutLibrary::GetViewportSize(GetWorld());
+		FVector2D VeiwportSize2 = UWidgetLayoutLibrary::GetViewportSize(GetWorld());
 		// Define the size of the element
-		int32 WidthOfShipStatusUI = VeiwportSize.X * 0.5;
-		int32 HeightOfShipStatusUI = 165;
+		int32 WidthOfShipStatusUI = VeiwportSize2.X*0.5 / DpiScale; // We always want the ShipSatusList to be 50% of the screen
+		int32 HeightOfShipStatusUI = DesiredHeight;
 
 		// Set the location to bottom left corner	
-		VeiwportSize.X = 30;
-		VeiwportSize.Y = VeiwportSize.Y - HeightOfShipStatusUI - Margin;
-		ShipStatusUI->SetPositionInViewport(VeiwportSize / DpiScale, false);
+		VeiwportSize2.X = MarginX;
+		VeiwportSize2.Y = (VeiwportSize2.Y / DpiScale) - HeightOfShipStatusUI - MarginY;
+		ShipStatusUI->SetPositionInViewport(VeiwportSize2, false);
 		// Resize to correct size
-		ShipStatusUI->SetDesiredSizeInViewport(FVector2D(WidthOfShipStatusUI / DpiScale, HeightOfShipStatusUI / DpiScale));
+		ShipStatusUI->SetDesiredSizeInViewport(FVector2D(WidthOfShipStatusUI, HeightOfShipStatusUI));
 
 		ShipStatusUI->AddToViewport();
 

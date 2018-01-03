@@ -572,6 +572,8 @@ void AETVGameModeBase::EndTurn()
 		CurShip->UnconditionallyCloseContextMenu();
 	}
 
+	CurrentTurnTime = 0.0f;
+
 	// Handle turn end
 	if (bDisableAI)
 	{

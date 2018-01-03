@@ -59,6 +59,9 @@ void AETVGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// Margin for UI Widgets
+	int32 Margin = 45;
+
 	// Spawn Widget for Action Log
 	ActionLogClass = CreateWidget<UETVActionLogWidget>(GetWorld(), ActionLogWidget);
 	FVector2D VeiwportSize = UWidgetLayoutLibrary::GetViewportSize(GetWorld());
@@ -73,13 +76,11 @@ void AETVGameModeBase::BeginPlay()
 	int32 HeightOfActionLog = 165;
 
 	// Set the location to bottom left corner
-	VeiwportSize.X = VeiwportSize.X - WidthOfActionLog - 45;
-	VeiwportSize.Y = VeiwportSize.Y - HeightOfActionLog - 45;
-
-	//FVector2D viewportSize = UWidgetLayoutLibrary::GetViewportSize(GetWorld());;
+	VeiwportSize.X = VeiwportSize.X - WidthOfActionLog - Margin;
+	VeiwportSize.Y = VeiwportSize.Y - HeightOfActionLog - Margin;
 
 	ActionLogClass->SetPositionInViewport(VeiwportSize / DpiScale, false);
-	ActionLogClass->SetDesiredSizeInViewport(UKismetMathLibrary::MakeVector2D(WidthOfActionLog / DpiScale, HeightOfActionLog / DpiScale));
+	ActionLogClass->SetDesiredSizeInViewport(FVector2D(WidthOfActionLog / DpiScale, HeightOfActionLog / DpiScale));
 	ActionLogClass->AddToViewport();
 
 
@@ -107,10 +108,10 @@ void AETVGameModeBase::BeginPlay()
 
 		// Set the location to bottom left corner	
 		VeiwportSize.X = 30;
-		VeiwportSize.Y = VeiwportSize.Y - HeightOfShipStatusUI - 45;
+		VeiwportSize.Y = VeiwportSize.Y - HeightOfShipStatusUI - Margin;
 		ShipStatusUI->SetPositionInViewport(VeiwportSize / DpiScale, false);
 		// Resize to correct size
-		ShipStatusUI->SetDesiredSizeInViewport(UKismetMathLibrary::MakeVector2D(WidthOfShipStatusUI / DpiScale, HeightOfShipStatusUI / DpiScale));
+		ShipStatusUI->SetDesiredSizeInViewport(FVector2D(WidthOfShipStatusUI / DpiScale, HeightOfShipStatusUI / DpiScale));
 
 		ShipStatusUI->AddToViewport();
 
@@ -624,7 +625,7 @@ void AETVGameModeBase::GetMouseOverTile(FETVTile& Tile)
 		if (Camera == nullptr)
 		{
 			UE_LOG(LogTemp, Error, TEXT("GetMouseOverTile(): Pawn not set to AETVCameraDirector!"))
-				return;
+			return;
 		}
 
 		// Add height to tile map

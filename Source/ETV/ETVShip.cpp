@@ -112,8 +112,8 @@ void AETVShip::SpawnContextMenu(AActor *Actor, FKey Key)
 			float x; // X coordinate of MouseCursor
 			float y; // Y coordinate of MouseCursor
 			if (PlayerController->GetMousePosition(x, y)) {
-				CurrentContextMenu->SetPositionInViewport(UKismetMathLibrary::MakeVector2D(x, y));
-				CurrentContextMenu->SetDesiredSizeInViewport(UKismetMathLibrary::MakeVector2D(320, 280));
+				CurrentContextMenu->SetPositionInViewport(FVector2D(x, y));
+				CurrentContextMenu->SetDesiredSizeInViewport(FVector2D(320, 280));
 				CurrentContextMenu->AddToViewport();
 				IsContextMenuOpen = true;
 			}

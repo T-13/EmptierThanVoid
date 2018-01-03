@@ -61,32 +61,25 @@ void AETVGameModeBase::BeginPlay()
 
 	// Spawn Widget for Action Log
 	ActionLogClass = CreateWidget<UETVActionLogWidget>(GetWorld(), ActionLogWidget);
-	FVector2D temp = UWidgetLayoutLibrary::GetViewportSize(GetWorld());
+	FVector2D VeiwportSize = UWidgetLayoutLibrary::GetViewportSize(GetWorld());
+
+	// we need to floor the float values of the viewport size so we can pass those into the GetDPIScaleBasedOnSize function
+	int32 XOfViewport = FGenericPlatformMath::FloorToInt(VeiwportSize.X);
+	int32 YOfViewport = FGenericPlatformMath::FloorToInt(VeiwportSize.Y);
+	float DpiScale = GetDefault<UUserInterfaceSettings>(UUserInterfaceSettings::StaticClass())->GetDPIScaleBasedOnSize(FIntPoint(XOfViewport, YOfViewport));
 
 	// Define the size of the element
-	int32 WidthOfActionLog = temp.X * 0.4;
+	int32 WidthOfActionLog = VeiwportSize.X * 0.4;
 	int32 HeightOfActionLog = 165;
 
 	// Set the location to bottom left corner
-	temp.X = temp.X - WidthOfActionLog - 45;
-	temp.Y = temp.Y - HeightOfActionLog - 45;
+	VeiwportSize.X = VeiwportSize.X - WidthOfActionLog - 45;
+	VeiwportSize.Y = VeiwportSize.Y - HeightOfActionLog - 45;
 
-	/*DPI TEST*/
-	FVector2D viewportSize = UWidgetLayoutLibrary::GetViewportSize(GetWorld());;
+	//FVector2D viewportSize = UWidgetLayoutLibrary::GetViewportSize(GetWorld());;
 
-	// we need to floor the float values of the viewport size so we can pass those into the GetDPIScaleBasedOnSize function
-	int32 X = FGenericPlatformMath::FloorToInt(viewportSize.X);
-	int32 Y = FGenericPlatformMath::FloorToInt(viewportSize.Y);
-
-	// the GetDPIScaleBasedOnSize function takes an FIntPoint, so we construct one out of the floored floats of the viewport
-	// the fuction returns a float, so we can return the value out of our function here
-	float dpi = GetDefault<UUserInterfaceSettings>(UUserInterfaceSettings::StaticClass())->GetDPIScaleBasedOnSize(FIntPoint(X, Y));
-	UE_LOG(LogTemp, Warning, TEXT("%f"), dpi);
-	/*END OF DPI TEST*/
-
-
-	ActionLogClass->SetPositionInViewport(temp/dpi, false);
-	ActionLogClass->SetDesiredSizeInViewport(UKismetMathLibrary::MakeVector2D(WidthOfActionLog/dpi, HeightOfActionLog/dpi));
+	ActionLogClass->SetPositionInViewport(VeiwportSize / DpiScale, false);
+	ActionLogClass->SetDesiredSizeInViewport(UKismetMathLibrary::MakeVector2D(WidthOfActionLog / DpiScale, HeightOfActionLog / DpiScale));
 	ActionLogClass->AddToViewport();
 
 
@@ -107,17 +100,17 @@ void AETVGameModeBase::BeginPlay()
 		// Pass ships to the ShipStatus UI
 		ShipStatusUI->AssignShips(Ships);
 
-		FVector2D temp = UWidgetLayoutLibrary::GetViewportSize(GetWorld());
+		FVector2D VeiwportSize = UWidgetLayoutLibrary::GetViewportSize(GetWorld());
 		// Define the size of the element
-		int32 WidthOfShipStatusUI = temp.X * 0.5;
+		int32 WidthOfShipStatusUI = VeiwportSize.X * 0.5;
 		int32 HeightOfShipStatusUI = 165;
 
 		// Set the location to bottom left corner	
-		temp.X = 30;
-		temp.Y = temp.Y - HeightOfShipStatusUI - 45;
-		ShipStatusUI->SetPositionInViewport(temp/dpi, false);
+		VeiwportSize.X = 30;
+		VeiwportSize.Y = VeiwportSize.Y - HeightOfShipStatusUI - 45;
+		ShipStatusUI->SetPositionInViewport(VeiwportSize / DpiScale, false);
 		// Resize to correct size
-		ShipStatusUI->SetDesiredSizeInViewport(UKismetMathLibrary::MakeVector2D(WidthOfShipStatusUI/dpi, HeightOfShipStatusUI/dpi));
+		ShipStatusUI->SetDesiredSizeInViewport(UKismetMathLibrary::MakeVector2D(WidthOfShipStatusUI / DpiScale, HeightOfShipStatusUI / DpiScale));
 
 		ShipStatusUI->AddToViewport();
 
@@ -631,7 +624,7 @@ void AETVGameModeBase::GetMouseOverTile(FETVTile& Tile)
 		if (Camera == nullptr)
 		{
 			UE_LOG(LogTemp, Error, TEXT("GetMouseOverTile(): Pawn not set to AETVCameraDirector!"))
-			return;
+				return;
 		}
 
 		// Add height to tile map

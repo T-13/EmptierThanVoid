@@ -12,6 +12,7 @@
 #include "WidgetLayoutLibrary.h"
 #include "UserWidget.h"
 #include "ETVCalculator.h"
+#include "Runtime/Engine/Classes/Engine/UserInterfaceSettings.h"
 //#include "DrawDebugHelpers.h" // Uncomment for debug drawing
 
 // Sets default values
@@ -59,11 +60,30 @@ void AETVGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// Margin for UI Widgets
+	int32 Margin = 45;
+
 	// Spawn Widget for Action Log
 	ActionLogClass = CreateWidget<UETVActionLogWidget>(GetWorld(), ActionLogWidget);
-	ActionLogClass->SetPositionInViewport(UKismetMathLibrary::MakeVector2D(0, 0));
-	ActionLogClass->SetDesiredSizeInViewport(FVector2D(UWidgetLayoutLibrary::GetViewportSize(GetWorld())));
+	FVector2D VeiwportSize = UWidgetLayoutLibrary::GetViewportSize(GetWorld());
+
+	// we need to floor the float values of the viewport size so we can pass those into the GetDPIScaleBasedOnSize function
+	int32 XOfViewport = FGenericPlatformMath::FloorToInt(VeiwportSize.X);
+	int32 YOfViewport = FGenericPlatformMath::FloorToInt(VeiwportSize.Y);
+	float DpiScale = GetDefault<UUserInterfaceSettings>(UUserInterfaceSettings::StaticClass())->GetDPIScaleBasedOnSize(FIntPoint(XOfViewport, YOfViewport));
+
+	// Define the size of the element
+	int32 WidthOfActionLog = VeiwportSize.X * 0.4;
+	int32 HeightOfActionLog = 165;
+
+	// Set the location to bottom left corner
+	VeiwportSize.X = VeiwportSize.X - WidthOfActionLog - Margin;
+	VeiwportSize.Y = VeiwportSize.Y - HeightOfActionLog - Margin;
+
+	ActionLogClass->SetPositionInViewport(VeiwportSize / DpiScale, false);
+	ActionLogClass->SetDesiredSizeInViewport(FVector2D(WidthOfActionLog / DpiScale, HeightOfActionLog / DpiScale));
 	ActionLogClass->AddToViewport();
+
 
 	if (TileSet != nullptr)
 	{
@@ -82,19 +102,17 @@ void AETVGameModeBase::BeginPlay()
 		// Pass ships to the ShipStatus UI
 		ShipStatusUI->AssignShips(Ships);
 
-		FVector2D temp = UWidgetLayoutLibrary::GetViewportSize(GetWorld());
-		
+		FVector2D VeiwportSize = UWidgetLayoutLibrary::GetViewportSize(GetWorld());
 		// Define the size of the element
-		int32 WidthOfShipStatusUI = temp.X*0.5;
-		int32 HeightOfShipStatusUI = 180;
+		int32 WidthOfShipStatusUI = VeiwportSize.X * 0.5;
+		int32 HeightOfShipStatusUI = 165;
 
-		// Set the location to bottom left corner
-		temp.X = temp.X*0.02;
-		temp.Y = temp.Y*0.995 - HeightOfShipStatusUI;
-		ShipStatusUI->SetPositionInViewport(temp);
-
+		// Set the location to bottom left corner	
+		VeiwportSize.X = 30;
+		VeiwportSize.Y = VeiwportSize.Y - HeightOfShipStatusUI - Margin;
+		ShipStatusUI->SetPositionInViewport(VeiwportSize / DpiScale, false);
 		// Resize to correct size
-		ShipStatusUI->SetDesiredSizeInViewport(UKismetMathLibrary::MakeVector2D(WidthOfShipStatusUI, HeightOfShipStatusUI));
+		ShipStatusUI->SetDesiredSizeInViewport(FVector2D(WidthOfShipStatusUI / DpiScale, HeightOfShipStatusUI / DpiScale));
 
 		ShipStatusUI->AddToViewport();
 
@@ -362,7 +380,7 @@ void AETVGameModeBase::SpawnShip(int32 x, int32 y, UPaperTileSet* type)
 	// Spawning ShipActor based on class
 	if (type == PlayerCapitalShip || type == EnemyCapitalShip) {
 		CapitalShip = GetWorld()->SpawnActor<AETVShipCapital>(LocDim, Rotator, SpawnInfo);
-		CapitalShip->Init("Cap", 100, 100, 100, 10, 10, 10, 10, true, 1.0f, 1);
+		CapitalShip->InitRandom("Cap");
 		CapitalShip->SetCurrentPosition(x, y);
 		CapitalShip->SetContextMenu(ContextMenu);
 		CapitalShip->GetRenderComponent()->SetMobility(EComponentMobility::Movable);
@@ -399,7 +417,7 @@ void AETVGameModeBase::SpawnShip(int32 x, int32 y, UPaperTileSet* type)
 	}
 	else if (type == PlayerFighterShip || type == EnemyFighterShip) {
 		FighterShip = GetWorld()->SpawnActor<AETVShipFighter>(LocDim, Rotator, SpawnInfo);
-		FighterShip->Init("Fighter", 100, 100, 100, 10, 10, 10, 10, 1.0f, 2.0f);
+		FighterShip->InitRandom("Fighter");
 		FighterShip->SetCurrentPosition(x, y);
 		FighterShip->SetContextMenu(ContextMenu);
 		FighterShip->GetRenderComponent()->SetMobility(EComponentMobility::Movable);

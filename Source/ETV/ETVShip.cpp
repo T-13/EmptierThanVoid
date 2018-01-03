@@ -17,16 +17,53 @@ AETVShip::AETVShip() : Super()
 	Type = EETVShipType::PlayerShip;
 }
 
-void AETVShip::Init(FString NewName, int32 HP, int32 MaxHP, int32 ShieldP, int32 NewShieldRechargeTime, int32 NewSize, int32 NewMoveRange, int32 Speed)
+void AETVShip::Init(FString NewName, int32 MaxHP, int32 ShieldP, int32 NewShieldRechargeTime, int32 NewMoveRange, int32 Speed)
 {
 	Name = NewName;
-	HealthPoints = HP;
+	HealthPoints = MaxHP;
 	MaximumHealthPoints = MaxHP;
 	ShieldPoints = ShieldP;
 	ShieldRechargeTime = NewShieldRechargeTime;
-	Size = NewSize;
 	MoveRange = NewMoveRange;
 	ShipSpeed = Speed;
+}
+
+void AETVShip::InitRandom(FString NewName)
+{
+	Level = FMath::RandRange(50, 200);
+	InitRandomWithLevel(NewName, Level);
+}
+
+void AETVShip::InitRandomWithLevel(FString NewName, int32 PowerLvl)
+{
+	if (PowerLvl < 50)
+		PowerLvl = 50;
+	else if (PowerLvl > 200)
+		PowerLvl = 200;
+
+	Level = PowerLvl;
+
+	// The range of values we can generate
+	int32 RangeMin = PowerLvl - 25;
+	int32 RangeMax = PowerLvl + 25;
+
+	Name = NewName;
+
+	MaximumHealthPoints = FMath::RandRange(RangeMin, RangeMax);
+	HealthPoints = MaximumHealthPoints;
+
+	ShieldPoints = FMath::RandRange(RangeMin, RangeMax);
+
+	// The better the level the lower the time (min 1)
+	int32 MinShieldRechargeTime = 200 / PowerLvl;
+	int32 MaxShieldRechargeTime = MinShieldRechargeTime + 3;
+	ShieldRechargeTime = FMath::RandRange(MinShieldRechargeTime, MaxShieldRechargeTime);
+
+	int32 MinMoveRange = PowerLvl / 25;
+	int32 MaxMoveRange = PowerLvl / 15;
+	MoveRange = FMath::RandRange(MinMoveRange, MaxMoveRange);
+
+	ShipSpeed = FMath::RandRange(MinMoveRange, MaxMoveRange);
 }
 
 void AETVShip::BeginPlay()

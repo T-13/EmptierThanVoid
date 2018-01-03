@@ -7,6 +7,7 @@
 #include "ETVWeaponShieldBattery.h"
 #include "ETVActionTarget_Fire.h"
 #include "ETVActionTarget_Move.h"
+#include "ETVActionTarget_Use.h"
 #include "ETVCameraDirector.h"
 #include "WidgetLayoutLibrary.h"
 #include "UserWidget.h"
@@ -380,6 +381,7 @@ void AETVGameModeBase::SpawnShip(int32 x, int32 y, UPaperTileSet* type)
 	if (type == PlayerCapitalShip || type == EnemyCapitalShip) {
 		CapitalShip = GetWorld()->SpawnActor<AETVShipCapital>(LocDim, Rotator, SpawnInfo);
 		CapitalShip->InitRandom("Cap");
+		CapitalShip->SetCurrentPosition(x, y);
 		CapitalShip->SetContextMenu(ContextMenu);
 		CapitalShip->GetRenderComponent()->SetMobility(EComponentMobility::Movable);
 		CapitalShip->GetRenderComponent()->SetSprite(Sprite);
@@ -416,6 +418,7 @@ void AETVGameModeBase::SpawnShip(int32 x, int32 y, UPaperTileSet* type)
 	else if (type == PlayerFighterShip || type == EnemyFighterShip) {
 		FighterShip = GetWorld()->SpawnActor<AETVShipFighter>(LocDim, Rotator, SpawnInfo);
 		FighterShip->InitRandom("Fighter");
+		FighterShip->SetCurrentPosition(x, y);
 		FighterShip->SetContextMenu(ContextMenu);
 		FighterShip->GetRenderComponent()->SetMobility(EComponentMobility::Movable);
 		FighterShip->GetRenderComponent()->SetSprite(Sprite);
@@ -491,7 +494,7 @@ void AETVGameModeBase::SpawnWeapon(int32 NewX, int32 NewY, AETVShip* Ship, int32
 		RepairArm = GetWorld()->SpawnActor<AETVWeaponRepairArm>(LocDim, Rotator, SpawnInfo);
 
 		do {
-			RepairArm->InitRandom("RepairArm", level);
+			RepairArm->InitRandom("Repair Arm", level);
 		} while (!WeaponSlot->DoesWeaponFit(RepairArm));
 		WeaponSlot->FitWeapon(RepairArm);
 		Ship->AddWeapon(WeaponSlot);
@@ -502,7 +505,7 @@ void AETVGameModeBase::SpawnWeapon(int32 NewX, int32 NewY, AETVShip* Ship, int32
 		ShieldBattery = GetWorld()->SpawnActor<AETVWeaponShieldBattery>(LocDim, Rotator, SpawnInfo);
 
 		do {
-			ShieldBattery->InitRandom("ShieldBattery", level);
+			ShieldBattery->InitRandom("Shield Bat", level); // Abbreviated "Battery" as "Bat" to fit in Context Menu
 		} while (!WeaponSlot->DoesWeaponFit(ShieldBattery));
 		WeaponSlot->FitWeapon(ShieldBattery);
 		Ship->AddWeapon(WeaponSlot);
@@ -513,7 +516,15 @@ void AETVGameModeBase::SpawnActions(AETVShip* Ship)
 {
 	for (UETVWeaponSlot* w : Ship->GetWeapons())
 	{
-		UETVActionTarget_Fire *Fire = NewObject<UETVActionTarget_Fire>();
+		UETVActionTarget *Fire;
+		if (w->GetWeapon()->GetType() == AETVWeapon::HealHull || w->GetWeapon()->GetType() == AETVWeapon::HealShield)
+		{
+			Fire = NewObject<UETVActionTarget_Use>();
+		}
+		else
+		{
+			Fire = NewObject<UETVActionTarget_Fire>();
+		}
 		Fire->Init(Ship, w->GetWeapon());
 		Ship->AddAction(Fire);
 	}
@@ -542,13 +553,23 @@ FVector AETVGameModeBase::GetPosition(int32 x, int32 y, float z)
 	return FVector(-(TileSize / 2)*MapWidth + x * TileSize, -(TileSize / 2)*MapHeight + y * TileSize, z);
 }
 
+void AETVGameModeBase::SetPosition(int32 ToX, int32 ToY, int32 FromX, int32 FromY)
+{
+	// Set new tile
+	FPaperTileInfo ToTileInfo = TileMapComp->GetTile(FromX, FromY, EETVTileLayer::Ship);
+	TileMapComp->SetTile(ToX, ToY, EETVTileLayer::Ship, ToTileInfo);
+
+	// Reset old tile
+	TileMapComp->SetTile(FromX, FromY, EETVTileLayer::Ship, FPaperTileInfo());
+}
+
 void AETVGameModeBase::EndTurn()
 {
 	// Close context menu if any is open
+	// TODO Optimize by closing the only open context menu as there can't be more than one open
 	for (AETVShip* CurShip : Ships)
 	{
-		// TODO Close context menu
-		//CurShip->CloseMenu();
+		CurShip->UnconditionallyCloseContextMenu();
 	}
 
 	// Handle turn end
@@ -756,6 +777,26 @@ void AETVGameModeBase::StopTargeting(bool bSuccess)
 	SelectedAction = nullptr;
 }
 
+void AETVGameModeBase::ShipClicked(AETVShip *ClickedShip)
+{
+	LastClickedShip = ClickedShip;
+}
+
+bool AETVGameModeBase::WasShipClickedRecently()
+{
+	return (LastClickedShip != nullptr);
+}
+
+AETVShip* AETVGameModeBase::GetLastClickedShip()
+{
+	return LastClickedShip;
+}
+
 UETVActionLogWidget* AETVGameModeBase::GetLogWidget() {
 	return ActionLogClass;
+}
+
+UETVShipStatusUIWidget* AETVGameModeBase::GetShipListWidget()
+{
+	return ShipStatusUI;
 }

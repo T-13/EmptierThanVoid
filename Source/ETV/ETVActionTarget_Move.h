@@ -19,6 +19,7 @@ public:
 	UETVActionTarget_Move();
 
 public:
+	bool CanActivate() override;
 	bool CanPerform() override;
 
 	void ApplyEffectsSelf() override;

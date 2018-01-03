@@ -4,23 +4,22 @@
 
 #include "CoreMinimal.h"
 #include "ETVActionTarget.h"
-#include "ETVActionTarget_Fire.generated.h"
+#include "ETVActionTarget_Use.generated.h"
 
 /**
- * Action class for firing at another asset.
+ * Action class for using a weapon on another asset.
  */
 UCLASS()
-class ETV_API UETVActionTarget_Fire : public UETVActionTarget
+class ETV_API UETVActionTarget_Use : public UETVActionTarget
 {
 	GENERATED_BODY()
 	
 public:
 	// Sets default values for this actor's properties
-	UETVActionTarget_Fire();
+	UETVActionTarget_Use();
 
 public:
 	bool CanActivate() override;
-	bool CanPerform() override;
 
 	void ApplyEffectsTarget() override;
 	void ApplyEffectsSelf() override;

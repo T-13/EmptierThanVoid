@@ -47,7 +47,6 @@ protected:
 	// Called when the game starts or when spawned
 	void BeginPlay() override;
 
-protected:
 
 	// Name of the ship
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship")
@@ -126,6 +125,10 @@ protected:
 	int32 Level;
 
 public:
+	// Called every frame
+	void Tick(float DeltaTime) override;
+
+
 	UFUNCTION()
 	void SetCurrentPosition(int32 NewX, int32 NewY);
 
@@ -162,8 +165,23 @@ public:
 	UFUNCTION()
 	bool CanMove();
 
+	UFUNCTION()
+	void MoveToTile(int32 NewX, int32 NewY);
+
 	UFUNCTION(BlueprintCallable)
 	bool IsEnemy();
+
+	UFUNCTION(BlueprintCallable)
+	int32 GetX() const { return X; }
+
+	UFUNCTION(BlueprintCallable)
+	int32 GetY() const { return Y; }
+
+	UFUNCTION()
+	void CloseContextMenu();
+
+	UFUNCTION()
+	void UnconditionallyCloseContextMenu();
 
 
 	// Returns a multiplier for the effectiveness of ship's actions depending on its status

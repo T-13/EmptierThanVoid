@@ -24,6 +24,9 @@ protected:
 public:
 	// A method to assign the reference to the list of ships
 	void AssignShips(TArray<AETVShip*> ListOfShips);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "ETV ShipsStatusGameUI")
+	void Update();
 	
 	
 	

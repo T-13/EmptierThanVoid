@@ -13,16 +13,26 @@ UETVActionTarget_Move::UETVActionTarget_Move() : Super()
 	RequiredTargetType = APaperTileMapActor::StaticClass();
 }
 
+bool UETVActionTarget_Move::CanActivate()
+{
+	return Super::CanActivate() && OwnerShip->CanMove();
+}
+
 bool UETVActionTarget_Move::CanPerform()
 {
-	return Super::CanPerform() && OwnerShip->CanMove();
+	// TODO Check distance (Ship's MoveRange vs distance)
+	return Super::CanPerform() && TileX != -1 && TileY != -1;
 }
 
 void UETVActionTarget_Move::ApplyEffectsSelf()
 {
+	Super::ApplyEffectsSelf();
+
 	if (IsLastPerform())
 	{
-		Super::ApplyEffectsSelf();
-		// TODO Move from current tile to target tile, do flipbook animations and all that
+		// TODO Do animation
+
+		// Move ship
+		OwnerShip->MoveToTile(TileX, TileY);
 	}
 }

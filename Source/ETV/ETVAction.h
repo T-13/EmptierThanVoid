@@ -17,7 +17,7 @@ enum class EETVActionAvailability : uint8
  * Abstract base Action class.
  * Actions are attached to assets (eg. ships, weapons).
  */
-UCLASS(Abstract)
+UCLASS(Abstract, Blueprintable)
 class ETV_API UETVAction : public UObject
 {
 	GENERATED_BODY()
@@ -26,12 +26,19 @@ public:
 	// Sets default values for this actor's properties
 	UETVAction();
 
+protected:
+	// Ship this action is part of
+	UPROPERTY(BlueprintReadOnly, Category = "ETV Action")
 	AETVShip* OwnerShip;
+
+	// Weapon this action is part of
+	UPROPERTY(BlueprintReadOnly, Category = "ETV Action")
 	AETVWeapon* OwnerWeapon;
 
+	// Current turn of the perform
+	UPROPERTY(BlueprintReadOnly, Category = "ETV Action")
 	int32 CurrentPerform;
 
-protected:
 	// Display name of the action
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Action")
 	FName Name;
@@ -72,15 +79,20 @@ public:
 	UFUNCTION()
 	virtual bool IsLastPerform();
 
+	// Returns if action can be activated
+	UFUNCTION(BlueprintCallable, Category = "ETV Action")
+	virtual bool CanActivate();
+
+	// Returns if action can be performed (post action selection parameters set correctly)
 	UFUNCTION()
 	virtual bool CanPerform();
 
-	// Activates the action (double checking if can perform, starts targeting if required), returns activation success
+	// Activates the action (double checking if can activate, starts targeting if required), returns activation success
 	UFUNCTION(BlueprintCallable, Category = "ETV Action")
 	virtual bool Activate();
 
 	UFUNCTION()
-	virtual void Perform();
+	virtual bool Perform();
 
 	UFUNCTION()
 	virtual void OnBeginPerform();

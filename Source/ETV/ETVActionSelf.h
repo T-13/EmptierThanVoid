@@ -27,7 +27,6 @@ public:
 	UFUNCTION()
 	virtual bool IsSafe();
 
-	bool CanPerform() override;
-
+	bool CanActivate() override;
 	bool Activate() override;
 };

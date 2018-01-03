@@ -9,6 +9,9 @@
 // Sets default values
 AETVShip::AETVShip() : Super()
 {
+	// Set this actor to call Tick() every frame
+	PrimaryActorTick.bCanEverTick = true;
+
 	IsContextMenuOpen = false;
 
 	Type = EETVShipType::PlayerShip;
@@ -70,8 +73,29 @@ void AETVShip::BeginPlay()
 	OnClicked.AddDynamic(this, &AETVShip::SpawnContextMenu);
 }
 
+// Called every frame
+void AETVShip::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	// Invoke custom Tick (from this/owned Actor) due to UE-22374
+	if (IsContextMenuOpen && CurrentContextMenu != nullptr)
+	{
+		if (WasRecentlyRendered())
+		{
+			CurrentContextMenu->Ticked();
+		}
+		else
+		{
+			// Close if off-screen (prevent close animation from restarting/pausing mid-way)
+			ClosingContextMenu();
+		}
+	}
+}
+
 void AETVShip::SetCurrentPosition(int32 NewX, int32 NewY)
 {
+	// Update references
 	X = NewX;
 	Y = NewY;
 }
@@ -101,21 +125,33 @@ void AETVShip::GetReport()
 
 void AETVShip::SpawnContextMenu(AActor *Actor, FKey Key)
 {
-	AETVGameModeBase* GameMode = (AETVGameModeBase*)GetWorld()->GetAuthGameMode();
+	AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 	if (ContextMenuClass != nullptr && !GameMode->IsTargeting() && !IsContextMenuOpen && !PlayerController->IsPaused())
 	{
+		// If another menu is in focus close it
+		if (GameMode->WasShipClickedRecently())
+		{
+			GameMode->GetLastClickedShip()->UnconditionallyCloseContextMenu();
+		}
+		GameMode->ShipClicked(this);
+
 		CurrentContextMenu = CreateWidget<UETVShipContextMenuWidget>(GetWorld(), ContextMenuClass);
 		CurrentContextMenu->AssignShip(this);
 		if (CurrentContextMenu != nullptr)
 		{
-			float x; // X coordinate of MouseCursor
-			float y; // Y coordinate of MouseCursor
-			if (PlayerController->GetMousePosition(x, y)) {
-				CurrentContextMenu->SetPositionInViewport(FVector2D(x, y));
+			const FVector WorldTilePos = GetActorLocation();
+			FVector2D ScreenTilePos;
+			if (PlayerController->ProjectWorldLocationToScreen(WorldTilePos, ScreenTilePos))
+			{
+				CurrentContextMenu->SetPositionInViewport(ScreenTilePos);
 				CurrentContextMenu->SetDesiredSizeInViewport(FVector2D(320, 280));
 				CurrentContextMenu->AddToViewport();
 				IsContextMenuOpen = true;
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("AETVShip::SpawnContextMenu(): Out of screen location!"))
 			}
 		}
 	}
@@ -154,9 +190,40 @@ bool AETVShip::CanMove()
 	return ShipSpeed != 0;
 }
 
+void AETVShip::MoveToTile(int32 NewX, int32 NewY)
+{
+	AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
+
+	// Move tile
+	GameMode->SetPosition(NewX, NewY, X, Y);
+
+	// Move actor
+	SetActorLocation(GameMode->GetPosition(NewX, NewY));
+
+	// Update references
+	SetCurrentPosition(NewX, NewY);
+}
+
 bool AETVShip::IsEnemy()
 {
 	return Type == EETVShipType::EnemyShip;
+}
+
+void AETVShip::CloseContextMenu()
+{
+	if (CurrentContextMenu != nullptr)
+	{
+		CurrentContextMenu->Close();
+	}
+}
+
+void AETVShip::UnconditionallyCloseContextMenu()
+{
+	if (CurrentContextMenu != nullptr)
+	{
+		CurrentContextMenu->ShouldNotReOpen();
+		CurrentContextMenu->Close();
+	}
 }
 
 float AETVShip::GetMultiplier()
@@ -195,7 +262,14 @@ float AETVShip::GetMultiplier()
 
 void AETVShip::ClosingContextMenu()
 {
-	// Tell the ship its' ContextMenu is closed 
+	// If this is the current focused menu tell gameMode it has closed
+	AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
+	if (GameMode->GetLastClickedShip() == this)
+	{
+		GameMode->ShipClicked(nullptr);
+	}
+
+	// Tell the ship its ContextMenu is closed 
 	IsContextMenuOpen = false;
 	// Remove the reference to the Closed Menu
 	CurrentContextMenu = nullptr;

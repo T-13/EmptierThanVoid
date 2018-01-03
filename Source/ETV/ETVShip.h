@@ -36,14 +36,17 @@ class ETV_API AETVShip : public APaperSpriteActor
 public:
 	// Sets default values for this actor's properties
 	AETVShip();
-	void Init(FString NewName, int32 HP, int32 MaxHP, int32 ShieldP, int32 NewShieldRechargeTime, int32 NewSize, int32 NewMoveRange, int32 Speed);
+	void Init(FString NewName, int32 MaxHP, int32 ShieldP, int32 NewShieldRechargeTime, int32 NewMoveRange, int32 Speed);
+
+	void InitRandom(FString NewName);
+
+	void InitRandomWithLevel(FString NewName, int32 PowerLvl);
 
 
 protected:
 	// Called when the game starts or when spawned
 	void BeginPlay() override;
 
-protected:
 
 	// Name of the ship
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship")
@@ -74,10 +77,6 @@ protected:
 	// Integers (x,y) that represent a point on a sprite where the attachement goes
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship")
 	TArray<int32> AttachementSlots;
-
-	// Size of the ship
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship", meta = (ClampMin = "1.0"))
-	int32 Size;
 
 	// Area that ship is allowed to move to
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship", meta = (ClampMin = "1.0"))
@@ -126,7 +125,14 @@ protected:
 	UPROPERTY()
 	int32 Y;
 
+	UPROPERTY()
+	int32 Level;
+
 public:
+	// Called every frame
+	void Tick(float DeltaTime) override;
+
+
 	UFUNCTION()
 	void SetCurrentPosition(int32 NewX, int32 NewY);
 
@@ -163,8 +169,23 @@ public:
 	UFUNCTION()
 	bool CanMove();
 
+	UFUNCTION()
+	void MoveToTile(int32 NewX, int32 NewY);
+
 	UFUNCTION(BlueprintCallable)
 	bool IsEnemy();
+
+	UFUNCTION(BlueprintCallable)
+	int32 GetX() const { return X; }
+
+	UFUNCTION(BlueprintCallable)
+	int32 GetY() const { return Y; }
+
+	UFUNCTION()
+	void CloseContextMenu();
+
+	UFUNCTION()
+	void UnconditionallyCloseContextMenu();
 
 
 	// Returns a multiplier for the effectiveness of ship's actions depending on its status

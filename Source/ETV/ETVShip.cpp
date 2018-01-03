@@ -9,6 +9,9 @@
 // Sets default values
 AETVShip::AETVShip() : Super()
 {
+	// Set this actor to call Tick() every frame
+	PrimaryActorTick.bCanEverTick = true;
+
 	IsContextMenuOpen = false;
 
 	Type = EETVShipType::PlayerShip;
@@ -16,16 +19,53 @@ AETVShip::AETVShip() : Super()
 	SensorRange = 8;
 }
 
-void AETVShip::Init(FString NewName, int32 HP, int32 MaxHP, int32 ShieldP, int32 NewShieldRechargeTime, int32 NewSize, int32 NewMoveRange, int32 Speed)
+void AETVShip::Init(FString NewName, int32 MaxHP, int32 ShieldP, int32 NewShieldRechargeTime, int32 NewMoveRange, int32 Speed)
 {
 	Name = NewName;
-	HealthPoints = HP;
+	HealthPoints = MaxHP;
 	MaximumHealthPoints = MaxHP;
 	ShieldPoints = ShieldP;
 	ShieldRechargeTime = NewShieldRechargeTime;
-	Size = NewSize;
 	MoveRange = NewMoveRange;
 	ShipSpeed = Speed;
+}
+
+void AETVShip::InitRandom(FString NewName)
+{
+	Level = FMath::RandRange(50, 200);
+	InitRandomWithLevel(NewName, Level);
+}
+
+void AETVShip::InitRandomWithLevel(FString NewName, int32 PowerLvl)
+{
+	if (PowerLvl < 50)
+		PowerLvl = 50;
+	else if (PowerLvl > 200)
+		PowerLvl = 200;
+
+	Level = PowerLvl;
+
+	// The range of values we can generate
+	int32 RangeMin = PowerLvl - 25;
+	int32 RangeMax = PowerLvl + 25;
+
+	Name = NewName;
+
+	MaximumHealthPoints = FMath::RandRange(RangeMin, RangeMax);
+	HealthPoints = MaximumHealthPoints;
+
+	ShieldPoints = FMath::RandRange(RangeMin, RangeMax);
+
+	// The better the level the lower the time (min 1)
+	int32 MinShieldRechargeTime = 200 / PowerLvl;
+	int32 MaxShieldRechargeTime = MinShieldRechargeTime + 3;
+	ShieldRechargeTime = FMath::RandRange(MinShieldRechargeTime, MaxShieldRechargeTime);
+
+	int32 MinMoveRange = PowerLvl / 25;
+	int32 MaxMoveRange = PowerLvl / 15;
+	MoveRange = FMath::RandRange(MinMoveRange, MaxMoveRange);
+
+	ShipSpeed = FMath::RandRange(MinMoveRange, MaxMoveRange);
 }
 
 void AETVShip::BeginPlay()
@@ -35,8 +75,29 @@ void AETVShip::BeginPlay()
 	OnClicked.AddDynamic(this, &AETVShip::SpawnContextMenu);
 }
 
+// Called every frame
+void AETVShip::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	// Invoke custom Tick (from this/owned Actor) due to UE-22374
+	if (IsContextMenuOpen && CurrentContextMenu != nullptr)
+	{
+		if (WasRecentlyRendered())
+		{
+			CurrentContextMenu->Ticked();
+		}
+		else
+		{
+			// Close if off-screen (prevent close animation from restarting/pausing mid-way)
+			ClosingContextMenu();
+		}
+	}
+}
+
 void AETVShip::SetCurrentPosition(int32 NewX, int32 NewY)
 {
+	// Update references
 	X = NewX;
 	Y = NewY;
 }
@@ -66,21 +127,33 @@ void AETVShip::GetReport()
 
 void AETVShip::SpawnContextMenu(AActor *Actor, FKey Key)
 {
-	AETVGameModeBase* GameMode = (AETVGameModeBase*)GetWorld()->GetAuthGameMode();
+	AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 	if (ContextMenuClass != nullptr && !GameMode->IsTargeting() && !IsContextMenuOpen && !PlayerController->IsPaused())
 	{
+		// If another menu is in focus close it
+		if (GameMode->WasShipClickedRecently())
+		{
+			GameMode->GetLastClickedShip()->UnconditionallyCloseContextMenu();
+		}
+		GameMode->ShipClicked(this);
+
 		CurrentContextMenu = CreateWidget<UETVShipContextMenuWidget>(GetWorld(), ContextMenuClass);
 		CurrentContextMenu->AssignShip(this);
 		if (CurrentContextMenu != nullptr)
 		{
-			float x; // X coordinate of MouseCursor
-			float y; // Y coordinate of MouseCursor
-			if (PlayerController->GetMousePosition(x, y)) {
-				CurrentContextMenu->SetPositionInViewport(UKismetMathLibrary::MakeVector2D(x, y));
-				CurrentContextMenu->SetDesiredSizeInViewport(UKismetMathLibrary::MakeVector2D(320, 280));
+			const FVector WorldTilePos = GetActorLocation();
+			FVector2D ScreenTilePos;
+			if (PlayerController->ProjectWorldLocationToScreen(WorldTilePos, ScreenTilePos))
+			{
+				CurrentContextMenu->SetPositionInViewport(ScreenTilePos);
+				CurrentContextMenu->SetDesiredSizeInViewport(FVector2D(320, 280));
 				CurrentContextMenu->AddToViewport();
 				IsContextMenuOpen = true;
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("AETVShip::SpawnContextMenu(): Out of screen location!"))
 			}
 		}
 	}
@@ -119,9 +192,40 @@ bool AETVShip::CanMove()
 	return ShipSpeed != 0;
 }
 
+void AETVShip::MoveToTile(int32 NewX, int32 NewY)
+{
+	AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
+
+	// Move tile
+	GameMode->SetPosition(NewX, NewY, X, Y);
+
+	// Move actor
+	SetActorLocation(GameMode->GetPosition(NewX, NewY));
+
+	// Update references
+	SetCurrentPosition(NewX, NewY);
+}
+
 bool AETVShip::IsEnemy()
 {
 	return Type == EETVShipType::EnemyShip;
+}
+
+void AETVShip::CloseContextMenu()
+{
+	if (CurrentContextMenu != nullptr)
+	{
+		CurrentContextMenu->Close();
+	}
+}
+
+void AETVShip::UnconditionallyCloseContextMenu()
+{
+	if (CurrentContextMenu != nullptr)
+	{
+		CurrentContextMenu->ShouldNotReOpen();
+		CurrentContextMenu->Close();
+	}
 }
 
 float AETVShip::GetMultiplier()
@@ -160,7 +264,14 @@ float AETVShip::GetMultiplier()
 
 void AETVShip::ClosingContextMenu()
 {
-	// Tell the ship its' ContextMenu is closed 
+	// If this is the current focused menu tell gameMode it has closed
+	AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
+	if (GameMode->GetLastClickedShip() == this)
+	{
+		GameMode->ShipClicked(nullptr);
+	}
+
+	// Tell the ship its ContextMenu is closed 
 	IsContextMenuOpen = false;
 	// Remove the reference to the Closed Menu
 	CurrentContextMenu = nullptr;

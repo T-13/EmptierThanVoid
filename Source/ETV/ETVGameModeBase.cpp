@@ -7,10 +7,12 @@
 #include "ETVWeaponShieldBattery.h"
 #include "ETVActionTarget_Fire.h"
 #include "ETVActionTarget_Move.h"
+#include "ETVActionTarget_Use.h"
 #include "ETVCameraDirector.h"
 #include "WidgetLayoutLibrary.h"
 #include "UserWidget.h"
 #include "ETVCalculator.h"
+#include "Runtime/Engine/Classes/Engine/UserInterfaceSettings.h"
 //#include "DrawDebugHelpers.h" // Uncomment for debug drawing
 
 // Sets default values
@@ -58,11 +60,30 @@ void AETVGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// Margin for UI Widgets
+	int32 Margin = 45;
+
 	// Spawn Widget for Action Log
 	ActionLogClass = CreateWidget<UETVActionLogWidget>(GetWorld(), ActionLogWidget);
-	ActionLogClass->SetPositionInViewport(UKismetMathLibrary::MakeVector2D(0, 0));
-	ActionLogClass->SetDesiredSizeInViewport(FVector2D(UWidgetLayoutLibrary::GetViewportSize(GetWorld())));
+	FVector2D VeiwportSize = UWidgetLayoutLibrary::GetViewportSize(GetWorld());
+
+	// we need to floor the float values of the viewport size so we can pass those into the GetDPIScaleBasedOnSize function
+	int32 XOfViewport = FGenericPlatformMath::FloorToInt(VeiwportSize.X);
+	int32 YOfViewport = FGenericPlatformMath::FloorToInt(VeiwportSize.Y);
+	float DpiScale = GetDefault<UUserInterfaceSettings>(UUserInterfaceSettings::StaticClass())->GetDPIScaleBasedOnSize(FIntPoint(XOfViewport, YOfViewport));
+
+	// Define the size of the element
+	int32 WidthOfActionLog = VeiwportSize.X * 0.4;
+	int32 HeightOfActionLog = 165;
+
+	// Set the location to bottom left corner
+	VeiwportSize.X = VeiwportSize.X - WidthOfActionLog - Margin;
+	VeiwportSize.Y = VeiwportSize.Y - HeightOfActionLog - Margin;
+
+	ActionLogClass->SetPositionInViewport(VeiwportSize / DpiScale, false);
+	ActionLogClass->SetDesiredSizeInViewport(FVector2D(WidthOfActionLog / DpiScale, HeightOfActionLog / DpiScale));
 	ActionLogClass->AddToViewport();
+
 
 	if (TileSet != nullptr)
 	{
@@ -80,19 +101,18 @@ void AETVGameModeBase::BeginPlay()
 		ShipStatusUI = CreateWidget<UETVShipStatusUIWidget>(GetWorld(), ShipStatusUIClass);
 		// Pass ships to the ShipStatus UI
 		ShipStatusUI->AssignShips(Ships);
-		
+
+		FVector2D VeiwportSize = UWidgetLayoutLibrary::GetViewportSize(GetWorld());
 		// Define the size of the element
-		int32 WidthOfShipStatusUI = 1200;
-		int32 HeightOfShipStatusUI = 180;
+		int32 WidthOfShipStatusUI = VeiwportSize.X * 0.5;
+		int32 HeightOfShipStatusUI = 165;
 
-		// Set the location to bottom left corner
-		FVector2D temp = UWidgetLayoutLibrary::GetViewportSize(GetWorld());
-		temp.X = 0;
-		temp.Y = temp.Y - HeightOfShipStatusUI*0.6;
-		ShipStatusUI->SetPositionInViewport(temp);
-
+		// Set the location to bottom left corner	
+		VeiwportSize.X = 30;
+		VeiwportSize.Y = VeiwportSize.Y - HeightOfShipStatusUI - Margin;
+		ShipStatusUI->SetPositionInViewport(VeiwportSize / DpiScale, false);
 		// Resize to correct size
-		ShipStatusUI->SetDesiredSizeInViewport(UKismetMathLibrary::MakeVector2D(WidthOfShipStatusUI, HeightOfShipStatusUI));
+		ShipStatusUI->SetDesiredSizeInViewport(FVector2D(WidthOfShipStatusUI / DpiScale, HeightOfShipStatusUI / DpiScale));
 
 		ShipStatusUI->AddToViewport();
 
@@ -360,7 +380,8 @@ void AETVGameModeBase::SpawnShip(int32 x, int32 y, UPaperTileSet* type)
 	// Spawning ShipActor based on class
 	if (type == PlayerCapitalShip || type == EnemyCapitalShip) {
 		CapitalShip = GetWorld()->SpawnActor<AETVShipCapital>(LocDim, Rotator, SpawnInfo);
-		CapitalShip->Init("Cap", 100, 100, 100, 10, 10, 10, 10, true, 1.0f, 1);
+		CapitalShip->InitRandom("Cap");
+		CapitalShip->SetCurrentPosition(x, y);
 		CapitalShip->SetContextMenu(ContextMenu);
 		CapitalShip->GetRenderComponent()->SetMobility(EComponentMobility::Movable);
 		CapitalShip->GetRenderComponent()->SetSprite(Sprite);
@@ -396,7 +417,8 @@ void AETVGameModeBase::SpawnShip(int32 x, int32 y, UPaperTileSet* type)
 	}
 	else if (type == PlayerFighterShip || type == EnemyFighterShip) {
 		FighterShip = GetWorld()->SpawnActor<AETVShipFighter>(LocDim, Rotator, SpawnInfo);
-		FighterShip->Init("Fighter", 100, 100, 100, 10, 10, 10, 10, 1.0f, 2.0f);
+		FighterShip->InitRandom("Fighter");
+		FighterShip->SetCurrentPosition(x, y);
 		FighterShip->SetContextMenu(ContextMenu);
 		FighterShip->GetRenderComponent()->SetMobility(EComponentMobility::Movable);
 		FighterShip->GetRenderComponent()->SetSprite(Sprite);
@@ -472,7 +494,7 @@ void AETVGameModeBase::SpawnWeapon(int32 NewX, int32 NewY, AETVShip* Ship, int32
 		RepairArm = GetWorld()->SpawnActor<AETVWeaponRepairArm>(LocDim, Rotator, SpawnInfo);
 
 		do {
-			RepairArm->InitRandom("RepairArm", level);
+			RepairArm->InitRandom("Repair Arm", level);
 		} while (!WeaponSlot->DoesWeaponFit(RepairArm));
 		WeaponSlot->FitWeapon(RepairArm);
 		Ship->AddWeapon(WeaponSlot);
@@ -483,7 +505,7 @@ void AETVGameModeBase::SpawnWeapon(int32 NewX, int32 NewY, AETVShip* Ship, int32
 		ShieldBattery = GetWorld()->SpawnActor<AETVWeaponShieldBattery>(LocDim, Rotator, SpawnInfo);
 
 		do {
-			ShieldBattery->InitRandom("ShieldBattery", level);
+			ShieldBattery->InitRandom("Shield Bat", level); // Abbreviated "Battery" as "Bat" to fit in Context Menu
 		} while (!WeaponSlot->DoesWeaponFit(ShieldBattery));
 		WeaponSlot->FitWeapon(ShieldBattery);
 		Ship->AddWeapon(WeaponSlot);
@@ -494,7 +516,15 @@ void AETVGameModeBase::SpawnActions(AETVShip* Ship)
 {
 	for (UETVWeaponSlot* w : Ship->GetWeapons())
 	{
-		UETVActionTarget_Fire *Fire = NewObject<UETVActionTarget_Fire>();
+		UETVActionTarget *Fire;
+		if (w->GetWeapon()->GetType() == AETVWeapon::HealHull || w->GetWeapon()->GetType() == AETVWeapon::HealShield)
+		{
+			Fire = NewObject<UETVActionTarget_Use>();
+		}
+		else
+		{
+			Fire = NewObject<UETVActionTarget_Fire>();
+		}
 		Fire->Init(Ship, w->GetWeapon());
 		Ship->AddAction(Fire);
 	}
@@ -523,14 +553,26 @@ FVector AETVGameModeBase::GetPosition(int32 x, int32 y, float z)
 	return FVector(-(TileSize / 2)*MapWidth + x * TileSize, -(TileSize / 2)*MapHeight + y * TileSize, z);
 }
 
+void AETVGameModeBase::SetPosition(int32 ToX, int32 ToY, int32 FromX, int32 FromY)
+{
+	// Set new tile
+	FPaperTileInfo ToTileInfo = TileMapComp->GetTile(FromX, FromY, EETVTileLayer::Ship);
+	TileMapComp->SetTile(ToX, ToY, EETVTileLayer::Ship, ToTileInfo);
+
+	// Reset old tile
+	TileMapComp->SetTile(FromX, FromY, EETVTileLayer::Ship, FPaperTileInfo());
+}
+
 void AETVGameModeBase::EndTurn()
 {
 	// Close context menu if any is open
+	// TODO Optimize by closing the only open context menu as there can't be more than one open
 	for (AETVShip* CurShip : Ships)
 	{
-		// TODO Close context menu
-		//CurShip->CloseMenu();
+		CurShip->UnconditionallyCloseContextMenu();
 	}
+
+	CurrentTurnTime = 0.0f;
 
 	// Handle turn end
 	if (bDisableAI)
@@ -758,6 +800,26 @@ void AETVGameModeBase::StopTargeting(bool bSuccess)
 	SelectedAction = nullptr;
 }
 
+void AETVGameModeBase::ShipClicked(AETVShip *ClickedShip)
+{
+	LastClickedShip = ClickedShip;
+}
+
+bool AETVGameModeBase::WasShipClickedRecently()
+{
+	return (LastClickedShip != nullptr);
+}
+
+AETVShip* AETVGameModeBase::GetLastClickedShip()
+{
+	return LastClickedShip;
+}
+
 UETVActionLogWidget* AETVGameModeBase::GetLogWidget() {
 	return ActionLogClass;
+}
+
+UETVShipStatusUIWidget* AETVGameModeBase::GetShipListWidget()
+{
+	return ShipStatusUI;
 }

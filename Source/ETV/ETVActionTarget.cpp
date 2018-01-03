@@ -8,11 +8,21 @@ UETVActionTarget::UETVActionTarget() : Super()
 {
 	// No failure possibility
 	FailureChance = 0.0f;
+
+	SelectedTarget = nullptr;
+	TileX = -1;
+	TileY = -1;
 }
 
-AActor* UETVActionTarget::GetSelectedTarget()
+void UETVActionTarget::Init(AETVShip* OwnerShipPtr, AETVWeapon* OwnerWeaponPtr)
 {
-	return SelectedTarget;
+	Super::Init(OwnerShipPtr, OwnerWeaponPtr);
+
+	if (OwnerWeapon != nullptr)
+	{
+		FString NameWithWeapon = Name.ToString() + " " + OwnerWeapon->GetDisplayString();
+		Name = FName(*NameWithWeapon);
+	}
 }
 
 void UETVActionTarget::SetTarget(AActor* Target, int32 X, int32 Y)
@@ -34,6 +44,11 @@ bool UETVActionTarget::IsTargetValid()
 	return SelectedTarget->IsA(RequiredTargetType);
 }
 
+bool UETVActionTarget::CanActivate()
+{
+	return Super::CanActivate();
+}
+
 bool UETVActionTarget::CanPerform()
 {
 	return Super::CanPerform() && IsTargetValid();
@@ -53,12 +68,22 @@ bool UETVActionTarget::Activate()
 	return false;
 }
 
-void UETVActionTarget::Perform()
+bool UETVActionTarget::Perform()
 {
-	Super::Perform();
-
-	if (IsLastPerform())
+	if (Super::Perform())
 	{
 		ApplyEffectsTarget();
+
+		OnEndPerform();
+
+		return true;
 	}
+
+	return false;
+}
+
+void UETVActionTarget::OnEndPerform()
+{
+	AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
+	GameMode->GetShipListWidget()->Update();
 }

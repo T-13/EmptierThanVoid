@@ -205,4 +205,10 @@ public:
 	UFUNCTION()
 	FString GetShipName();
 
+	UFUNCTION()
+	int32 GetLevel() const { return Level; }
+
+	UFUNCTION()
+	EETVShipClass GetClass() const { return Class; }
+
 };

@@ -30,6 +30,10 @@ protected:
 	float DeflectionChance;
 	
 public:
+
+	UFUNCTION()
+	void SpawnWeapons();
+
 	// TODO Add methods
 	
 };

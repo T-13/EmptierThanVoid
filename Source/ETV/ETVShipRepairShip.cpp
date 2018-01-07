@@ -1,6 +1,8 @@
 // Copyright (C) Team13. All rights reserved.
 
 #include "ETVShipRepairShip.h"
+#include "ETVWeaponRepairArm.h"
+#include "ETVWeaponShieldBattery.h"
 
 AETVShipRepairShip::AETVShipRepairShip() : Super()
 {
@@ -29,4 +31,39 @@ void AETVShipRepairShip::InitRandomWithLevel(FString NewName, int32 PowerLvl)
 	Super::InitRandomWithLevel(NewName, PowerLvl);
 
 	RepairPower = PowerLvl / 5;
+}
+
+void AETVShipRepairShip::SpawnWeapons()
+{
+	// Actor spawn parameters
+	const FActorSpawnParameters SpawnInfo;
+
+	// Rotate upwards to face the top-down camera
+	const FRotator Rotator(0, 0, -90);
+
+	// Add RepairArm
+	UETVWeaponSlot* WeaponSlotRepairArm = NewObject<UETVWeaponSlot>();
+	WeaponSlotRepairArm->Init(Level, Level);
+
+	AETVWeaponRepairArm* RepairArm;
+	RepairArm = GetWorld()->SpawnActor<AETVWeaponRepairArm>(PositionInWorld, Rotator, SpawnInfo);
+
+	do {
+		RepairArm->InitRandom("Repair Arm", Level);
+	} while (!WeaponSlotRepairArm->DoesWeaponFit(RepairArm));
+	WeaponSlotRepairArm->FitWeapon(RepairArm);
+	AddWeapon(WeaponSlotRepairArm);
+
+	// Add ShieldBattery
+	UETVWeaponSlot* WeaponSlotShieldBattery = NewObject<UETVWeaponSlot>();
+	WeaponSlotShieldBattery->Init(Level, Level);
+
+	AETVWeaponShieldBattery* ShieldBattery;
+	ShieldBattery = GetWorld()->SpawnActor<AETVWeaponShieldBattery>(PositionInWorld, Rotator, SpawnInfo);
+
+	do {
+		ShieldBattery->InitRandom("Shield Bat", Level); // Abbreviated "Battery" as "Bat" to fit in Context Menu
+	} while (!WeaponSlotShieldBattery->DoesWeaponFit(ShieldBattery));
+	WeaponSlotShieldBattery->FitWeapon(ShieldBattery);
+	AddWeapon(WeaponSlotShieldBattery);
 }

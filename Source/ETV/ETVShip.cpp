@@ -5,6 +5,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "ETVGameModeBase.h"
+#include "ETVWeaponLaser.h"
 
 // Sets default values
 AETVShip::AETVShip() : Super()
@@ -64,6 +65,8 @@ void AETVShip::InitRandomWithLevel(FString NewName, int32 PowerLvl)
 	MoveRange = FMath::RandRange(MinMoveRange, MaxMoveRange);
 
 	ShipSpeed = FMath::RandRange(MinMoveRange, MaxMoveRange);
+
+	SpawnWeapons();
 }
 
 void AETVShip::BeginPlay()
@@ -98,6 +101,9 @@ void AETVShip::SetCurrentPosition(int32 NewX, int32 NewY)
 	// Update references
 	X = NewX;
 	Y = NewY;
+
+	AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
+	PositionInWorld = GameMode->GetPosition(NewX, NewY);
 }
 
 void AETVShip::AddWeapon(UETVWeaponSlot * Weapon)
@@ -200,6 +206,13 @@ void AETVShip::MoveToTile(int32 NewX, int32 NewY)
 	// Move actor
 	SetActorLocation(GameMode->GetPosition(NewX, NewY));
 
+	// Move all Weapons actors on this Ship
+	for (UETVWeaponSlot* w : Weapons)
+	{
+		w->GetWeapon()->GetRenderComponent()->SetMobility(EComponentMobility::Movable);
+		w->GetWeapon()->SetActorLocation(GameMode->GetPosition(NewX, NewY));
+	}
+
 	// Update references
 	SetCurrentPosition(NewX, NewY);
 }
@@ -294,7 +307,40 @@ FString AETVShip::GetShipType()
 	return "";
 }
 
+FString AETVShip::GetShipClass()
+{
+	if (Class == EETVShipClass::Capital)
+		return "Capital";
+	else if (Class == EETVShipClass::Fighter)
+		return "Fighter";
+	else if (Class == EETVShipClass::Repair)
+		return "Repair";
+	return "";
+}
+
 FString AETVShip::GetShipName()
 {
 	return Name;
+}
+
+void AETVShip::SpawnWeapons()
+{
+	// Actor spawn parameters
+	const FActorSpawnParameters SpawnInfo;
+
+	// Rotate upwards to face the top-down camera
+	const FRotator Rotator(0, 0, -90);
+
+	// Add Laser
+	UETVWeaponSlot* WeaponSlotLaser = NewObject<UETVWeaponSlot>();
+	WeaponSlotLaser->Init(Level, Level);
+
+	AETVWeaponLaser* Laser;
+	Laser = GetWorld()->SpawnActor<AETVWeaponLaser>(PositionInWorld, Rotator, SpawnInfo);
+
+	do {
+		Laser->InitRandom("Laser", Level);
+	} while (!WeaponSlotLaser->DoesWeaponFit(Laser));
+	WeaponSlotLaser->FitWeapon(Laser);
+	AddWeapon(WeaponSlotLaser);
 }

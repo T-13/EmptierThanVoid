@@ -50,8 +50,13 @@ void UETVCalculator::CalculateWeaponEffect(AETVShip *User, AETVWeapon *WeaponUse
 	// Weapon is a support type that heals HealthPoints
 	else if (WeaponUsed->GetType() == AETVWeapon::HealHull)
 	{
-		Target->SetHP(Target->GetHP() + ChangeValue);
-		ActionHP = "Healed Hull";
+		if (Target->GetHP() != Target->GetMaxHP()) {
+			if ((Target->GetHP() + ChangeValue) > Target->GetMaxHP()) {
+				ChangeValue = Target->GetMaxHP() - Target->GetHP();
+			}
+			Target->SetHP(Target->GetHP() + ChangeValue);
+			ActionHP = "Healed Hull";
+		}
 	}
 	// Weapon is a support type that heals ShieldPoints
 	else if (WeaponUsed->GetType() == AETVWeapon::HealShield)

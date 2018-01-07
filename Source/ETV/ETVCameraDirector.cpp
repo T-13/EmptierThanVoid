@@ -51,12 +51,12 @@ void AETVCameraDirector::BeginPlay()
 	// Setup binds through player controller input component
 	UInputComponent* InputComponent = GetWorld()->GetFirstPlayerController()->InputComponent;
 
-	InputComponent->BindAction("CameraZoomIn", IE_Pressed, this, &AETVCameraDirector::OnZoomIn);
-	InputComponent->BindAction("CameraZoomOut", IE_Pressed, this, &AETVCameraDirector::OnZoomOut);
-	InputComponent->BindAction("CameraMoveModifier", IE_Pressed, this, &AETVCameraDirector::OnMoveModifier);
-	InputComponent->BindAction("CameraMoveModifier", IE_Released, this, &AETVCameraDirector::OnMoveModifier);
-	InputComponent->BindAxis("CameraMoveHorizontal", this, &AETVCameraDirector::OnMoveHorizontal);
-	InputComponent->BindAxis("CameraMoveVertical", this, &AETVCameraDirector::OnMoveVertical);
+	InputComponent->BindAction("Camera Zoom In", IE_Pressed, this, &AETVCameraDirector::OnZoomIn);
+	InputComponent->BindAction("Camera Zoom Out", IE_Pressed, this, &AETVCameraDirector::OnZoomOut);
+	InputComponent->BindAction("Camera Move", IE_Pressed, this, &AETVCameraDirector::OnMoveModifier);
+	InputComponent->BindAction("Camera Move", IE_Released, this, &AETVCameraDirector::OnMoveModifier);
+	InputComponent->BindAxis("Camera Move H", this, &AETVCameraDirector::OnMoveHorizontal);
+	InputComponent->BindAxis("Camera Move V", this, &AETVCameraDirector::OnMoveVertical);
 }
 
 void AETVCameraDirector::OnZoomIn()

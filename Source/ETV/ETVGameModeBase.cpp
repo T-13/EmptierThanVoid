@@ -257,9 +257,9 @@ void AETVGameModeBase::MapGeneration()
 
 	// Bind click
 	UInputComponent* InputComponent = GetWorld()->GetFirstPlayerController()->InputComponent;
-	InputComponent->BindAction("SelectTile", IE_Pressed, this, &AETVGameModeBase::OnClickedSelectMapTile);
-	InputComponent->BindAction("SelectTile", IE_Released, this, &AETVGameModeBase::OnReleasedSelectMapTile);
-	InputComponent->BindAction("CancelTargeting", IE_Pressed, this, &AETVGameModeBase::OnClickedCancelTargeting);
+	InputComponent->BindAction("Select Tile", IE_Pressed, this, &AETVGameModeBase::OnClickedSelectMapTile);
+	InputComponent->BindAction("Select Tile", IE_Released, this, &AETVGameModeBase::OnReleasedSelectMapTile);
+	InputComponent->BindAction("Cancel Targeting", IE_Pressed, this, &AETVGameModeBase::OnClickedCancelTargeting);
 }
 
 void AETVGameModeBase::GenerateShips()

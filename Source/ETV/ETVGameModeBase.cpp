@@ -367,79 +367,79 @@ void AETVGameModeBase::GenerateShips()
 
 	}
 
-	// Balancing Health on both sides
-	int32 PlayerShipsHealth = 0;
-	int32 EnemyShipsHealth = 0;
+	// Balancing Levels on both sides
+	int32 PlayerShipsLevel = 0;
+	int32 EnemyShipsLevel = 0;
 	for (AETVShip* ship : Ships) {
 		if (ship->IsEnemy()) {
-			EnemyShipsHealth += ship->GetHP();
+			EnemyShipsLevel += ship->GetLevel();
 		}
 		else {
-			PlayerShipsHealth += ship->GetHP();
+			PlayerShipsLevel += ship->GetLevel();
 		}
 	}
-	int32 HealthDiff = PlayerShipsHealth - EnemyShipsHealth;
+	int32 LevelDiff = PlayerShipsLevel - EnemyShipsLevel;
 
-	// If Health Difference is larger than 100
-	while (FMath::Abs(HealthDiff) > 100) {
+	// If level difference is larger than 100
+	while (FMath::Abs(LevelDiff) > 100) {
 		AETVShip* PlayerShip = Ships[3];
 		AETVShip* EnemyShip = Ships[4];
-		if (PlayerShipsHealth > EnemyShipsHealth) {
+		if (PlayerShipsLevel > EnemyShipsLevel) {
 
-			// Finding Player ship with most HP and Enemy ship with least HP
+			// Finding Player ship with biggest level and Enemy ship with smallest level
 			for (AETVShip* ship : Ships) {
 				if (ship->GetClass() != EETVShipClass::Capital) {
 					if (!ship->IsEnemy()) {
-						if (ship->GetHP() > PlayerShip->GetHP()) {
+						if (ship->GetLevel() > PlayerShip->GetLevel()) {
 							PlayerShip = ship;
 						}
 					}
 					else {
-						if (ship->GetHP() < EnemyShip->GetHP()) {
+						if (ship->GetLevel() < EnemyShip->GetLevel()) {
 							EnemyShip = ship;
 						}
 					}
 				}
 			}
 
-			// New Init with +-50 Level
+			// New Init with +-50 level
 			PlayerShip->InitRandomWithLevel(PlayerShip->GetShipName(), PlayerShip->GetLevel() - 50);
 			EnemyShip->InitRandomWithLevel(EnemyShip->GetShipName(), EnemyShip->GetLevel() + 50);
 		}
 		else {
 
-			// Finding Enemy ship with most HP and Player ship with least HP
+			// Finding Enemy ship with biggest level and Player ship with smallest level
 			for (AETVShip* ship : Ships) {
 				if (ship->GetClass() != EETVShipClass::Capital) {
 					if (!ship->IsEnemy()) {
-						if (ship->GetHP() < PlayerShip->GetHP()) {
+						if (ship->GetLevel() < PlayerShip->GetLevel()) {
 							PlayerShip = ship;
 						}
 					}
 					else {
-						if (ship->GetHP() > EnemyShip->GetHP()) {
+						if (ship->GetLevel() > EnemyShip->GetLevel()) {
 							EnemyShip = ship;
 						}
 					}
 				}
 			}
-			// New Init with +-50 Level
+			// New Init with +-50 level
 			PlayerShip->InitRandomWithLevel(PlayerShip->GetShipName(), PlayerShip->GetLevel() + 50);
 			EnemyShip->InitRandomWithLevel(EnemyShip->GetShipName(), EnemyShip->GetLevel() - 50);
 		}
 
-		// Calculating new HP Difference
-		PlayerShipsHealth = 0;
-		EnemyShipsHealth = 0;
+		// Calculating new level difference
+		PlayerShipsLevel = 0;
+		EnemyShipsLevel = 0;
 		for (AETVShip* ship : Ships) {
 			if (ship->IsEnemy()) {
-				EnemyShipsHealth += ship->GetHP();
+				EnemyShipsLevel += ship->GetLevel();
 			}
 			else {
-				PlayerShipsHealth += ship->GetHP();
+				PlayerShipsLevel += ship->GetLevel();
 			}
 		}
-		HealthDiff = PlayerShipsHealth - EnemyShipsHealth;
+		LevelDiff = PlayerShipsLevel - EnemyShipsLevel;
 	}
 }
 

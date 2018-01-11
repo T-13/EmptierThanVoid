@@ -122,12 +122,14 @@ protected:
 	int32 Y;
 
 	UPROPERTY()
+	FVector PositionInWorld;
+
+	UPROPERTY()
 	int32 Level;
 
 public:
 	// Called every frame
 	void Tick(float DeltaTime) override;
-
 
 	UFUNCTION()
 	void SetCurrentPosition(int32 NewX, int32 NewY);
@@ -183,7 +185,6 @@ public:
 	UFUNCTION()
 	void UnconditionallyCloseContextMenu();
 
-
 	// Returns a multiplier for the effectiveness of ship's actions depending on its status
 	UFUNCTION()
 	virtual float GetMultiplier();
@@ -202,7 +203,22 @@ public:
 	UFUNCTION()
 	FString GetShipType();
 
+	// Just for checking in LOG
+	UFUNCTION()
+	FString GetShipClass();
+
 	UFUNCTION()
 	FString GetShipName();
 
+	UFUNCTION()
+	int32 GetLevel() const { return Level; }
+
+	UFUNCTION()
+	EETVShipClass GetClass() const { return Class; }
+
+	UFUNCTION()
+	void SpawnWeapons();
+
+	UFUNCTION()
+	int32 GetMaxHP() const { return MaximumHealthPoints; }
 };

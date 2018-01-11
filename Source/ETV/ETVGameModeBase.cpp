@@ -1,10 +1,6 @@
 // Copyright (C) Team13. All rights reserved.
 
 #include "ETVGameModeBase.h"
-#include "ETVWeaponLaser.h"
-#include "ETVWeaponTorpedo.h"
-#include "ETVWeaponRepairArm.h"
-#include "ETVWeaponShieldBattery.h"
 #include "ETVActionTarget_Fire.h"
 #include "ETVActionTarget_Move.h"
 #include "ETVActionTarget_Use.h"
@@ -83,7 +79,7 @@ void AETVGameModeBase::BeginPlay()
 	VeiwportSize.Y = (VeiwportSize.Y / DpiScale) - HeightOfActionLog - MarginY;
 
 	ActionLogClass->SetPositionInViewport(VeiwportSize, false);
-	
+
 	ActionLogClass->SetDesiredSizeInViewport(FVector2D(WidthOfActionLog, HeightOfActionLog));
 	ActionLogClass->AddToViewport();
 
@@ -366,6 +362,81 @@ void AETVGameModeBase::GenerateShips()
 		SpawnShip(xcoord, ycoord, TileInfo.TileSet);
 
 	}
+
+	// Balancing Levels on both sides
+	int32 PlayerShipsLevel = 0;
+	int32 EnemyShipsLevel = 0;
+	for (AETVShip* ship : Ships) {
+		if (ship->IsEnemy()) {
+			EnemyShipsLevel += ship->GetLevel();
+		}
+		else {
+			PlayerShipsLevel += ship->GetLevel();
+		}
+	}
+	int32 LevelDiff = PlayerShipsLevel - EnemyShipsLevel;
+
+	// If level difference is larger than 100
+	while (FMath::Abs(LevelDiff) > 100) {
+		AETVShip* PlayerShip = Ships[3];
+		AETVShip* EnemyShip = Ships[4];
+		if (PlayerShipsLevel > EnemyShipsLevel) {
+
+			// Finding Player ship with biggest level and Enemy ship with smallest level
+			for (AETVShip* ship : Ships) {
+				if (ship->GetClass() != EETVShipClass::Capital) {
+					if (!ship->IsEnemy()) {
+						if (ship->GetLevel() > PlayerShip->GetLevel()) {
+							PlayerShip = ship;
+						}
+					}
+					else {
+						if (ship->GetLevel() < EnemyShip->GetLevel()) {
+							EnemyShip = ship;
+						}
+					}
+				}
+			}
+
+			// New Init with +-50 level
+			PlayerShip->InitRandomWithLevel(PlayerShip->GetShipName(), PlayerShip->GetLevel() - 50);
+			EnemyShip->InitRandomWithLevel(EnemyShip->GetShipName(), EnemyShip->GetLevel() + 50);
+		}
+		else {
+
+			// Finding Enemy ship with biggest level and Player ship with smallest level
+			for (AETVShip* ship : Ships) {
+				if (ship->GetClass() != EETVShipClass::Capital) {
+					if (!ship->IsEnemy()) {
+						if (ship->GetLevel() < PlayerShip->GetLevel()) {
+							PlayerShip = ship;
+						}
+					}
+					else {
+						if (ship->GetLevel() > EnemyShip->GetLevel()) {
+							EnemyShip = ship;
+						}
+					}
+				}
+			}
+			// New Init with +-50 level
+			PlayerShip->InitRandomWithLevel(PlayerShip->GetShipName(), PlayerShip->GetLevel() + 50);
+			EnemyShip->InitRandomWithLevel(EnemyShip->GetShipName(), EnemyShip->GetLevel() - 50);
+		}
+
+		// Calculating new level difference
+		PlayerShipsLevel = 0;
+		EnemyShipsLevel = 0;
+		for (AETVShip* ship : Ships) {
+			if (ship->IsEnemy()) {
+				EnemyShipsLevel += ship->GetLevel();
+			}
+			else {
+				PlayerShipsLevel += ship->GetLevel();
+			}
+		}
+		LevelDiff = PlayerShipsLevel - EnemyShipsLevel;
+	}
 }
 
 void AETVGameModeBase::SpawnShip(int32 x, int32 y, UPaperTileSet* type)
@@ -392,25 +463,6 @@ void AETVGameModeBase::SpawnShip(int32 x, int32 y, UPaperTileSet* type)
 		// Setting sprite color to transparent
 		CapitalShip->GetRenderComponent()->SetSpriteColor(FLinearColor(1.0f, 1.0f, 1.0f, 0.0f));
 
-		for (int32 i = 0; i < 4; i++) {
-			if (i == 0)  // Laser
-			{
-				SpawnWeapon(x, y, CapitalShip, AETVWeapon::DamageHull, 200);
-			}
-			else if (i == 1) // Torpedo
-			{
-				SpawnWeapon(x, y, CapitalShip, AETVWeapon::DamageShieldThenHull, 200);
-			}
-			else if (i == 2) // RepairArm
-			{
-				SpawnWeapon(x, y, CapitalShip, AETVWeapon::HealHull, 200);
-			}
-			else if (i == 3) // ShieldBattery
-			{
-				SpawnWeapon(x, y, CapitalShip, AETVWeapon::HealShield, 200);
-			}
-		}
-
 		if (type == EnemyCapitalShip)
 			CapitalShip->SetTypeToEnemy();
 		else
@@ -429,89 +481,12 @@ void AETVGameModeBase::SpawnShip(int32 x, int32 y, UPaperTileSet* type)
 		// Setting sprite color to transparent
 		FighterShip->GetRenderComponent()->SetSpriteColor(FLinearColor(1.0f, 1.0f, 1.0f, 0.0f));
 
-		for (int32 i = 0; i < 3; i++) {
-			if (i == 0)  // Laser
-			{
-				SpawnWeapon(x, y, FighterShip, AETVWeapon::DamageHull, 100);
-			}
-			else if (i == 1) // Torpedo
-			{
-				SpawnWeapon(x, y, FighterShip, AETVWeapon::DamageShieldThenHull, 100);
-			}
-			else if (i == 2) // ShieldBattery
-			{
-				SpawnWeapon(x, y, FighterShip, AETVWeapon::HealShield, 100);
-			}
-		}
-
 		if (type == EnemyFighterShip)
 			FighterShip->SetTypeToEnemy();
 		else
 			SpawnActions(FighterShip);
 
 		Ships.Add(FighterShip);
-	}
-}
-
-void AETVGameModeBase::SpawnWeapon(int32 NewX, int32 NewY, AETVShip* Ship, int32 type, int32 level)
-{
-	UETVWeaponSlot* WeaponSlot = NewObject<UETVWeaponSlot>();
-	WeaponSlot->Init(level, level);
-
-	// Vector for spawn location based on where TileSet is in TileMap
-	const FVector LocDim = GetPosition(NewX, NewY);
-
-	// Actor spawn parameters
-	const FActorSpawnParameters SpawnInfo;
-
-	// Rotate upwards to face the top-down camera
-	const FRotator Rotator(0, 0, -90);
-	// Spawning ShipActor based on class
-	if (type == AETVWeapon::DamageShieldThenHull)
-	{
-		AETVWeaponLaser* Laser;
-		Laser = GetWorld()->SpawnActor<AETVWeaponLaser>(LocDim, Rotator, SpawnInfo);
-
-		do {
-			Laser->InitRandom("Laser", level);
-		} while (!WeaponSlot->DoesWeaponFit(Laser));
-		WeaponSlot->FitWeapon(Laser);
-		Ship->AddWeapon(WeaponSlot);
-
-
-	}
-	else if (type == AETVWeapon::DamageHull)
-	{
-		AETVWeaponTorpedo* Torpedo;
-		Torpedo = GetWorld()->SpawnActor<AETVWeaponTorpedo>(LocDim, Rotator, SpawnInfo);
-
-		do {
-			Torpedo->InitRandom("Torpedo", level);
-		} while (!WeaponSlot->DoesWeaponFit(Torpedo));
-		WeaponSlot->FitWeapon(Torpedo);
-		Ship->AddWeapon(WeaponSlot);
-	}
-	else if (type == AETVWeapon::HealHull)
-	{
-		AETVWeaponRepairArm* RepairArm;
-		RepairArm = GetWorld()->SpawnActor<AETVWeaponRepairArm>(LocDim, Rotator, SpawnInfo);
-
-		do {
-			RepairArm->InitRandom("Repair Arm", level);
-		} while (!WeaponSlot->DoesWeaponFit(RepairArm));
-		WeaponSlot->FitWeapon(RepairArm);
-		Ship->AddWeapon(WeaponSlot);
-	}
-	else if (type == AETVWeapon::HealShield)
-	{
-		AETVWeaponShieldBattery* ShieldBattery;
-		ShieldBattery = GetWorld()->SpawnActor<AETVWeaponShieldBattery>(LocDim, Rotator, SpawnInfo);
-
-		do {
-			ShieldBattery->InitRandom("Shield Bat", level); // Abbreviated "Battery" as "Bat" to fit in Context Menu
-		} while (!WeaponSlot->DoesWeaponFit(ShieldBattery));
-		WeaponSlot->FitWeapon(ShieldBattery);
-		Ship->AddWeapon(WeaponSlot);
 	}
 }
 

@@ -182,7 +182,10 @@ public:
 
 	// Spawn ShipActor on the correct X and Y
 	UFUNCTION()
-	void SpawnShip(int32 x, int32 y, UPaperTileSet* type, FString name);
+	void SpawnShips(int32 x, int32 y, UPaperTileSet* type, FString name);
+
+	template<class T>
+	void SpawnShip(int32 x, int32 y, FString name, bool Enemy);
 
 	// Spawn Actions for Ship and Weapons
 	UFUNCTION()
@@ -282,3 +285,35 @@ public:
 	UFUNCTION()
 	bool IsShipNameUsed(FString Name);
 };
+
+template<class T>
+FORCEINLINE void AETVGameModeBase::SpawnShip(int32 x, int32 y, FString name, bool Enemy)
+{
+	FVector LocDim = GetPosition(x, y);
+	LocDim.Z = 0.1f;
+
+	// Actor spawn parameters
+	const FActorSpawnParameters SpawnInfo;
+
+	// Rotate upwards to face the top-down camera
+	const FRotator Rotator(0, 0, -90);
+
+	T* Ship;
+
+	Ship = GetWorld()->SpawnActor<T>(LocDim, Rotator, SpawnInfo);
+	Ship->InitRandom(name);
+	Ship->SetCurrentPosition(x, y);
+	Ship->SetContextMenu(ContextMenu);
+	Ship->GetRenderComponent()->SetMobility(EComponentMobility::Movable);
+	Ship->GetRenderComponent()->SetSprite(Sprite);
+
+	// Setting sprite color to transparent
+	Ship->GetRenderComponent()->SetSpriteColor(FLinearColor(1.0f, 1.0f, 1.0f, 0.0f));
+
+	if (Enemy)
+		Ship->SetTypeToEnemy();
+	else
+		SpawnActions(Ship);
+
+	Ships.Add(Ship);
+}

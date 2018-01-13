@@ -315,7 +315,7 @@ void AETVGameModeBase::GenerateShips()
 	// Name of Ship
 	nameIndex = FMath::FRandRange(0, CapitalShipNames.Num()-1);
 
-	SpawnShip(xcoord, ycoord, TileInfo.TileSet, CapitalShipNames[nameIndex]);
+	SpawnShips(xcoord, ycoord, TileInfo.TileSet, CapitalShipNames[nameIndex]);
 
 	// Spawning Capital Ship for Enemy
 	TileInfo.TileSet = EnemyCapitalShip;
@@ -334,7 +334,7 @@ void AETVGameModeBase::GenerateShips()
 		nameIndex = FMath::FRandRange(0, CapitalShipNames.Num()-1);
 	}
 
-	SpawnShip(xcoord, ycoord, TileInfo.TileSet, CapitalShipNames[nameIndex]);
+	SpawnShips(xcoord, ycoord, TileInfo.TileSet, CapitalShipNames[nameIndex]);
 
 	// Spawning Fighter Ships on each side
 	for (int32 i = 0; i < numOfSpawnedShips; i++) {
@@ -372,7 +372,7 @@ void AETVGameModeBase::GenerateShips()
 			nameIndex = FMath::FRandRange(0, FighterShipNames.Num()-1);
 		}
 
-		SpawnShip(xcoord, ycoord, TileInfo.TileSet, FighterShipNames[nameIndex]);
+		SpawnShips(xcoord, ycoord, TileInfo.TileSet, FighterShipNames[nameIndex]);
 
 
 		// Enemy Fighter Ship
@@ -409,7 +409,7 @@ void AETVGameModeBase::GenerateShips()
 			nameIndex = FMath::FRandRange(0, FighterShipNames.Num()-1);
 		}
 
-		SpawnShip(xcoord, ycoord, TileInfo.TileSet, FighterShipNames[nameIndex]);
+		SpawnShips(xcoord, ycoord, TileInfo.TileSet, FighterShipNames[nameIndex]);
 
 	}
 
@@ -489,55 +489,16 @@ void AETVGameModeBase::GenerateShips()
 	}
 }
 
-void AETVGameModeBase::SpawnShip(int32 x, int32 y, UPaperTileSet* type, FString name)
+void AETVGameModeBase::SpawnShips(int32 x, int32 y, UPaperTileSet* type, FString name)
 {
-	// Vector for spawn location based on where TileSet is in TileMap
-	FVector LocDim = GetPosition(x, y);
-	LocDim.Z = 0.1f;
-
-	// Actor spawn parameters
-	const FActorSpawnParameters SpawnInfo;
-
-	// Rotate upwards to face the top-down camera
-	const FRotator Rotator(0, 0, -90);
-
-	// Spawning ShipActor based on class
-	if (type == PlayerCapitalShip || type == EnemyCapitalShip) {
-		CapitalShip = GetWorld()->SpawnActor<AETVShipCapital>(LocDim, Rotator, SpawnInfo);
-		CapitalShip->InitRandom(name);
-		CapitalShip->SetCurrentPosition(x, y);
-		CapitalShip->SetContextMenu(ContextMenu);
-		CapitalShip->GetRenderComponent()->SetMobility(EComponentMobility::Movable);
-		CapitalShip->GetRenderComponent()->SetSprite(Sprite);
-
-		// Setting sprite color to transparent
-		CapitalShip->GetRenderComponent()->SetSpriteColor(FLinearColor(1.0f, 1.0f, 1.0f, 0.0f));
-
-		if (type == EnemyCapitalShip)
-			CapitalShip->SetTypeToEnemy();
-		else
-			SpawnActions(CapitalShip);
-
-		Ships.Add(CapitalShip);
-	}
-	else if (type == PlayerFighterShip || type == EnemyFighterShip) {
-		FighterShip = GetWorld()->SpawnActor<AETVShipFighter>(LocDim, Rotator, SpawnInfo);
-		FighterShip->InitRandom(name);
-		FighterShip->SetCurrentPosition(x, y);
-		FighterShip->SetContextMenu(ContextMenu);
-		FighterShip->GetRenderComponent()->SetMobility(EComponentMobility::Movable);
-		FighterShip->GetRenderComponent()->SetSprite(Sprite);
-
-		// Setting sprite color to transparent
-		FighterShip->GetRenderComponent()->SetSpriteColor(FLinearColor(1.0f, 1.0f, 1.0f, 0.0f));
-
-		if (type == EnemyFighterShip)
-			FighterShip->SetTypeToEnemy();
-		else
-			SpawnActions(FighterShip);
-
-		Ships.Add(FighterShip);
-	}
+	if(type== PlayerCapitalShip)
+		SpawnShip<AETVShipCapital>(x, y, name, false);
+	else if(type==EnemyCapitalShip)
+		SpawnShip<AETVShipCapital>(x, y, name, true);
+	if (type == PlayerFighterShip)
+		SpawnShip<AETVShipFighter>(x, y, name, false);
+	else if (type == EnemyFighterShip)
+		SpawnShip<AETVShipFighter>(x, y, name, true);
 }
 
 void AETVGameModeBase::SpawnActions(AETVShip* Ship)

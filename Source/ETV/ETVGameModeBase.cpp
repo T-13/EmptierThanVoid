@@ -9,6 +9,7 @@
 #include "UserWidget.h"
 #include "ETVCalculator.h"
 #include "Runtime/Engine/Classes/Engine/UserInterfaceSettings.h"
+#include "Runtime/Core/Public/Misc/FileHelper.h"
 //#include "DrawDebugHelpers.h" // Uncomment for debug drawing
 
 // Sets default values
@@ -260,9 +261,34 @@ void AETVGameModeBase::MapGeneration()
 
 void AETVGameModeBase::GenerateShips()
 {
+	// Array for names of Ships
+	TArray<FString> CapitalShipNames;
+	TArray<FString> FighterShipNames;
+	TArray<FString> RepairShipNames;
+
+	// All names for Capital Ships to array CapitalShipNames
+	FString ProjectDir = FPaths::ProjectDir();
+	FString CompleteFilePath = ProjectDir + "Content/EmptierThanVoid/Core/Ship Names/CapitalShipNames.txt";
+	FString Names = "";
+	FFileHelper::LoadFileToString(Names, *CompleteFilePath);
+	Names.ParseIntoArray(CapitalShipNames, TEXT("\n"), false);
+
+	// All names for Fighter Ships to array FighterShipNames
+	CompleteFilePath = ProjectDir + "Content/EmptierThanVoid/Core/Ship Names/FighterShipNames.txt";
+	Names = "";
+	FFileHelper::LoadFileToString(Names, *CompleteFilePath);
+	Names.ParseIntoArray(FighterShipNames, TEXT("\n"), false);
+
+	// All names for Repair Ships to array RepairShipNames
+	CompleteFilePath = ProjectDir + "Content/EmptierThanVoid/Core/Ship Names/RepairShipNames.txt";
+	Names = "";
+	FFileHelper::LoadFileToString(Names, *CompleteFilePath);
+	Names.ParseIntoArray(RepairShipNames, TEXT("\n"), false);
+
 	int32 ycoord;
 	int32 xcoord;
 	int32 numOfSpawnedShips = FMath::FRandRange(FMath::Sqrt(MapWidth), MapWidth / 2);
+	int32 nameIndex;
 
 	// To check if Tile is allready set
 	bool bIsTileSet;
@@ -286,7 +312,10 @@ void AETVGameModeBase::GenerateShips()
 	xArr.Push(0);
 	yArr.Push(ycoord);
 
-	SpawnShip(xcoord, ycoord, TileInfo.TileSet);
+	// Name of Ship
+	nameIndex = FMath::FRandRange(0, CapitalShipNames.Num()-1);
+
+	SpawnShip(xcoord, ycoord, TileInfo.TileSet, CapitalShipNames[nameIndex]);
 
 	// Spawning Capital Ship for Enemy
 	TileInfo.TileSet = EnemyCapitalShip;
@@ -298,7 +327,14 @@ void AETVGameModeBase::GenerateShips()
 	xArr.Push(MapWidth - 1);
 	yArr.Push(ycoord);
 
-	SpawnShip(xcoord, ycoord, TileInfo.TileSet);
+	// Name of Ship
+	nameIndex = FMath::FRandRange(0, CapitalShipNames.Num()-1);
+
+	while (IsShipNameUsed(CapitalShipNames[nameIndex])) {
+		nameIndex = FMath::FRandRange(0, CapitalShipNames.Num()-1);
+	}
+
+	SpawnShip(xcoord, ycoord, TileInfo.TileSet, CapitalShipNames[nameIndex]);
 
 	// Spawning Fighter Ships on each side
 	for (int32 i = 0; i < numOfSpawnedShips; i++) {
@@ -329,7 +365,14 @@ void AETVGameModeBase::GenerateShips()
 		xArr.Push(xcoord);
 		yArr.Push(ycoord);
 
-		SpawnShip(xcoord, ycoord, TileInfo.TileSet);
+		// Name of Ship
+		nameIndex = FMath::FRandRange(0, FighterShipNames.Num()-1);
+
+		while (IsShipNameUsed(FighterShipNames[nameIndex])) {
+			nameIndex = FMath::FRandRange(0, FighterShipNames.Num()-1);
+		}
+
+		SpawnShip(xcoord, ycoord, TileInfo.TileSet, FighterShipNames[nameIndex]);
 
 
 		// Enemy Fighter Ship
@@ -359,7 +402,14 @@ void AETVGameModeBase::GenerateShips()
 		xArr.Push(xcoord);
 		yArr.Push(ycoord);
 
-		SpawnShip(xcoord, ycoord, TileInfo.TileSet);
+		// Name of Ship
+		nameIndex = FMath::FRandRange(0, FighterShipNames.Num()-1);
+
+		while (IsShipNameUsed(FighterShipNames[nameIndex])) {
+			nameIndex = FMath::FRandRange(0, FighterShipNames.Num()-1);
+		}
+
+		SpawnShip(xcoord, ycoord, TileInfo.TileSet, FighterShipNames[nameIndex]);
 
 	}
 
@@ -439,7 +489,7 @@ void AETVGameModeBase::GenerateShips()
 	}
 }
 
-void AETVGameModeBase::SpawnShip(int32 x, int32 y, UPaperTileSet* type)
+void AETVGameModeBase::SpawnShip(int32 x, int32 y, UPaperTileSet* type, FString name)
 {
 	// Vector for spawn location based on where TileSet is in TileMap
 	FVector LocDim = GetPosition(x, y);
@@ -454,7 +504,7 @@ void AETVGameModeBase::SpawnShip(int32 x, int32 y, UPaperTileSet* type)
 	// Spawning ShipActor based on class
 	if (type == PlayerCapitalShip || type == EnemyCapitalShip) {
 		CapitalShip = GetWorld()->SpawnActor<AETVShipCapital>(LocDim, Rotator, SpawnInfo);
-		CapitalShip->InitRandom("Cap");
+		CapitalShip->InitRandom(name);
 		CapitalShip->SetCurrentPosition(x, y);
 		CapitalShip->SetContextMenu(ContextMenu);
 		CapitalShip->GetRenderComponent()->SetMobility(EComponentMobility::Movable);
@@ -472,7 +522,7 @@ void AETVGameModeBase::SpawnShip(int32 x, int32 y, UPaperTileSet* type)
 	}
 	else if (type == PlayerFighterShip || type == EnemyFighterShip) {
 		FighterShip = GetWorld()->SpawnActor<AETVShipFighter>(LocDim, Rotator, SpawnInfo);
-		FighterShip->InitRandom("Fighter");
+		FighterShip->InitRandom(name);
 		FighterShip->SetCurrentPosition(x, y);
 		FighterShip->SetContextMenu(ContextMenu);
 		FighterShip->GetRenderComponent()->SetMobility(EComponentMobility::Movable);
@@ -627,7 +677,7 @@ void AETVGameModeBase::GetMouseOverTile(FETVTile& Tile)
 		if (Camera == nullptr)
 		{
 			UE_LOG(LogTemp, Error, TEXT("GetMouseOverTile(): Pawn not set to AETVCameraDirector!"))
-			return;
+				return;
 		}
 
 		// Add height to tile map
@@ -779,4 +829,13 @@ UETVActionLogWidget* AETVGameModeBase::GetLogWidget() {
 UETVShipStatusUIWidget* AETVGameModeBase::GetShipListWidget()
 {
 	return ShipStatusUI;
+}
+
+bool AETVGameModeBase::IsShipNameUsed(FString Name)
+{
+	for (AETVShip* ship : Ships) {
+		if (ship->GetShipName().Equals(Name))
+			return true;
+	}
+	return false;
 }

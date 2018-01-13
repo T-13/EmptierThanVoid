@@ -182,7 +182,7 @@ public:
 
 	// Spawn ShipActor on the correct X and Y
 	UFUNCTION()
-	void SpawnShip(int32 x, int32 y, UPaperTileSet* type);
+	void SpawnShip(int32 x, int32 y, UPaperTileSet* type, FString name);
 
 	// Spawn Actions for Ship and Weapons
 	UFUNCTION()
@@ -278,4 +278,7 @@ public:
 	// Get Ship List widget
 	UFUNCTION(BlueprintCallable, Category = "ETV UI")
 	UETVShipStatusUIWidget* GetShipListWidget();
+
+	UFUNCTION()
+	bool IsShipNameUsed(FString Name);
 };

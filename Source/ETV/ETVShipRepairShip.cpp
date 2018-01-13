@@ -7,6 +7,7 @@
 AETVShipRepairShip::AETVShipRepairShip() : Super()
 {
 	Class = EETVShipClass::Repair;
+	MoveRange = 3;
 }
 
 void AETVShipRepairShip::Init(FString NewName, int32 MaxHP, int32 ShieldP, int32 NewShieldRechargeTime, int32 NewMoveRange, int32 Speed, int32 NewRepairPower)

@@ -72,6 +72,8 @@ class ETV_API AETVGameModeBase : public AGameModeBase
 	UPaperTileSet* PlayerFighterShip;
 	UPaperTileSet* EnemyCapitalShip;
 	UPaperTileSet* EnemyFighterShip;
+	UPaperTileSet* PlayerRepairShip;
+	UPaperTileSet* EnemyRepairShip;
 
 public:
 	// Sets default values for this actor's properties
@@ -298,8 +300,8 @@ FORCEINLINE void AETVGameModeBase::SpawnShip(int32 x, int32 y, FString name, boo
 	// Rotate upwards to face the top-down camera
 	const FRotator Rotator(0, 0, -90);
 
+	// Spawn and Initialize Ship
 	T* Ship;
-
 	Ship = GetWorld()->SpawnActor<T>(LocDim, Rotator, SpawnInfo);
 	Ship->InitRandom(name);
 	Ship->SetCurrentPosition(x, y);

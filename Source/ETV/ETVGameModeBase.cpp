@@ -50,6 +50,12 @@ AETVGameModeBase::AETVGameModeBase()
 
 	static ConstructorHelpers::FObjectFinder<UPaperTileSet> PlayerFighterTile(TEXT("PaperTileSet'/Game/EmptierThanVoid/Art/Ships/PlayerFighterShipTile.PlayerFighterShipTile'"));
 	PlayerFighterShip = PlayerFighterTile.Object;
+
+	static ConstructorHelpers::FObjectFinder<UPaperTileSet> PlayerRepairShipTile(TEXT("PaperTileSet'/Game/EmptierThanVoid/Art/Ships/PlayerRepairShipTile.PlayerRepairShipTile'"));
+	PlayerRepairShip = PlayerRepairShipTile.Object;
+
+	static ConstructorHelpers::FObjectFinder<UPaperTileSet> EnemyRepairShipTile(TEXT("PaperTileSet'/Game/EmptierThanVoid/Art/Ships/EnemyRepairShipTile.EnemyRepairShipTile'"));
+	EnemyRepairShip = EnemyRepairShipTile.Object;
 }
 
 // Called when the game starts or when spawned
@@ -287,8 +293,15 @@ void AETVGameModeBase::GenerateShips()
 
 	int32 ycoord;
 	int32 xcoord;
-	int32 numOfSpawnedShips = FMath::FRandRange(FMath::Sqrt(MapWidth), MapWidth / 2);
 	int32 nameIndex;
+
+	// Number of FighterShips Spawned on each side
+	int32 numOfFighters = FMath::FRandRange(FMath::Sqrt(MapWidth), MapWidth / 2);
+
+	// Number of RepairShips Spawned on each side (1 one each side for every 10 Ships overall)
+	int32 numOfRepairShips = ((numOfFighters * 2 + 2) / 10) + 1;
+
+	UE_LOG(LogTemp, Warning, TEXT("A: %d,   R: %d\n"), numOfFighters*2+2, numOfRepairShips);
 
 	// To check if Tile is allready set
 	bool bIsTileSet;
@@ -336,8 +349,85 @@ void AETVGameModeBase::GenerateShips()
 
 	SpawnShips(xcoord, ycoord, TileInfo.TileSet, CapitalShipNames[nameIndex]);
 
+	// Spawning Repair Ships on each side
+	for (int32 i = 0; i < numOfRepairShips; i++) {
+
+		bIsTileSet = true;
+		// Player Repair Ship
+		TileInfo.TileSet = PlayerRepairShip;
+
+		// Loop for looking for empty Tile
+		while (bIsTileSet) {
+			bIsTileSet = false;
+			ycoord = FMath::FRandRange(0, MapWidth);
+
+			// So that middle 20% are left empty
+			xcoord = FMath::FRandRange(0, (MapWidth / 2 - MapWidth * 0.1));
+
+			for (int j = 0; j < xArr.Num(); j++) {
+				if (xArr[j] == xcoord && yArr[j] == ycoord) {
+					bIsTileSet = true;
+				}
+			}
+		}
+
+		// Set Tile
+		TileMapComp->SetTile(xcoord, ycoord, EETVTileLayer::Ship, TileInfo);
+
+		// Push to array for later to check if those coordinates are allready filled
+		xArr.Push(xcoord);
+		yArr.Push(ycoord);
+
+		// Name of Ship
+		nameIndex = FMath::FRandRange(0, RepairShipNames.Num() - 1);
+
+		while (IsShipNameUsed(RepairShipNames[nameIndex])) {
+			nameIndex = FMath::FRandRange(0, RepairShipNames.Num() - 1);
+		}
+
+		SpawnShips(xcoord, ycoord, TileInfo.TileSet, RepairShipNames[nameIndex]);
+
+
+		// Enemy Repair Ship
+		TileInfo.TileSet = EnemyRepairShip;
+
+		bIsTileSet = true;
+
+		// Loop for looking for empty Tile
+		while (bIsTileSet) {
+			bIsTileSet = false;
+			ycoord = FMath::FRandRange(0, MapWidth);
+
+			// So that middle 20% are left empty
+			xcoord = FMath::FRandRange((MapWidth / 2 + MapWidth * 0.1), MapWidth);
+
+			for (int j = 0; j < xArr.Num(); j++) {
+				if (xArr[j] == xcoord && yArr[j] == ycoord) {
+					bIsTileSet = true;
+				}
+			}
+		}
+
+		// Set Tile
+		TileMapComp->SetTile(xcoord, ycoord, EETVTileLayer::Ship, TileInfo);
+
+		// Push to array for later to check if those coordinates are allready filled
+		xArr.Push(xcoord);
+		yArr.Push(ycoord);
+
+		// Name of Ship
+		nameIndex = FMath::FRandRange(0, RepairShipNames.Num() - 1);
+
+		while (IsShipNameUsed(RepairShipNames[nameIndex])) {
+			nameIndex = FMath::FRandRange(0, RepairShipNames.Num() - 1);
+		}
+
+		SpawnShips(xcoord, ycoord, TileInfo.TileSet, RepairShipNames[nameIndex]);
+	}
+
+
 	// Spawning Fighter Ships on each side
-	for (int32 i = 0; i < numOfSpawnedShips; i++) {
+	for (int32 i = 0; i < numOfFighters; i++) {
 
 		bIsTileSet = true;
 		// Player Fighter Ship
@@ -495,10 +585,14 @@ void AETVGameModeBase::SpawnShips(int32 x, int32 y, UPaperTileSet* type, FString
 		SpawnShip<AETVShipCapital>(x, y, name, false);
 	else if(type==EnemyCapitalShip)
 		SpawnShip<AETVShipCapital>(x, y, name, true);
-	if (type == PlayerFighterShip)
+	else if (type == PlayerFighterShip)
 		SpawnShip<AETVShipFighter>(x, y, name, false);
 	else if (type == EnemyFighterShip)
 		SpawnShip<AETVShipFighter>(x, y, name, true);
+	else if (type == PlayerRepairShip)
+		SpawnShip<AETVShipRepairShip>(x, y, name, false);
+	else if (type == EnemyRepairShip)
+		SpawnShip<AETVShipRepairShip>(x, y, name, true);
 }
 
 void AETVGameModeBase::SpawnActions(AETVShip* Ship)

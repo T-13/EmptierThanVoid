@@ -301,17 +301,6 @@ void AETVGameModeBase::GenerateShips()
 	// Number of RepairShips Spawned on each side (1 one each side for every 10 Ships overall)
 	int32 numOfRepairShips = ((numOfFighters * 2 + 2) / 10) + 1;
 
-	UE_LOG(LogTemp, Warning, TEXT("A: %d,   R: %d\n"), numOfFighters*2+2, numOfRepairShips);
-
-	// To check if Tile is allready set
-	bool bIsTileSet;
-
-	// Array for all set x coordinates
-	TArray<int32> xArr;
-
-	// Array for all set y coordinates
-	TArray<int32> yArr;
-
 	FPaperTileInfo TileInfo;
 	TileInfo.PackedTileIndex = 0;
 
@@ -321,14 +310,9 @@ void AETVGameModeBase::GenerateShips()
 	xcoord = 0;
 	TileMapComp->SetTile(xcoord, ycoord, EETVTileLayer::Ship, TileInfo);
 
-	// So that nothing will overlay the Capital
-	xArr.Push(0);
-	yArr.Push(ycoord);
-
 	// Name of Ship
-	nameIndex = FMath::FRandRange(0, CapitalShipNames.Num()-1);
-
-	SpawnShips(xcoord, ycoord, TileInfo.TileSet, CapitalShipNames[nameIndex]);
+	nameIndex = FMath::FRandRange(0, CapitalShipNames.Num() - 1);
+	SpawnShipType(xcoord, ycoord, TileInfo.TileSet, CapitalShipNames[nameIndex]);
 
 	// Spawning Capital Ship for Enemy
 	TileInfo.TileSet = EnemyCapitalShip;
@@ -336,172 +320,19 @@ void AETVGameModeBase::GenerateShips()
 	xcoord = MapWidth - 1;
 	TileMapComp->SetTile(xcoord, ycoord, EETVTileLayer::Ship, TileInfo);
 
-	// So that nothing will overlay the Capital
-	xArr.Push(MapWidth - 1);
-	yArr.Push(ycoord);
-
 	// Name of Ship
-	nameIndex = FMath::FRandRange(0, CapitalShipNames.Num()-1);
-
+	nameIndex = FMath::FRandRange(0, CapitalShipNames.Num() - 1);
 	while (IsShipNameUsed(CapitalShipNames[nameIndex])) {
-		nameIndex = FMath::FRandRange(0, CapitalShipNames.Num()-1);
+		nameIndex = FMath::FRandRange(0, CapitalShipNames.Num() - 1);
 	}
 
-	SpawnShips(xcoord, ycoord, TileInfo.TileSet, CapitalShipNames[nameIndex]);
+	SpawnShipType(xcoord, ycoord, TileInfo.TileSet, CapitalShipNames[nameIndex]);
 
 	// Spawning Repair Ships on each side
-	for (int32 i = 0; i < numOfRepairShips; i++) {
-
-		bIsTileSet = true;
-		// Player Repair Ship
-		TileInfo.TileSet = PlayerRepairShip;
-
-		// Loop for looking for empty Tile
-		while (bIsTileSet) {
-			bIsTileSet = false;
-			ycoord = FMath::FRandRange(0, MapWidth);
-
-			// So that middle 20% are left empty
-			xcoord = FMath::FRandRange(0, (MapWidth / 2 - MapWidth * 0.1));
-
-			for (int j = 0; j < xArr.Num(); j++) {
-				if (xArr[j] == xcoord && yArr[j] == ycoord) {
-					bIsTileSet = true;
-				}
-			}
-		}
-
-		// Set Tile
-		TileMapComp->SetTile(xcoord, ycoord, EETVTileLayer::Ship, TileInfo);
-
-		// Push to array for later to check if those coordinates are allready filled
-		xArr.Push(xcoord);
-		yArr.Push(ycoord);
-
-		// Name of Ship
-		nameIndex = FMath::FRandRange(0, RepairShipNames.Num() - 1);
-
-		while (IsShipNameUsed(RepairShipNames[nameIndex])) {
-			nameIndex = FMath::FRandRange(0, RepairShipNames.Num() - 1);
-		}
-
-		SpawnShips(xcoord, ycoord, TileInfo.TileSet, RepairShipNames[nameIndex]);
-
-
-		// Enemy Repair Ship
-		TileInfo.TileSet = EnemyRepairShip;
-
-		bIsTileSet = true;
-
-		// Loop for looking for empty Tile
-		while (bIsTileSet) {
-			bIsTileSet = false;
-			ycoord = FMath::FRandRange(0, MapWidth);
-
-			// So that middle 20% are left empty
-			xcoord = FMath::FRandRange((MapWidth / 2 + MapWidth * 0.1), MapWidth);
-
-			for (int j = 0; j < xArr.Num(); j++) {
-				if (xArr[j] == xcoord && yArr[j] == ycoord) {
-					bIsTileSet = true;
-				}
-			}
-		}
-
-		// Set Tile
-		TileMapComp->SetTile(xcoord, ycoord, EETVTileLayer::Ship, TileInfo);
-
-		// Push to array for later to check if those coordinates are allready filled
-		xArr.Push(xcoord);
-		yArr.Push(ycoord);
-
-		// Name of Ship
-		nameIndex = FMath::FRandRange(0, RepairShipNames.Num() - 1);
-
-		while (IsShipNameUsed(RepairShipNames[nameIndex])) {
-			nameIndex = FMath::FRandRange(0, RepairShipNames.Num() - 1);
-		}
-
-		SpawnShips(xcoord, ycoord, TileInfo.TileSet, RepairShipNames[nameIndex]);
-	}
-
+	SpawnShipsLoop(PlayerRepairShip, EnemyRepairShip, numOfRepairShips, RepairShipNames);
 
 	// Spawning Fighter Ships on each side
-	for (int32 i = 0; i < numOfFighters; i++) {
-
-		bIsTileSet = true;
-		// Player Fighter Ship
-		TileInfo.TileSet = PlayerFighterShip;
-
-		// Loop for looking for empty Tile
-		while (bIsTileSet) {
-			bIsTileSet = false;
-			ycoord = FMath::FRandRange(0, MapWidth);
-
-			// So that middle 20% are left empty
-			xcoord = FMath::FRandRange(0, (MapWidth / 2 - MapWidth * 0.1));
-
-			for (int j = 0; j < xArr.Num(); j++) {
-				if (xArr[j] == xcoord && yArr[j] == ycoord) {
-					bIsTileSet = true;
-				}
-			}
-		}
-
-		// Set Tile
-		TileMapComp->SetTile(xcoord, ycoord, EETVTileLayer::Ship, TileInfo);
-
-		// Push to array for later to check if those coordinates are allready filled
-		xArr.Push(xcoord);
-		yArr.Push(ycoord);
-
-		// Name of Ship
-		nameIndex = FMath::FRandRange(0, FighterShipNames.Num()-1);
-
-		while (IsShipNameUsed(FighterShipNames[nameIndex])) {
-			nameIndex = FMath::FRandRange(0, FighterShipNames.Num()-1);
-		}
-
-		SpawnShips(xcoord, ycoord, TileInfo.TileSet, FighterShipNames[nameIndex]);
-
-
-		// Enemy Fighter Ship
-		TileInfo.TileSet = EnemyFighterShip;
-
-		bIsTileSet = true;
-
-		// Loop for looking for empty Tile
-		while (bIsTileSet) {
-			bIsTileSet = false;
-			ycoord = FMath::FRandRange(0, MapWidth);
-
-			// So that middle 20% are left empty
-			xcoord = FMath::FRandRange((MapWidth / 2 + MapWidth * 0.1), MapWidth);
-
-			for (int j = 0; j < xArr.Num(); j++) {
-				if (xArr[j] == xcoord && yArr[j] == ycoord) {
-					bIsTileSet = true;
-				}
-			}
-		}
-
-		// Set Tile
-		TileMapComp->SetTile(xcoord, ycoord, EETVTileLayer::Ship, TileInfo);
-
-		// Push to array for later to check if those coordinates are allready filled
-		xArr.Push(xcoord);
-		yArr.Push(ycoord);
-
-		// Name of Ship
-		nameIndex = FMath::FRandRange(0, FighterShipNames.Num()-1);
-
-		while (IsShipNameUsed(FighterShipNames[nameIndex])) {
-			nameIndex = FMath::FRandRange(0, FighterShipNames.Num()-1);
-		}
-
-		SpawnShips(xcoord, ycoord, TileInfo.TileSet, FighterShipNames[nameIndex]);
-
-	}
+	SpawnShipsLoop(PlayerFighterShip, EnemyFighterShip, numOfFighters, FighterShipNames);
 
 	// Balancing Levels on both sides
 	int32 PlayerShipsLevel = 0;
@@ -579,11 +410,71 @@ void AETVGameModeBase::GenerateShips()
 	}
 }
 
-void AETVGameModeBase::SpawnShips(int32 x, int32 y, UPaperTileSet* type, FString name)
+void AETVGameModeBase::SpawnShipsLoop(UPaperTileSet * Player, UPaperTileSet * Enemy, int32 NumOfShips, TArray<FString> ShipNames)
 {
-	if(type== PlayerCapitalShip)
+	int32 xcoord, ycoord, nameIndex;
+	FPaperTileInfo TileInfo;
+	TileInfo.PackedTileIndex = 0;
+
+	for (int32 i = 0; i < NumOfShips; i++) {
+		// Player Fighter Ship
+		TileInfo.TileSet = Player;
+
+		ycoord = FMath::FRandRange(0, MapWidth);
+		// So that middle 20% are left empty
+		xcoord = FMath::FRandRange(0, (MapWidth / 2 - MapWidth * 0.1));
+
+		// Loop for looking for empty Tile
+		while (TileHasShip(xcoord, ycoord)) {
+			ycoord = FMath::FRandRange(0, MapWidth);
+			// So that middle 20% are left empty
+			xcoord = FMath::FRandRange(0, (MapWidth / 2 - MapWidth * 0.1));
+		}
+
+		// Set Tile
+		TileMapComp->SetTile(xcoord, ycoord, EETVTileLayer::Ship, TileInfo);
+
+		// Name of Ship
+		nameIndex = FMath::FRandRange(0, ShipNames.Num() - 1);
+
+		while (IsShipNameUsed(ShipNames[nameIndex])) {
+			nameIndex = FMath::FRandRange(0, ShipNames.Num() - 1);
+		}
+		SpawnShipType(xcoord, ycoord, TileInfo.TileSet, ShipNames[nameIndex]);
+
+
+		// Enemy Fighter Ship
+		TileInfo.TileSet = Enemy;
+
+		ycoord = FMath::FRandRange(0, MapWidth);
+		// So that middle 20% are left empty
+		xcoord = FMath::FRandRange((MapWidth / 2 + MapWidth * 0.1), MapWidth);
+
+		// Loop for looking for empty Tile
+		while (TileHasShip(xcoord, ycoord)) {
+			ycoord = FMath::FRandRange(0, MapWidth);
+			// So that middle 20% are left empty
+			xcoord = FMath::FRandRange((MapWidth / 2 + MapWidth * 0.1), MapWidth);
+		}
+
+		// Set Tile
+		TileMapComp->SetTile(xcoord, ycoord, EETVTileLayer::Ship, TileInfo);
+
+		// Name of Ship
+		nameIndex = FMath::FRandRange(0, ShipNames.Num() - 1);
+		while (IsShipNameUsed(ShipNames[nameIndex])) {
+			nameIndex = FMath::FRandRange(0, ShipNames.Num() - 1);
+		}
+
+		SpawnShipType(xcoord, ycoord, TileInfo.TileSet, ShipNames[nameIndex]);
+	}
+}
+
+void AETVGameModeBase::SpawnShipType(int32 x, int32 y, UPaperTileSet* type, FString name)
+{
+	if (type == PlayerCapitalShip)
 		SpawnShip<AETVShipCapital>(x, y, name, false);
-	else if(type==EnemyCapitalShip)
+	else if (type == EnemyCapitalShip)
 		SpawnShip<AETVShipCapital>(x, y, name, true);
 	else if (type == PlayerFighterShip)
 		SpawnShip<AETVShipFighter>(x, y, name, false);
@@ -890,6 +781,15 @@ bool AETVGameModeBase::IsShipNameUsed(FString Name)
 {
 	for (AETVShip* ship : Ships) {
 		if (ship->GetShipName().Equals(Name))
+			return true;
+	}
+	return false;
+}
+
+bool AETVGameModeBase::TileHasShip(int32 x, int32 y)
+{
+	for (AETVShip* ship : Ships) {
+		if (ship->GetX() == x && ship->GetY() == y)
 			return true;
 	}
 	return false;

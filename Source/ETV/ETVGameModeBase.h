@@ -184,7 +184,10 @@ public:
 
 	// Spawn ShipActor on the correct X and Y
 	UFUNCTION()
-	void SpawnShips(int32 x, int32 y, UPaperTileSet* type, FString name);
+	void SpawnShipType(int32 x, int32 y, UPaperTileSet* type, FString name);
+
+	// Loop for spawning many Ships of the same type
+	void SpawnShipsLoop(UPaperTileSet* Player, UPaperTileSet* Enemy, int32 NumOfShips, TArray<FString> ShipNames);
 
 	template<class T>
 	void SpawnShip(int32 x, int32 y, FString name, bool Enemy);
@@ -286,6 +289,10 @@ public:
 
 	UFUNCTION()
 	bool IsShipNameUsed(FString Name);
+
+	UFUNCTION()
+	bool TileHasShip(int32 x, int32 y);
+
 };
 
 template<class T>

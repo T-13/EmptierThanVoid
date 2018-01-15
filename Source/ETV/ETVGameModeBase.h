@@ -189,10 +189,6 @@ public:
 	UFUNCTION()
 	void SpawnShip(int32 x, int32 y, UPaperTileSet* type);
 
-	// Spawn WeaponActor for Ship
-	UFUNCTION()
-	void SpawnWeapon(int32 NewX, int32 NewY, AETVShip* Ship, int32 type, int32 level);
-
 	// Spawn Actions for Ship and Weapons
 	UFUNCTION()
 	void SpawnActions(AETVShip* Ship);

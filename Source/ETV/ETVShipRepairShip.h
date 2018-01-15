@@ -30,6 +30,10 @@ protected:
 	int32 RepairPower;
 
 public:
+
+	UFUNCTION()
+	void SpawnWeapons();
+
 	// TODO Add methods
 
 };

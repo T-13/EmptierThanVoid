@@ -39,6 +39,9 @@ protected:
 	int32 NumOfHangars;
 
 public:
+	UFUNCTION()
+	void SpawnWeapons();
+
 	// TODO Add methods
 	// UseHyperdrive(int32 x, int32 y);
 	// RepairShipInHangar(AETVShip ship, int32 hangar);

@@ -1,6 +1,7 @@
 // Copyright (C) Team13. All rights reserved.
 
 #include "ETVShipFighter.h"
+#include "ETVWeaponTorpedo.h"
 
 AETVShipFighter::AETVShipFighter() : Super()
 {
@@ -30,4 +31,28 @@ void AETVShipFighter::InitRandomWithLevel(FString NewName, int32 PowerLvl)
 
 	// DeflectionChance is somewhere between 0 and 0.25
 	DeflectionChance = FMath::RandRange(PowerLvl / 800, 0.25);
+
+	SpawnWeapons();
+}
+
+void AETVShipFighter::SpawnWeapons()
+{
+	// Actor spawn parameters
+	const FActorSpawnParameters SpawnInfo;
+
+	// Rotate upwards to face the top-down camera
+	const FRotator Rotator(0, 0, -90);
+
+	// Add Torpedo
+	UETVWeaponSlot* WeaponSlotTorpedo = NewObject<UETVWeaponSlot>();
+	WeaponSlotTorpedo->Init(Level, Level);
+
+	AETVWeaponTorpedo* Torpedo;
+	Torpedo = GetWorld()->SpawnActor<AETVWeaponTorpedo>(PositionInWorld, Rotator, SpawnInfo);
+
+	do {
+		Torpedo->InitRandom("Torpedo", Level);
+	} while (!WeaponSlotTorpedo->DoesWeaponFit(Torpedo));
+	WeaponSlotTorpedo->FitWeapon(Torpedo);
+	AddWeapon(WeaponSlotTorpedo);
 }

@@ -172,6 +172,9 @@ public:
 	bool CanMove();
 
 	UFUNCTION()
+	int32 GetMoveRange() const { return MoveRange; }
+
+	UFUNCTION()
 	void MoveToTile(int32 NewX, int32 NewY);
 
 	UFUNCTION(BlueprintCallable)

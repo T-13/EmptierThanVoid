@@ -96,6 +96,9 @@ public:
 	// Get weapons current HealthPoints
 	int32 GetHP();
 
+	// Get weapons current firing range
+	int32 GetFiringRange() const { return FiringRange; }
+
 	// Static intigers to define type of effect a weapon has
 	const static int32 DamageHull = 1;
 	const static int32 DamageShieldThenHull = 2;

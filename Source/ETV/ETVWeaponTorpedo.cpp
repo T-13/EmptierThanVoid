@@ -1,4 +1,4 @@
-﻿// Copyright (C) Team13. All rights reserved.
+// Copyright (C) Team13. All rights reserved.
 
 #include "ETVWeaponTorpedo.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -6,6 +6,7 @@
 AETVWeaponTorpedo::AETVWeaponTorpedo() : Super()
 {
 	Type = AETVWeapon::DamageHull;
+	FiringRange = 8;
 }
 
 void AETVWeaponTorpedo::Init(FName NewName, float MaximumHP, float Dmg, float WeaponWeight, float WeaponSize, int32 Range, int32 Speed)

@@ -3,6 +3,7 @@
 #include "ETVActionTarget_Move.h"
 #include "ETVShip.h"
 #include "PaperTileMapActor.h"
+#include "ETVGameModeBase.h"
 
 // Sets default values
 UETVActionTarget_Move::UETVActionTarget_Move() : Super()
@@ -20,8 +21,15 @@ bool UETVActionTarget_Move::CanActivate()
 
 bool UETVActionTarget_Move::CanPerform()
 {
-	// TODO Check distance (Ship's MoveRange vs distance)
-	return Super::CanPerform() && TileX != -1 && TileY != -1 && OwnerShip->CanMove();
+	if (Super::CanPerform() && TileX != -1 && TileY != -1)
+	{
+		AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
+		float Distance = GameMode->GetTiledDistance(OwnerShip->GetX(), OwnerShip->GetY(), TileX, TileY);
+
+		return Distance <= OwnerShip->GetMoveRange();
+	}
+
+	return false;
 }
 
 void UETVActionTarget_Move::ApplyEffectsSelf()

@@ -626,7 +626,7 @@ void AETVGameModeBase::GetMouseOverTile(FETVTile& Tile)
 		AETVCameraDirector* Camera = Cast<AETVCameraDirector>(PlayerController->GetPawn());
 		if (Camera == nullptr)
 		{
-			UE_LOG(LogTemp, Error, TEXT("GetMouseOverTile(): Pawn not set to AETVCameraDirector!"))
+			UE_LOG(LogTemp, Error, TEXT("GetMouseOverTile(): Pawn not set to AETVCameraDirector!"));
 			return;
 		}
 
@@ -649,7 +649,7 @@ void AETVGameModeBase::GetMouseOverTile(FETVTile& Tile)
 					FVector DebugPointTileCenter = FVector(CurrentTileData.PointLeftTop.X, CurrentTileData.PointLeftTop.Y, 0.0f) * 0.5f + FVector(CurrentTileData.PointRightBottom.X, CurrentTileData.PointRightBottom.Y, 0.0f) * 0.5f;
 					DrawDebugPoint(GetWorld(), DebugPointTileCenter, 5.0f, FColor(255, 0, 0), false);
 					DrawDebugLine(GetWorld(), WorldLocation, DebugPointTileCenter, FColor(255, 0, 0), false);
-					UE_LOG(LogTemp, Warning, TEXT("Loc (%s) -- Dir (%s) -- Zoom %g"), *WorldLocation.ToString(), *WorldDirection.ToString(), Camera->GetZoom())
+					UE_LOG(LogTemp, Warning, TEXT("Loc (%s) -- Dir (%s) -- Zoom %g"), *WorldLocation.ToString(), *WorldDirection.ToString(), Camera->GetZoom());
 					*/
 
 					Tile.Set(CurrentTileData.Tile);
@@ -718,27 +718,6 @@ void AETVGameModeBase::OnClickedCancelTargeting()
 	StopTargeting(false);
 }
 
-void AETVGameModeBase::SetTileVisibility(int32 X, int32 Y, bool bVisible)
-{
-	if (bVisible)
-	{
-		TileMapComp->SetTile(X, Y, EETVTileLayer::Effect, FPaperTileInfo());
-	}
-	else
-	{
-		FPaperTileInfo TileInfo;
-		TileInfo.TileSet = TileSetHidden;
-		TileInfo.PackedTileIndex = 0;
-		TileMapComp->SetTile(X, Y, EETVTileLayer::Effect, TileInfo);
-	}
-}
-
-bool AETVGameModeBase::IsTileVisible(int32 X, int32 Y)
-{
-	FPaperTileInfo TileInfo = TileMapComp->GetTile(X, Y, EETVTileLayer::Effect);
-	return TileInfo.TileSet != TileSetHidden;
-}
-
 void AETVGameModeBase::StartTargeting(UETVActionTarget* Action)
 {
 	SelectedAction = Action;
@@ -776,6 +755,35 @@ void AETVGameModeBase::StopTargeting(bool bSuccess)
 	}
 
 	SelectedAction = nullptr;
+}
+
+float AETVGameModeBase::GetTiledDistance(int32 X1, int32 Y1, int32 X2, int32 Y2)
+{
+	// Calculate distance between points
+	float Distance = sqrtf(powf(X2 - X1, 2) + powf(Y2 - Y1, 2));
+
+	// Round up (tile distance)
+	return floorf(Distance);
+}
+
+void AETVGameModeBase::SetTileVisibility(int32 X, int32 Y, bool bVisible)
+{
+	if (bVisible)
+	{
+		TileMapComp->SetTile(X, Y, EETVTileLayer::Effect, FPaperTileInfo());
+	} else
+	{
+		FPaperTileInfo TileInfo;
+		TileInfo.TileSet = TileSetHidden;
+		TileInfo.PackedTileIndex = 0;
+		TileMapComp->SetTile(X, Y, EETVTileLayer::Effect, TileInfo);
+	}
+}
+
+bool AETVGameModeBase::IsTileVisible(int32 X, int32 Y)
+{
+	FPaperTileInfo TileInfo = TileMapComp->GetTile(X, Y, EETVTileLayer::Effect);
+	return TileInfo.TileSet != TileSetHidden;
 }
 
 void AETVGameModeBase::ShipClicked(AETVShip *ClickedShip)

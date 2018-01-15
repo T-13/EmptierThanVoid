@@ -253,14 +253,6 @@ public:
 	UFUNCTION()
 	void OnClickedCancelTargeting();
 
-	// Set tile visibility (fog effect)
-	UFUNCTION(BlueprintCallable, Category = "ETV Map")
-	void SetTileVisibility(int32 X, int32 Y, bool bVisible);
-
-	// Returns tile visibility
-	UFUNCTION(BlueprintCallable, Category = "ETV Map")
-	bool IsTileVisible(int32 X, int32 Y);
-
 	// Starts targeting, handles ETV Action calls and stops targeting after target is selected
 	UFUNCTION(BlueprintCallable, Category = "ETV Targeting")
 	void StartTargeting(UETVActionTarget* Action);
@@ -268,6 +260,20 @@ public:
 	// Stops targeting, resetting targeting mode
 	UFUNCTION(BlueprintCallable, Category = "ETV Targeting")
 	void StopTargeting(bool bSuccess = true);
+
+
+	/* Line of Sight */
+	// Returns distance between 2 tiles in amount of tiles
+	UFUNCTION(BlueprintCallable, Category = "ETV Map")
+	float GetTiledDistance(int32 X1, int32 Y1, int32 X2, int32 Y2);
+
+	// Set tile visibility (fog effect)
+	UFUNCTION(BlueprintCallable, Category = "ETV Map")
+	void SetTileVisibility(int32 X, int32 Y, bool bVisible);
+
+	// Returns tile visibility
+	UFUNCTION(BlueprintCallable, Category = "ETV Map")
+	bool IsTileVisible(int32 X, int32 Y);
 
 
 	/* Player Action Handling */

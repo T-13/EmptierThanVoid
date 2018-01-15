@@ -51,7 +51,19 @@ bool UETVActionTarget::CanActivate()
 
 bool UETVActionTarget::CanPerform()
 {
-	return Super::CanPerform() && IsTargetValid();
+	if (Super::CanPerform() && IsTargetValid())
+	{
+		if (OwnerWeapon != nullptr) {
+			AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
+			float Distance = GameMode->GetTiledDistance(OwnerShip->GetX(), OwnerShip->GetY(), TileX, TileY);
+
+			return Distance <= OwnerWeapon->GetFiringRange();
+		}
+
+		return true;
+	}
+
+	return false;
 }
 
 bool UETVActionTarget::Activate()

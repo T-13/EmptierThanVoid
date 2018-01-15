@@ -137,7 +137,8 @@ void AETVShip::SpawnContextMenu(AActor *Actor, FKey Key)
 {
 	AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-	if (ContextMenuClass != nullptr && !GameMode->IsTargeting() && !IsContextMenuOpen && !PlayerController->IsPaused())
+	if (ContextMenuClass != nullptr && !IsContextMenuOpen && !PlayerController->IsPaused()
+		&& !GameMode->IsTargeting() && GameMode->IsTileVisible(GetTilePosition()))
 	{
 		// If another menu is in focus close it
 		if (GameMode->WasShipClickedRecently())

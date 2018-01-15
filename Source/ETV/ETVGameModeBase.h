@@ -274,7 +274,7 @@ public:
 
 	// Returns visibility of the given tile (if visible by any ship on given side)
 	UFUNCTION(BlueprintCallable, Category = "ETV Map")
-	bool IsTileVisible(FVector2D Tile, EETVShipType Side);
+	bool IsTileVisible(FVector2D Tile, EETVShipType Side = EETVShipType::PlayerShip);
 
 	// Set tile visibility (fog effect)
 	UFUNCTION(BlueprintCallable, Category = "ETV Map")

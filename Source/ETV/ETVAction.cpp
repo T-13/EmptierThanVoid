@@ -3,6 +3,7 @@
 #include "ETVAction.h"
 #include "ETVGameModeBase.h" // Not in .h due to circular dependency
 #include "ETVShipStatusUIWidget.h"
+#include "ETVShip.h"
 
 // Sets default values
 UETVAction::UETVAction() : Super()
@@ -108,9 +109,11 @@ void UETVAction::OnBeginPerform()
 
 void UETVAction::OnEndPerform()
 {
+	AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
+	GameMode->GetVisibleTiles(EETVShipType::PlayerShip);
+
 	if (bEndsTurn)
 	{
-		AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
 		// TODO Delay this until all effects are done
 		GameMode->EndTurn();
 	}

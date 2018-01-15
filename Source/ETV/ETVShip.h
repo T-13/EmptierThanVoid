@@ -175,6 +175,9 @@ public:
 	int32 GetMoveRange() const { return MoveRange; }
 
 	UFUNCTION()
+	int32 GetSensorRange() const { return SensorRange; }
+
+	UFUNCTION()
 	void MoveToTile(int32 NewX, int32 NewY);
 
 	UFUNCTION(BlueprintCallable)
@@ -208,6 +211,9 @@ public:
 	// Set Ship Type to Enemy
 	UFUNCTION()
 	void SetTypeToEnemy();
+
+	UFUNCTION()
+	EETVShipType GetType() const { return Type; };
 
 	// Just for checking in LOG
 	UFUNCTION()

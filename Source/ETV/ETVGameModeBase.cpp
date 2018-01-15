@@ -115,6 +115,9 @@ void AETVGameModeBase::BeginPlay()
 
 		ShipStatusUI->AddToViewport();
 
+		// Set starting visibility
+		GetVisibleTiles(EETVShipType::PlayerShip);
+
 		// Start game lopp
 		ElapsedTime = 0.0f;
 		CurrentTurnTime = static_cast<float>(TurnTime);
@@ -572,6 +575,12 @@ void AETVGameModeBase::EndTurn()
 
 void AETVGameModeBase::NextTurn()
 {
+	// Update visibility (eg. player ships have been destroyed)
+	GetVisibleTiles(EETVShipType::PlayerShip);
+
+	// Update ship list (eg. enemy ships became hidden or visible)
+	GetShipListWidget()->Update();
+
 	// Apply next turn
 	CurrentTurn++;
 	CurrentTurnTime = static_cast<float>(TurnTime);
@@ -766,7 +775,58 @@ float AETVGameModeBase::GetTiledDistance(FVector2D TileA, FVector2D TileB)
 	return floorf(Distance);
 }
 
-void AETVGameModeBase::SetTileVisibility(int32 X, int32 Y, bool bVisible)
+void AETVGameModeBase::GetVisibleTiles(EETVShipType Side, TArray<FVector2D>& VisibleTiles)
+{
+	// Go through all tiles checking if they are visible by any ship on given side
+	for (auto &CurrentTileData : TileData)
+	{
+		FVector2D CurrentTile = FVector2D(CurrentTileData.Tile.X, CurrentTileData.Tile.Y);
+		bool bIsVisible = IsTileVisible(CurrentTile, Side);
+
+		if (bIsVisible)
+		{
+			VisibleTiles.Add(CurrentTile);
+		}
+
+		// Update effects if called for player
+		if (Side == EETVShipType::PlayerShip)
+		{
+			SetTileVisibilityEffect(CurrentTile.X, CurrentTile.Y, bIsVisible);
+		}
+	}
+}
+
+void AETVGameModeBase::GetVisibleTiles(EETVShipType Side)
+{
+	TArray<FVector2D> VisibleTilesDummy;
+	GetVisibleTiles(Side, VisibleTilesDummy);
+}
+
+bool AETVGameModeBase::IsTileVisible(FVector2D Tile, EETVShipType Side)
+{
+	bool bVisible = false;
+	// Check visibility from each ship
+	for (auto &CurrentShip : Ships)
+	{
+		// Skip if not wanted side
+		if (CurrentShip->GetType() != Side)
+		{
+			continue;
+		}
+
+		// Check if in neighbouring tile (always visible) or in sensor range
+		float Distance = GetTiledDistance(CurrentShip->GetTilePosition(), Tile);
+		if (Distance <= 1 || Distance <= CurrentShip->GetSensorRange())
+		{
+			bVisible = true;
+			break;
+		}
+	}
+
+	return bVisible;
+}
+
+void AETVGameModeBase::SetTileVisibilityEffect(int32 X, int32 Y, bool bVisible)
 {
 	if (bVisible)
 	{
@@ -778,12 +838,6 @@ void AETVGameModeBase::SetTileVisibility(int32 X, int32 Y, bool bVisible)
 		TileInfo.PackedTileIndex = 0;
 		TileMapComp->SetTile(X, Y, EETVTileLayer::Effect, TileInfo);
 	}
-}
-
-bool AETVGameModeBase::IsTileVisible(int32 X, int32 Y)
-{
-	FPaperTileInfo TileInfo = TileMapComp->GetTile(X, Y, EETVTileLayer::Effect);
-	return TileInfo.TileSet != TileSetHidden;
 }
 
 void AETVGameModeBase::ShipClicked(AETVShip *ClickedShip)

@@ -267,13 +267,18 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ETV Map")
 	float GetTiledDistance(FVector2D TileA, FVector2D TileB);
 
+	// Returns all visible tile position for the given side and sets board effects if player side
+	UFUNCTION(BlueprintCallable, Category = "ETV Map")
+	void GetVisibleTiles(EETVShipType Side, /*out*/ TArray<FVector2D>& VisibleTiles);
+	void GetVisibleTiles(EETVShipType Side);
+
+	// Returns visibility of the given tile (if visible by any ship on given side)
+	UFUNCTION(BlueprintCallable, Category = "ETV Map")
+	bool IsTileVisible(FVector2D Tile, EETVShipType Side);
+
 	// Set tile visibility (fog effect)
 	UFUNCTION(BlueprintCallable, Category = "ETV Map")
-	void SetTileVisibility(int32 X, int32 Y, bool bVisible);
-
-	// Returns tile visibility
-	UFUNCTION(BlueprintCallable, Category = "ETV Map")
-	bool IsTileVisible(int32 X, int32 Y);
+	void SetTileVisibilityEffect(int32 X, int32 Y, bool bVisible);
 
 
 	/* Player Action Handling */

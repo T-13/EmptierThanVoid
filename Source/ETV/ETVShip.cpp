@@ -17,7 +17,9 @@ AETVShip::AETVShip() : Super()
 
 	Type = EETVShipType::PlayerShip;
 
-	SensorRange = 8;
+	// Default ranges
+	MoveRange = 1;
+	SensorRange = 2;
 }
 
 void AETVShip::Init(FString NewName, int32 MaxHP, int32 ShieldP, int32 NewShieldRechargeTime, int32 NewMoveRange, int32 Speed)

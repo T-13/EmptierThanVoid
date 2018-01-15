@@ -49,5 +49,5 @@ public:
 	bool CanPerform() override;
 	bool Activate() override;
 	bool Perform() override;
-	void OnEndPerform() override;
+	void OnEndPerform(); // Hides UETVAction member function on purpose
 };

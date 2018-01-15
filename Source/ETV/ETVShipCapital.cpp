@@ -8,6 +8,7 @@
 AETVShipCapital::AETVShipCapital() : Super()
 {
 	Class = EETVShipClass::Capital;
+	SensorRange = 5;
 }
 
 void AETVShipCapital::Init(FString NewName, int32 MaxHP, int32 ShieldP, int32 NewShieldRechargeTime, int32 NewMoveRange, int32 Speed, bool bHyperDrive, float NewLaserResistance, int32 Hangars)

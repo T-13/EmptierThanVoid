@@ -793,19 +793,5 @@ void AETVGameModeBase::ShipClicked(AETVShip *ClickedShip)
 
 bool AETVGameModeBase::WasShipClickedRecently()
 {
-	return (LastClickedShip != nullptr);
-}
-
-AETVShip* AETVGameModeBase::GetLastClickedShip()
-{
-	return LastClickedShip;
-}
-
-UETVActionLogWidget* AETVGameModeBase::GetLogWidget() {
-	return ActionLogClass;
-}
-
-UETVShipStatusUIWidget* AETVGameModeBase::GetShipListWidget()
-{
-	return ShipStatusUI;
+	return LastClickedShip != nullptr;
 }

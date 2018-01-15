@@ -286,15 +286,15 @@ public:
 	bool WasShipClickedRecently();
 
 	UFUNCTION()
-	AETVShip* GetLastClickedShip();
+	AETVShip* GetLastClickedShip() const { return LastClickedShip; }
 
 
 	/* Get Widgets */
 	// Get log widget
 	UFUNCTION(BlueprintCallable, Category = "ETV UI")
-	UETVActionLogWidget* GetLogWidget();
+	UETVActionLogWidget* GetLogWidget() const { return ActionLogClass; }
 
 	// Get Ship List widget
 	UFUNCTION(BlueprintCallable, Category = "ETV UI")
-	UETVShipStatusUIWidget* GetShipListWidget();
+	UETVShipStatusUIWidget* GetShipListWidget() const { return ShipStatusUI; }
 };

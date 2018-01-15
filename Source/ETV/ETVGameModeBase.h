@@ -265,7 +265,7 @@ public:
 	/* Line of Sight */
 	// Returns distance between 2 tiles in amount of tiles
 	UFUNCTION(BlueprintCallable, Category = "ETV Map")
-	float GetTiledDistance(int32 X1, int32 Y1, int32 X2, int32 Y2);
+	float GetTiledDistance(FVector2D TileA, FVector2D TileB);
 
 	// Set tile visibility (fog effect)
 	UFUNCTION(BlueprintCallable, Category = "ETV Map")

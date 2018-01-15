@@ -186,6 +186,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	int32 GetY() const { return Y; }
 
+	UFUNCTION(BlueprintCallable)
+	FVector2D GetTilePosition() const { return FVector2D(X, Y); }
+
 	UFUNCTION()
 	void CloseContextMenu();
 

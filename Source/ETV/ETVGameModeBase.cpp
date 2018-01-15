@@ -757,10 +757,10 @@ void AETVGameModeBase::StopTargeting(bool bSuccess)
 	SelectedAction = nullptr;
 }
 
-float AETVGameModeBase::GetTiledDistance(int32 X1, int32 Y1, int32 X2, int32 Y2)
+float AETVGameModeBase::GetTiledDistance(FVector2D TileA, FVector2D TileB)
 {
 	// Calculate distance between points
-	float Distance = sqrtf(powf(X2 - X1, 2) + powf(Y2 - Y1, 2));
+	float Distance = sqrtf(powf(TileB.X - TileA.X, 2) + powf(TileB.Y - TileA.Y, 2));
 
 	// Round up (tile distance)
 	return floorf(Distance);

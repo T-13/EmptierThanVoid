@@ -21,10 +21,10 @@ bool UETVActionTarget_Move::CanActivate()
 
 bool UETVActionTarget_Move::CanPerform()
 {
-	if (Super::CanPerform() && TileX != -1 && TileY != -1)
+	if (Super::CanPerform() && Tile.X != -1 && Tile.Y != -1)
 	{
 		AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
-		float Distance = GameMode->GetTiledDistance(OwnerShip->GetX(), OwnerShip->GetY(), TileX, TileY);
+		float Distance = GameMode->GetTiledDistance(OwnerShip->GetTilePosition(), Tile);
 
 		return Distance <= OwnerShip->GetMoveRange();
 	}
@@ -41,6 +41,6 @@ void UETVActionTarget_Move::ApplyEffectsSelf()
 		// TODO Do animation
 
 		// Move ship
-		OwnerShip->MoveToTile(TileX, TileY);
+		OwnerShip->MoveToTile(Tile.X, Tile.Y);
 	}
 }

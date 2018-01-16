@@ -38,6 +38,12 @@ AETVGameModeBase::AETVGameModeBase()
 	bTargeting = false;
 	bTargetingOnStart = false;
 
+
+	/* Visibility */
+	bIgnoreVisibility = false;
+	bShowEnemyVisibility = false;
+
+
 	static ConstructorHelpers::FObjectFinder<UPaperTileSet> EnemyCapitalTile(TEXT("PaperTileSet'/Game/EmptierThanVoid/Art/Ships/EnemyCapitalShipTile.EnemyCapitalShipTile'"));
 	EnemyCapitalShip = EnemyCapitalTile.Object;
 
@@ -570,6 +576,11 @@ void AETVGameModeBase::EndTurn()
 		APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 		PlayerController->SetPause(true);
 
+		if (bShowEnemyVisibility)
+		{
+			GetVisibleTiles(EETVShipType::EnemyShip);
+		}
+
 		// Move control to AI
 		// TODO Call into AI to do its thing
 		// TODO AI calls NextTurn() when done
@@ -792,9 +803,9 @@ void AETVGameModeBase::GetVisibleTiles(EETVShipType Side, TArray<FVector2D>& Vis
 		}
 
 		// Update effects if called for player
-		if (Side == EETVShipType::PlayerShip)
+		if (Side == EETVShipType::PlayerShip || bShowEnemyVisibility)
 		{
-			SetTileVisibilityEffect(CurrentTile.X, CurrentTile.Y, bIsVisible);
+			SetTileVisibilityEffect(CurrentTile.X, CurrentTile.Y, bIsVisible || bIgnoreVisibility);
 		}
 	}
 }

@@ -145,8 +145,19 @@ protected:
 
 	/* Targeting */
 	// Start with targeting enabled (debug)
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV Map")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV Targeting")
 	bool bTargetingOnStart;
+
+
+	/* Visibility */
+	// Makes all tiles visible (debug)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV Visibility")
+	bool bIgnoreVisibility;
+
+	// Shows visibility for enemy during its turn (debug)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ETV Visibility")
+	bool bShowEnemyVisibility;
+
 
 	// The widget class for the ShipStatusUI
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "ETV UI", meta = (BlueprintProtected = "true"))
@@ -262,22 +273,22 @@ public:
 	void StopTargeting(bool bSuccess = true);
 
 
-	/* Line of Sight */
+	/* Visibility */
 	// Returns distance between 2 tiles in amount of tiles
-	UFUNCTION(BlueprintCallable, Category = "ETV Map")
+	UFUNCTION(BlueprintCallable, Category = "ETV Visibility")
 	float GetTiledDistance(FVector2D TileA, FVector2D TileB);
 
 	// Returns all visible tile position for the given side and sets board effects if player side
-	UFUNCTION(BlueprintCallable, Category = "ETV Map")
+	UFUNCTION(BlueprintCallable, Category = "ETV Visibility")
 	void GetVisibleTiles(EETVShipType Side, /*out*/ TArray<FVector2D>& VisibleTiles);
 	void GetVisibleTiles(EETVShipType Side);
 
 	// Returns visibility of the given tile (if visible by any ship on given side)
-	UFUNCTION(BlueprintCallable, Category = "ETV Map")
+	UFUNCTION(BlueprintCallable, Category = "ETV Visibility")
 	bool IsTileVisible(FVector2D Tile, EETVShipType Side = EETVShipType::PlayerShip);
 
 	// Set tile visibility (fog effect)
-	UFUNCTION(BlueprintCallable, Category = "ETV Map")
+	UFUNCTION(BlueprintCallable, Category = "ETV Visibility")
 	void SetTileVisibilityEffect(int32 X, int32 Y, bool bVisible);
 
 

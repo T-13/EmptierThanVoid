@@ -118,6 +118,9 @@ void AETVGameModeBase::BeginPlay()
 		// Set starting visibility
 		GetVisibleTiles(EETVShipType::PlayerShip);
 
+		// Initialize ship list
+		GetShipListWidget()->Update();
+
 		// Start game lopp
 		ElapsedTime = 0.0f;
 		CurrentTurnTime = static_cast<float>(TurnTime);
@@ -804,7 +807,7 @@ void AETVGameModeBase::GetVisibleTiles(EETVShipType Side)
 
 bool AETVGameModeBase::IsTileVisible(FVector2D Tile, EETVShipType Side)
 {
-	bool bVisible = false;
+	bool bIsVisible = false;
 	// Check visibility from each ship
 	for (auto &CurrentShip : Ships)
 	{
@@ -818,12 +821,12 @@ bool AETVGameModeBase::IsTileVisible(FVector2D Tile, EETVShipType Side)
 		float Distance = GetTiledDistance(CurrentShip->GetTilePosition(), Tile);
 		if (Distance <= 1 || Distance <= CurrentShip->GetSensorRange())
 		{
-			bVisible = true;
+			bIsVisible = true;
 			break;
 		}
 	}
 
-	return bVisible;
+	return bIsVisible;
 }
 
 void AETVGameModeBase::SetTileVisibilityEffect(int32 X, int32 Y, bool bVisible)

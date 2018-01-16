@@ -227,6 +227,12 @@ bool AETVShip::IsEnemy()
 	return Type == EETVShipType::EnemyShip;
 }
 
+bool AETVShip::IsVisible()
+{
+	AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
+	return GameMode->IsTileVisible(GetTilePosition(), EETVShipType::PlayerShip);
+}
+
 void AETVShip::CloseContextMenu()
 {
 	if (CurrentContextMenu != nullptr)

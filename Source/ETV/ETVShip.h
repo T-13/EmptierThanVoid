@@ -184,6 +184,9 @@ public:
 	bool IsEnemy();
 
 	UFUNCTION(BlueprintCallable)
+	bool IsVisible();
+
+	UFUNCTION(BlueprintCallable)
 	int32 GetX() const { return X; }
 
 	UFUNCTION(BlueprintCallable)

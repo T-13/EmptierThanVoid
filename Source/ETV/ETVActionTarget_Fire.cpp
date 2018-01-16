@@ -70,13 +70,10 @@ void UETVActionTarget_Fire::ApplyEffectsTarget()
 	// TODO Show explosion animation
 
 	AETVShip* SelectedShip = nullptr;
-	bool bLog = true;
-
 	if (!SelectedTarget->IsA(APaperTileMapActor::StaticClass()))
 	{
 		AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
 		SelectedShip = GameMode->GetShipActor(Tile.X, Tile.Y);
-		bLog = false;
 	}
 	else
 	{
@@ -85,7 +82,7 @@ void UETVActionTarget_Fire::ApplyEffectsTarget()
 
 	if (SelectedShip != nullptr)
 	{
-		UETVCalculator::CalculateWeaponEffect(OwnerShip, OwnerWeapon, SelectedShip, bLog);
+		UETVCalculator::CalculateWeaponEffect(OwnerShip, OwnerWeapon, SelectedShip);
 	}
 }
 

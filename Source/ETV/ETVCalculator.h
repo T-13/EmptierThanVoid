@@ -19,7 +19,8 @@ class ETV_API UETVCalculator : public UObject
 	
 	
 public:
+	// Calculates weapon effect, applies it to involved ships/weapons and logs to Combat Log
 	UFUNCTION(BlueprintCallable)
-	static void CalculateWeaponEffect(AETVShip *Atacker, AETVWeapon *WeaponUsed, AETVShip *Target, bool bLog = true);
+	static void CalculateWeaponEffect(AETVShip *Atacker, AETVWeapon *WeaponUsed, AETVShip *Target);
 	
 };

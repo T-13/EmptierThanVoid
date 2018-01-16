@@ -3,7 +3,7 @@
 #include "ETVCalculator.h"
 #include "ETVGameModeBase.h"
 
-void UETVCalculator::CalculateWeaponEffect(AETVShip *User, AETVWeapon *WeaponUsed, AETVShip *Target, bool bLog)
+void UETVCalculator::CalculateWeaponEffect(AETVShip *User, AETVWeapon *WeaponUsed, AETVShip *Target)
 {
 	/*Printing for debugging
 	FString Msg = "User HP: " + FString::FromInt(User->GetHP());
@@ -74,10 +74,11 @@ void UETVCalculator::CalculateWeaponEffect(AETVShip *User, AETVWeapon *WeaponUse
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *Msg2);
 	/**/
 
-	if (bLog)
+	// Log if target visible
+	AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(User->GetWorld()->GetAuthGameMode());
+	if (GameMode->IsTileVisible(Target->GetTilePosition()))
 	{
 		// Add new Message to UETVActionLogWidget by calling event NewLogEntry
-		AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(User->GetWorld()->GetAuthGameMode());
 		UETVActionLogWidget *LogWidget = GameMode->GetLogWidget();
 		if (ActionHP != "") {
 			FString ShipName = User->GetShipName();

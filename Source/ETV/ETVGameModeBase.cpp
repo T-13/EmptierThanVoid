@@ -19,8 +19,8 @@ AETVGameModeBase::AETVGameModeBase()
 
 	/* Generation */
 	TileSize = 32;
-	MapWidth = 25.0f;
-	MapHeight = 25.0f;
+	MapWidth = 50.0f;
+	MapHeight = 50.0f;
 
 
 	/* Game Loop */

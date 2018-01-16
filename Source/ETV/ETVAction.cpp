@@ -20,8 +20,8 @@ UETVAction::UETVAction() : Super()
 	// Available
 	Available = EETVActionAvailability::ActionAvailable;
 
-	// Does not end turn
-	bEndsTurn = false;
+	// Ends turn after use
+	bEndsTurn = true;
 
 	// Takes at most one turn to complete
 	MaxPerforms = 1;

@@ -3,7 +3,7 @@
 #include "ETVCalculator.h"
 #include "ETVGameModeBase.h"
 
-void UETVCalculator::CalculateWeaponEffect(AETVShip *User, AETVWeapon *WeaponUsed, AETVShip *Target)
+void UETVCalculator::CalculateWeaponEffect(AETVShip *User, AETVWeapon *WeaponUsed, AETVShip *Target, bool bLog)
 {
 	/*Printing for debugging
 	FString Msg = "User HP: " + FString::FromInt(User->GetHP());
@@ -74,23 +74,26 @@ void UETVCalculator::CalculateWeaponEffect(AETVShip *User, AETVWeapon *WeaponUse
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *Msg2);
 	/**/
 
-	// Add new Message to UETVActionLogWidget by calling event NewLogEntry
-	AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(User->GetWorld()->GetAuthGameMode());
-	UETVActionLogWidget *LogWidget = GameMode->GetLogWidget();
-	if (ActionHP != "") {
-		FString ShipName = User->GetShipName();
-		FString ChangeValueS = FString::FromInt(ChangeValue);
-		FString TargetName = Target->GetShipName();
+	if (bLog)
+	{
+		// Add new Message to UETVActionLogWidget by calling event NewLogEntry
+		AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(User->GetWorld()->GetAuthGameMode());
+		UETVActionLogWidget *LogWidget = GameMode->GetLogWidget();
+		if (ActionHP != "") {
+			FString ShipName = User->GetShipName();
+			FString ChangeValueS = FString::FromInt(ChangeValue);
+			FString TargetName = Target->GetShipName();
 
-		FString Message = ShipName + ";" + ActionHP + ";" + ChangeValueS + ";" + TargetName;
-		LogWidget->NewLogEntry(Message);
-	}
-	if (ActionShields != "") {
-		FString ShipName = User->GetShipName();
-		FString ChangeValueS = FString::FromInt(ChangeValue);
-		FString TargetName = Target->GetShipName();
+			FString Message = ShipName + ";" + ActionHP + ";" + ChangeValueS + ";" + TargetName;
+			LogWidget->NewLogEntry(Message);
+		}
+		if (ActionShields != "") {
+			FString ShipName = User->GetShipName();
+			FString ChangeValueS = FString::FromInt(ChangeValue);
+			FString TargetName = Target->GetShipName();
 
-		FString Message = ShipName + ";" + ActionShields + ";" + ChangeValueS + ";" + TargetName;
-		LogWidget->NewLogEntry(Message);
+			FString Message = ShipName + ";" + ActionShields + ";" + ChangeValueS + ";" + TargetName;
+			LogWidget->NewLogEntry(Message);
+		}
 	}
 }

@@ -1,4 +1,4 @@
-﻿// Copyright (C) Team13. All rights reserved.
+// Copyright (C) Team13. All rights reserved.
 
 #pragma once
 
@@ -20,6 +20,6 @@ class ETV_API UETVCalculator : public UObject
 	
 public:
 	UFUNCTION(BlueprintCallable)
-	static void CalculateWeaponEffect(AETVShip *Atacker, AETVWeapon *WeaponUsed, AETVShip *Target);
+	static void CalculateWeaponEffect(AETVShip *Atacker, AETVWeapon *WeaponUsed, AETVShip *Target, bool bLog = true);
 	
 };

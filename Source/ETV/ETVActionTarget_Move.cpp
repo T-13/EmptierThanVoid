@@ -1,9 +1,9 @@
 // Copyright (C) Team13. All rights reserved.
 
 #include "ETVActionTarget_Move.h"
+#include "ETVGameModeBase.h"
 #include "ETVShip.h"
 #include "PaperTileMapActor.h"
-#include "ETVGameModeBase.h"
 
 // Sets default values
 UETVActionTarget_Move::UETVActionTarget_Move() : Super()

@@ -32,14 +32,8 @@ void UETVActionTarget::SetTarget(AActor* Target, int32 X, int32 Y)
 
 bool UETVActionTarget::IsTargetValid()
 {
-	// Are required variables set
-	if (SelectedTarget == nullptr || RequiredTargetType == nullptr)
-	{
-		return false;
-	}
-
-	// Is correct type
-	return SelectedTarget->IsA(RequiredTargetType);
+	// Are required variables set and is correct type
+	return SelectedTarget != nullptr && RequiredTargetType != nullptr && SelectedTarget->IsA(RequiredTargetType);
 }
 
 bool UETVActionTarget::CanActivate()

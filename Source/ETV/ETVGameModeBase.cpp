@@ -623,7 +623,7 @@ void AETVGameModeBase::GetMouseOverTile(FETVTile& Tile)
 		if (Camera == nullptr)
 		{
 			UE_LOG(LogTemp, Error, TEXT("GetMouseOverTile(): Pawn not set to AETVCameraDirector!"))
-				return;
+			return;
 		}
 
 		// Add height to tile map

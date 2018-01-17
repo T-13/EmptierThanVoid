@@ -10,8 +10,7 @@ UETVActionTarget::UETVActionTarget() : Super()
 	FailureChance = 0.0f;
 
 	SelectedTarget = nullptr;
-	TileX = -1;
-	TileY = -1;
+	Tile = FVector2D(-1, -1);
 }
 
 void UETVActionTarget::Init(AETVShip* OwnerShipPtr, AETVWeapon* OwnerWeaponPtr)
@@ -28,20 +27,13 @@ void UETVActionTarget::Init(AETVShip* OwnerShipPtr, AETVWeapon* OwnerWeaponPtr)
 void UETVActionTarget::SetTarget(AActor* Target, int32 X, int32 Y)
 {
 	SelectedTarget = Target;
-	TileX = X;
-	TileY = Y;
+	Tile = FVector2D(X, Y);
 }
 
 bool UETVActionTarget::IsTargetValid()
 {
-	// Are required variables set
-	if (SelectedTarget == nullptr || RequiredTargetType == nullptr)
-	{
-		return false;
-	}
-
-	// Is correct type
-	return SelectedTarget->IsA(RequiredTargetType);
+	// Are required variables set and is correct type
+	return SelectedTarget != nullptr && RequiredTargetType != nullptr && SelectedTarget->IsA(RequiredTargetType);
 }
 
 bool UETVActionTarget::CanActivate()
@@ -51,7 +43,19 @@ bool UETVActionTarget::CanActivate()
 
 bool UETVActionTarget::CanPerform()
 {
-	return Super::CanPerform() && IsTargetValid();
+	if (Super::CanPerform() && IsTargetValid())
+	{
+		if (OwnerWeapon != nullptr && Tile.X != -1 && Tile.Y != -1) {
+			AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
+			float Distance = GameMode->GetTiledDistance(OwnerShip->GetTilePosition(), Tile);
+
+			return Distance <= OwnerWeapon->GetFiringRange();
+		}
+
+		return true;
+	}
+
+	return false;
 }
 
 bool UETVActionTarget::Activate()

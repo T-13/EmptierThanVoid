@@ -82,6 +82,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship", meta = (ClampMin = "1.0"))
 	int32 MoveRange;
 
+	// Area ship's sensors can see
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship", meta = (ClampMin = "1.0"))
+	int32 SensorRange;
+
 	// Integers (x,y) for possible fields that ship can move to
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Ship")
 	TArray<int32> Fields;
@@ -168,16 +172,28 @@ public:
 	bool CanMove();
 
 	UFUNCTION()
+	int32 GetMoveRange() const { return MoveRange; }
+
+	UFUNCTION()
+	int32 GetSensorRange() const { return SensorRange; }
+
+	UFUNCTION()
 	void MoveToTile(int32 NewX, int32 NewY);
 
 	UFUNCTION(BlueprintCallable)
 	bool IsEnemy();
 
 	UFUNCTION(BlueprintCallable)
+	bool IsVisible();
+
+	UFUNCTION(BlueprintCallable)
 	int32 GetX() const { return X; }
 
 	UFUNCTION(BlueprintCallable)
 	int32 GetY() const { return Y; }
+
+	UFUNCTION(BlueprintCallable)
+	FVector2D GetTilePosition() const { return FVector2D(X, Y); }
 
 	UFUNCTION()
 	void CloseContextMenu();
@@ -198,6 +214,9 @@ public:
 	// Set Ship Type to Enemy
 	UFUNCTION()
 	void SetTypeToEnemy();
+
+	UFUNCTION()
+	EETVShipType GetType() const { return Type; };
 
 	// Just for checking in LOG
 	UFUNCTION()

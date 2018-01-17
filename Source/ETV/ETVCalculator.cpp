@@ -74,23 +74,27 @@ void UETVCalculator::CalculateWeaponEffect(AETVShip *User, AETVWeapon *WeaponUse
 	UE_LOG(LogTemp, Warning, TEXT("%s"), *Msg2);
 	/**/
 
-	// Add new Message to UETVActionLogWidget by calling event NewLogEntry
+	// Log if target visible
 	AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(User->GetWorld()->GetAuthGameMode());
-	UETVActionLogWidget *LogWidget = GameMode->GetLogWidget();
-	if (ActionHP != "") {
-		FString ShipName = User->GetShipName();
-		FString ChangeValueS = FString::FromInt(ChangeValue);
-		FString TargetName = Target->GetShipName();
+	if (GameMode->IsTileVisible(Target->GetTilePosition()))
+	{
+		// Add new Message to UETVActionLogWidget by calling event NewLogEntry
+		UETVActionLogWidget *LogWidget = GameMode->GetLogWidget();
+		if (ActionHP != "") {
+			FString ShipName = User->GetShipName();
+			FString ChangeValueS = FString::FromInt(ChangeValue);
+			FString TargetName = Target->GetShipName();
 
-		FString Message = ShipName + ";" + ActionHP + ";" + ChangeValueS + ";" + TargetName;
-		LogWidget->NewLogEntry(Message);
-	}
-	if (ActionShields != "") {
-		FString ShipName = User->GetShipName();
-		FString ChangeValueS = FString::FromInt(ChangeValue);
-		FString TargetName = Target->GetShipName();
+			FString Message = ShipName + ";" + ActionHP + ";" + ChangeValueS + ";" + TargetName;
+			LogWidget->NewLogEntry(Message);
+		}
+		if (ActionShields != "") {
+			FString ShipName = User->GetShipName();
+			FString ChangeValueS = FString::FromInt(ChangeValue);
+			FString TargetName = Target->GetShipName();
 
-		FString Message = ShipName + ";" + ActionShields + ";" + ChangeValueS + ";" + TargetName;
-		LogWidget->NewLogEntry(Message);
+			FString Message = ShipName + ";" + ActionShields + ";" + ChangeValueS + ";" + TargetName;
+			LogWidget->NewLogEntry(Message);
+		}
 	}
 }

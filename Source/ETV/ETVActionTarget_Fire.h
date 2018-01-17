@@ -19,6 +19,8 @@ public:
 	UETVActionTarget_Fire();
 
 public:
+	bool IsTargetValid() override;
+
 	bool CanActivate() override;
 	bool CanPerform() override;
 

@@ -20,8 +20,8 @@ AETVGameModeBase::AETVGameModeBase()
 
 	/* Generation */
 	TileSize = 32;
-	MapWidth = 25.0f;
-	MapHeight = 25.0f;
+	MapWidth = 50.0f;
+	MapHeight = 50.0f;
 
 
 	/* Game Loop */
@@ -38,6 +38,12 @@ AETVGameModeBase::AETVGameModeBase()
 	/* Targeting */
 	bTargeting = false;
 	bTargetingOnStart = false;
+
+
+	/* Visibility */
+	bIgnoreVisibility = false;
+	bShowEnemyVisibility = false;
+
 
 	static ConstructorHelpers::FObjectFinder<UPaperTileSet> EnemyCapitalTile(TEXT("PaperTileSet'/Game/EmptierThanVoid/Art/Ships/EnemyCapitalShipTile.EnemyCapitalShipTile'"));
 	EnemyCapitalShip = EnemyCapitalTile.Object;
@@ -121,6 +127,12 @@ void AETVGameModeBase::BeginPlay()
 		ShipStatusUI->SetDesiredSizeInViewport(FVector2D(WidthOfShipStatusUI, HeightOfShipStatusUI));
 
 		ShipStatusUI->AddToViewport();
+
+		// Set starting visibility
+		UpdateVisibleTiles(EETVShipType::PlayerShip);
+
+		// Initialize ship list
+		GetShipListWidget()->Update();
 
 		// Start game lopp
 		ElapsedTime = 0.0f;
@@ -221,9 +233,9 @@ void AETVGameModeBase::MapGeneration()
 	TileMapComp->MakeTileMapEditable();
 
 	// Create additional layers before creating board layer (which creates empty layer at the bottom)
-	TileMapComp->AddNewLayer(); // Layer 3 for Effects
-	TileMapComp->AddNewLayer(); // Layer 2 for Ships
-	TileMapComp->AddNewLayer(); // Layer 1 for Targeting
+	TileMapComp->AddNewLayer(); // Layer 3 for Targeting
+	TileMapComp->AddNewLayer(); // Layer 2 for Effects
+	TileMapComp->AddNewLayer(); // Layer 1 for Ships
 	TileMapComp->AddNewLayer(); // Layer 0 for Board
 
 	// Paper tile info for SetTile function
@@ -560,6 +572,11 @@ void AETVGameModeBase::EndTurn()
 		APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 		PlayerController->SetPause(true);
 
+		if (bShowEnemyVisibility)
+		{
+			UpdateVisibleTiles(EETVShipType::EnemyShip);
+		}
+
 		// Move control to AI
 		// TODO Call into AI to do its thing
 		// TODO AI calls NextTurn() when done
@@ -568,6 +585,12 @@ void AETVGameModeBase::EndTurn()
 
 void AETVGameModeBase::NextTurn()
 {
+	// Update visibility (eg. player ships have been destroyed)
+	UpdateVisibleTiles(EETVShipType::PlayerShip);
+
+	// Update ship list (eg. enemy ships became hidden or visible)
+	GetShipListWidget()->Update();
+
 	// Apply next turn
 	CurrentTurn++;
 	CurrentTurnTime = static_cast<float>(TurnTime);
@@ -622,7 +645,7 @@ void AETVGameModeBase::GetMouseOverTile(FETVTile& Tile)
 		AETVCameraDirector* Camera = Cast<AETVCameraDirector>(PlayerController->GetPawn());
 		if (Camera == nullptr)
 		{
-			UE_LOG(LogTemp, Error, TEXT("GetMouseOverTile(): Pawn not set to AETVCameraDirector!"))
+			UE_LOG(LogTemp, Error, TEXT("GetMouseOverTile(): Pawn not set to AETVCameraDirector!"));
 			return;
 		}
 
@@ -645,7 +668,7 @@ void AETVGameModeBase::GetMouseOverTile(FETVTile& Tile)
 					FVector DebugPointTileCenter = FVector(CurrentTileData.PointLeftTop.X, CurrentTileData.PointLeftTop.Y, 0.0f) * 0.5f + FVector(CurrentTileData.PointRightBottom.X, CurrentTileData.PointRightBottom.Y, 0.0f) * 0.5f;
 					DrawDebugPoint(GetWorld(), DebugPointTileCenter, 5.0f, FColor(255, 0, 0), false);
 					DrawDebugLine(GetWorld(), WorldLocation, DebugPointTileCenter, FColor(255, 0, 0), false);
-					UE_LOG(LogTemp, Warning, TEXT("Loc (%s) -- Dir (%s) -- Zoom %g"), *WorldLocation.ToString(), *WorldDirection.ToString(), Camera->GetZoom())
+					UE_LOG(LogTemp, Warning, TEXT("Loc (%s) -- Dir (%s) -- Zoom %g"), *WorldLocation.ToString(), *WorldDirection.ToString(), Camera->GetZoom());
 					*/
 
 					Tile.Set(CurrentTileData.Tile);
@@ -753,6 +776,87 @@ void AETVGameModeBase::StopTargeting(bool bSuccess)
 	SelectedAction = nullptr;
 }
 
+float AETVGameModeBase::GetTiledDistance(FVector2D TileA, FVector2D TileB)
+{
+	// Calculate distance between points
+	float Distance = sqrtf(powf(TileB.X - TileA.X, 2) + powf(TileB.Y - TileA.Y, 2));
+
+	// Round up (tile distance)
+	return floorf(Distance);
+}
+
+void AETVGameModeBase::UpdateVisibleTiles(EETVShipType Side, TArray<FVector2D>& VisibleTiles)
+{
+	// Go through all tiles checking if they are visible by any ship on given side
+	for (auto &CurrentTileData : TileData)
+	{
+		FVector2D CurrentTile = FVector2D(CurrentTileData.Tile.X, CurrentTileData.Tile.Y);
+		bool bIsVisible = IsTileVisible(CurrentTile, Side);
+
+		if (bIsVisible)
+		{
+			VisibleTiles.Add(CurrentTile);
+		}
+
+		// Update effects if called for player
+		if (Side == EETVShipType::PlayerShip || bShowEnemyVisibility)
+		{
+			SetTileVisibilityEffect(CurrentTile.X, CurrentTile.Y, bIsVisible || bIgnoreVisibility);
+		}
+	}
+}
+
+void AETVGameModeBase::UpdateVisibleTiles(EETVShipType Side)
+{
+	TArray<FVector2D> VisibleTilesDummy;
+	UpdateVisibleTiles(Side, VisibleTilesDummy);
+}
+
+void AETVGameModeBase::GetVisibleShips(EETVShipType Side, TArray<AETVShip*>& VisibleShips)
+{
+	VisibleShips = Ships.FilterByPredicate([](AETVShip* Ship){
+		return Ship->IsVisible();
+	});
+}
+
+bool AETVGameModeBase::IsTileVisible(FVector2D Tile, EETVShipType Side)
+{
+	bool bIsVisible = false;
+	// Check visibility from each ship
+	for (auto &CurrentShip : Ships)
+	{
+		// Skip if not wanted side
+		if (CurrentShip->GetType() != Side)
+		{
+			continue;
+		}
+
+		// Check if in neighbouring tile (always visible) or in sensor range
+		float Distance = GetTiledDistance(CurrentShip->GetTilePosition(), Tile);
+		if (Distance <= 1 || Distance <= CurrentShip->GetSensorRange())
+		{
+			bIsVisible = true;
+			break;
+		}
+	}
+
+	return bIsVisible;
+}
+
+void AETVGameModeBase::SetTileVisibilityEffect(int32 X, int32 Y, bool bVisible)
+{
+	if (bVisible)
+	{
+		TileMapComp->SetTile(X, Y, EETVTileLayer::Effect, FPaperTileInfo());
+	} else
+	{
+		FPaperTileInfo TileInfo;
+		TileInfo.TileSet = TileSetHidden;
+		TileInfo.PackedTileIndex = 0;
+		TileMapComp->SetTile(X, Y, EETVTileLayer::Effect, TileInfo);
+	}
+}
+
 void AETVGameModeBase::ShipClicked(AETVShip *ClickedShip)
 {
 	LastClickedShip = ClickedShip;
@@ -760,21 +864,7 @@ void AETVGameModeBase::ShipClicked(AETVShip *ClickedShip)
 
 bool AETVGameModeBase::WasShipClickedRecently()
 {
-	return (LastClickedShip != nullptr);
-}
-
-AETVShip* AETVGameModeBase::GetLastClickedShip()
-{
-	return LastClickedShip;
-}
-
-UETVActionLogWidget* AETVGameModeBase::GetLogWidget() {
-	return ActionLogClass;
-}
-
-UETVShipStatusUIWidget* AETVGameModeBase::GetShipListWidget()
-{
-	return ShipStatusUI;
+	return LastClickedShip != nullptr;
 }
 
 bool AETVGameModeBase::IsShipNameUsed(FString Name)

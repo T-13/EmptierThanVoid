@@ -1,6 +1,7 @@
 // Copyright (C) Team13. All rights reserved.
 
 #include "ETVActionTarget_Move.h"
+#include "ETVGameModeBase.h"
 #include "ETVShip.h"
 #include "PaperTileMapActor.h"
 
@@ -20,8 +21,15 @@ bool UETVActionTarget_Move::CanActivate()
 
 bool UETVActionTarget_Move::CanPerform()
 {
-	// TODO Check distance (Ship's MoveRange vs distance)
-	return Super::CanPerform() && TileX != -1 && TileY != -1;
+	if (Super::CanPerform() && Tile.X != -1 && Tile.Y != -1)
+	{
+		AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
+		float Distance = GameMode->GetTiledDistance(OwnerShip->GetTilePosition(), Tile);
+
+		return Distance <= OwnerShip->GetMoveRange();
+	}
+
+	return false;
 }
 
 void UETVActionTarget_Move::ApplyEffectsSelf()
@@ -33,6 +41,6 @@ void UETVActionTarget_Move::ApplyEffectsSelf()
 		// TODO Do animation
 
 		// Move ship
-		OwnerShip->MoveToTile(TileX, TileY);
+		OwnerShip->MoveToTile(Tile.X, Tile.Y);
 	}
 }

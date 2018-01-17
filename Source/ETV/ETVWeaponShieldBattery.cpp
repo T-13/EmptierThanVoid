@@ -1,8 +1,9 @@
-﻿// Copyright (C) Team13. All rights reserved.
+// Copyright (C) Team13. All rights reserved.
 
 #include "ETVWeaponShieldBattery.h"
 
 AETVWeaponShieldBattery::AETVWeaponShieldBattery() : Super()
 {
 	Type = AETVWeapon::HealShield;
+	FiringRange = 1;
 }

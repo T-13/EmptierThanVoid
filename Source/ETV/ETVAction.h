@@ -95,10 +95,10 @@ public:
 	virtual bool Perform();
 
 	UFUNCTION()
-	virtual void OnBeginPerform();
+	void OnBeginPerform();
 
 	UFUNCTION()
-	virtual void OnEndPerform();
+	void OnEndPerform();
 
     UFUNCTION()
 	virtual void ApplyEffectsSelf() {}

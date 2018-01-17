@@ -16,6 +16,10 @@ AETVShip::AETVShip() : Super()
 	IsContextMenuOpen = false;
 
 	Type = EETVShipType::PlayerShip;
+
+	// Default ranges
+	MoveRange = 1;
+	SensorRange = 2;
 }
 
 void AETVShip::Init(FString NewName, int32 MaxHP, int32 ShieldP, int32 NewShieldRechargeTime, int32 NewMoveRange, int32 Speed)
@@ -132,7 +136,8 @@ void AETVShip::SpawnContextMenu(AActor *Actor, FKey Key)
 {
 	AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-	if (ContextMenuClass != nullptr && !GameMode->IsTargeting() && !IsContextMenuOpen && !PlayerController->IsPaused())
+	if (ContextMenuClass != nullptr && !IsContextMenuOpen && !PlayerController->IsPaused()
+		&& !GameMode->IsTargeting() && GameMode->IsTileVisible(GetTilePosition()))
 	{
 		// If another menu is in focus close it
 		if (GameMode->WasShipClickedRecently())
@@ -219,6 +224,12 @@ void AETVShip::MoveToTile(int32 NewX, int32 NewY)
 bool AETVShip::IsEnemy()
 {
 	return Type == EETVShipType::EnemyShip;
+}
+
+bool AETVShip::IsVisible()
+{
+	AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
+	return GameMode->IsTileVisible(GetTilePosition(), EETVShipType::PlayerShip);
 }
 
 void AETVShip::CloseContextMenu()

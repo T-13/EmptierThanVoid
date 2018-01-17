@@ -24,13 +24,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "ETV Action|Target")
 	AActor* SelectedTarget;
 
-	// Currently selected tile map X coordinate (-1 if unset)
+	// Currently selected tile map coordinate ((-1, -1) if unset)
 	UPROPERTY(BlueprintReadOnly, Category = "ETV Action|Target")
-	int32 TileX;
-
-	// Currently selected tile map Y coordinate (-1 if unset)
-	UPROPERTY(BlueprintReadOnly, Category = "ETV Action|Target")
-	int32 TileY;
+	FVector2D Tile;
 
 	// Required type of target
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ETV Action|Target")
@@ -53,5 +49,5 @@ public:
 	bool CanPerform() override;
 	bool Activate() override;
 	bool Perform() override;
-	void OnEndPerform() override;
+	void OnEndPerform(); // Hides UETVAction member function on purpose
 };

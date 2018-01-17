@@ -110,7 +110,7 @@ void UETVAction::OnBeginPerform()
 void UETVAction::OnEndPerform()
 {
 	AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
-	GameMode->GetVisibleTiles(EETVShipType::PlayerShip);
+	GameMode->UpdateVisibleTiles(EETVShipType::PlayerShip);
 
 	if (bEndsTurn)
 	{

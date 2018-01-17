@@ -286,10 +286,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ETV Visibility")
 	float GetTiledDistance(FVector2D TileA, FVector2D TileB);
 
-	// Returns all visible tile position for the given side and sets board effects if player side
+	// Updates board visibility effects if player side (or debug) and optionally returns visible tile positions
 	UFUNCTION(BlueprintCallable, Category = "ETV Visibility")
-	void GetVisibleTiles(EETVShipType Side, /*out*/ TArray<FVector2D>& VisibleTiles);
-	void GetVisibleTiles(EETVShipType Side);
+	void UpdateVisibleTiles(EETVShipType Side, /*out*/ TArray<FVector2D>& VisibleTiles);
+	void UpdateVisibleTiles(EETVShipType Side);
+
+	// Returns all visible ships for the given side (filters Ships from AETVGameModeBase)
+	UFUNCTION(BlueprintCallable, Category = "ETV Visibility")
+	void GetVisibleShips(EETVShipType Side, /*out*/ TArray<AETVShip*>& VisibleShips);
 
 	// Returns visibility of the given tile (if visible by any ship on given side)
 	UFUNCTION(BlueprintCallable, Category = "ETV Visibility")

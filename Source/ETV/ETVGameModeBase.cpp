@@ -129,7 +129,7 @@ void AETVGameModeBase::BeginPlay()
 		ShipStatusUI->AddToViewport();
 
 		// Set starting visibility
-		GetVisibleTiles(EETVShipType::PlayerShip);
+		UpdateVisibleTiles(EETVShipType::PlayerShip);
 
 		// Initialize ship list
 		GetShipListWidget()->Update();
@@ -574,7 +574,7 @@ void AETVGameModeBase::EndTurn()
 
 		if (bShowEnemyVisibility)
 		{
-			GetVisibleTiles(EETVShipType::EnemyShip);
+			UpdateVisibleTiles(EETVShipType::EnemyShip);
 		}
 
 		// Move control to AI
@@ -586,7 +586,7 @@ void AETVGameModeBase::EndTurn()
 void AETVGameModeBase::NextTurn()
 {
 	// Update visibility (eg. player ships have been destroyed)
-	GetVisibleTiles(EETVShipType::PlayerShip);
+	UpdateVisibleTiles(EETVShipType::PlayerShip);
 
 	// Update ship list (eg. enemy ships became hidden or visible)
 	GetShipListWidget()->Update();
@@ -785,7 +785,7 @@ float AETVGameModeBase::GetTiledDistance(FVector2D TileA, FVector2D TileB)
 	return floorf(Distance);
 }
 
-void AETVGameModeBase::GetVisibleTiles(EETVShipType Side, TArray<FVector2D>& VisibleTiles)
+void AETVGameModeBase::UpdateVisibleTiles(EETVShipType Side, TArray<FVector2D>& VisibleTiles)
 {
 	// Go through all tiles checking if they are visible by any ship on given side
 	for (auto &CurrentTileData : TileData)
@@ -806,10 +806,17 @@ void AETVGameModeBase::GetVisibleTiles(EETVShipType Side, TArray<FVector2D>& Vis
 	}
 }
 
-void AETVGameModeBase::GetVisibleTiles(EETVShipType Side)
+void AETVGameModeBase::UpdateVisibleTiles(EETVShipType Side)
 {
 	TArray<FVector2D> VisibleTilesDummy;
-	GetVisibleTiles(Side, VisibleTilesDummy);
+	UpdateVisibleTiles(Side, VisibleTilesDummy);
+}
+
+void AETVGameModeBase::GetVisibleShips(EETVShipType Side, TArray<AETVShip*>& VisibleShips)
+{
+	VisibleShips = Ships.FilterByPredicate([](AETVShip* Ship){
+		return Ship->IsVisible();
+	});
 }
 
 bool AETVGameModeBase::IsTileVisible(FVector2D Tile, EETVShipType Side)

@@ -7,6 +7,7 @@
 AETVShipRepairShip::AETVShipRepairShip() : Super()
 {
 	Class = EETVShipClass::Repair;
+	MoveRange = 3;
 }
 
 void AETVShipRepairShip::Init(FString NewName, int32 MaxHP, int32 ShieldP, int32 NewShieldRechargeTime, int32 NewMoveRange, int32 Speed, int32 NewRepairPower)
@@ -31,6 +32,8 @@ void AETVShipRepairShip::InitRandomWithLevel(FString NewName, int32 PowerLvl)
 	Super::InitRandomWithLevel(NewName, PowerLvl);
 
 	RepairPower = PowerLvl / 5;
+
+	SpawnWeapons();
 }
 
 void AETVShipRepairShip::SpawnWeapons()

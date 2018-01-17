@@ -6,6 +6,7 @@
 AETVShipFighter::AETVShipFighter() : Super()
 {
 	Class = EETVShipClass::Fighter;
+	MoveRange = 5;
 }
 
 void AETVShipFighter::Init(FString NewName, int32 MaxHP, int32 ShieldP, int32 NewShieldRechargeTime, int32 NewMoveRange, int32 Speed, float Deflection)

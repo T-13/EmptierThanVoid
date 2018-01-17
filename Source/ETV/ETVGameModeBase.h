@@ -72,6 +72,8 @@ class ETV_API AETVGameModeBase : public AGameModeBase
 	UPaperTileSet* PlayerFighterShip;
 	UPaperTileSet* EnemyCapitalShip;
 	UPaperTileSet* EnemyFighterShip;
+	UPaperTileSet* PlayerRepairShip;
+	UPaperTileSet* EnemyRepairShip;
 
 public:
 	// Sets default values for this actor's properties
@@ -182,7 +184,13 @@ public:
 
 	// Spawn ShipActor on the correct X and Y
 	UFUNCTION()
-	void SpawnShip(int32 x, int32 y, UPaperTileSet* type);
+	void SpawnShipType(int32 x, int32 y, UPaperTileSet* type, FString name);
+
+	// Loop for spawning many Ships of the same type
+	void SpawnShipsLoop(UPaperTileSet* Player, UPaperTileSet* Enemy, int32 NumOfShips, TArray<FString> ShipNames);
+
+	template<class T>
+	void SpawnShip(int32 x, int32 y, FString name, bool Enemy);
 
 	// Spawn Actions for Ship and Weapons
 	UFUNCTION()
@@ -278,4 +286,43 @@ public:
 	// Get Ship List widget
 	UFUNCTION(BlueprintCallable, Category = "ETV UI")
 	UETVShipStatusUIWidget* GetShipListWidget();
+
+	UFUNCTION()
+	bool IsShipNameUsed(FString Name);
+
+	UFUNCTION()
+	bool TileHasShip(int32 x, int32 y);
+
 };
+
+template<class T>
+FORCEINLINE void AETVGameModeBase::SpawnShip(int32 x, int32 y, FString name, bool Enemy)
+{
+	FVector LocDim = GetPosition(x, y);
+	LocDim.Z = 0.1f;
+
+	// Actor spawn parameters
+	const FActorSpawnParameters SpawnInfo;
+
+	// Rotate upwards to face the top-down camera
+	const FRotator Rotator(0, 0, -90);
+
+	// Spawn and Initialize Ship
+	T* Ship;
+	Ship = GetWorld()->SpawnActor<T>(LocDim, Rotator, SpawnInfo);
+	Ship->InitRandom(name);
+	Ship->SetCurrentPosition(x, y);
+	Ship->SetContextMenu(ContextMenu);
+	Ship->GetRenderComponent()->SetMobility(EComponentMobility::Movable);
+	Ship->GetRenderComponent()->SetSprite(Sprite);
+
+	// Setting sprite color to transparent
+	Ship->GetRenderComponent()->SetSpriteColor(FLinearColor(1.0f, 1.0f, 1.0f, 0.0f));
+
+	if (Enemy)
+		Ship->SetTypeToEnemy();
+
+	SpawnActions(Ship);
+
+	Ships.Add(Ship);
+}

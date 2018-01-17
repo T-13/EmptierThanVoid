@@ -321,8 +321,8 @@ FORCEINLINE void AETVGameModeBase::SpawnShip(int32 x, int32 y, FString name, boo
 
 	if (Enemy)
 		Ship->SetTypeToEnemy();
-	else
-		SpawnActions(Ship);
+
+	SpawnActions(Ship);
 
 	Ships.Add(Ship);
 }

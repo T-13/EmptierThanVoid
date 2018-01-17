@@ -789,10 +789,5 @@ bool AETVGameModeBase::IsShipNameUsed(FString Name)
 bool AETVGameModeBase::TileHasShip(int32 x, int32 y)
 {
 	FPaperTileInfo TileInfo = TileMapComp->GetTile(x, y, EETVTileLayer::Ship);
-	if (TileInfo.TileSet == nullptr) {
-		return false;
-	}
-	else {
-		return true;
-	}
+	return TileInfo.TileSet != nullptr;
 }

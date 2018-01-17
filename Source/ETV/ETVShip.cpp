@@ -64,11 +64,10 @@ void AETVShip::InitRandomWithLevel(FString NewName, int32 PowerLvl)
 	int32 MaxShieldRechargeTime = MinShieldRechargeTime + 3;
 	ShieldRechargeTime = FMath::RandRange(MinShieldRechargeTime, MaxShieldRechargeTime);
 
-	int32 MinMoveRange = PowerLvl / 25;
-	int32 MaxMoveRange = PowerLvl / 15;
-	MoveRange = FMath::RandRange(MinMoveRange, MaxMoveRange);
+	int32 MinSpeed = PowerLvl / 25;
+	int32 MaxSpped = PowerLvl / 15;
 
-	ShipSpeed = FMath::RandRange(MinMoveRange, MaxMoveRange);
+	ShipSpeed = FMath::RandRange(MinSpeed, MaxSpped);
 
 	SpawnWeapons();
 }

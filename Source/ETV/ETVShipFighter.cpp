@@ -6,6 +6,8 @@
 AETVShipFighter::AETVShipFighter() : Super()
 {
 	Class = EETVShipClass::Fighter;
+
+	MoveRange = 5;
 	SensorRange = 6;
 }
 

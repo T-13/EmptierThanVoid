@@ -8,6 +8,8 @@
 AETVShipCapital::AETVShipCapital() : Super()
 {
 	Class = EETVShipClass::Capital;
+
+	MoveRange = 1;
 	SensorRange = 5;
 }
 

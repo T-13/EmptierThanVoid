@@ -96,5 +96,14 @@ void UETVCalculator::CalculateWeaponEffect(AETVShip *User, AETVWeapon *WeaponUse
 			FString Message = ShipName + ";" + ActionShields + ";" + ChangeValueS + ";" + TargetName;
 			LogWidget->NewLogEntry(Message);
 		}
+
+		if (Target->GetHP() <= 0) {
+			FString ShipName = User->GetShipName();
+			FString TargetName = Target->GetShipName();
+
+			FString Message = ShipName + ";" + TargetName;
+			LogWidget->NewDeathLogEntry(Message);
+			GameMode->DestroyShip(Target);
+		}
 	}
 }

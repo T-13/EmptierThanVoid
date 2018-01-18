@@ -224,6 +224,9 @@ public:
 	UFUNCTION()
 	void SetPosition(int32 ToX, int32 ToY, int32 FromX, int32 FromY);
 
+	// Destroy Ship Actor and reset Tile
+	UFUNCTION()
+	void DestroyShip(AETVShip* DestroyedShip);
 
 	/* Game Loop */
 	// End current turn

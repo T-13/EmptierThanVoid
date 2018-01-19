@@ -18,4 +18,6 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "ETV ActionLogWidget")
 	void NewLogEntry(const FString& Message);
 
+	UFUNCTION(BlueprintImplementableEvent, Category = "ETV ActionLogWidget")
+	void NewDeathLogEntry(const FString& Message);
 };

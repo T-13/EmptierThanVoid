@@ -50,8 +50,10 @@ void UETVCalculator::CalculateWeaponEffect(AETVShip *User, AETVWeapon *WeaponUse
 	// Weapon is a support type that heals HealthPoints
 	else if (WeaponUsed->GetType() == AETVWeapon::HealHull)
 	{
-		if (Target->GetHP() != Target->GetMaxHP()) {
-			if ((Target->GetHP() + ChangeValue) > Target->GetMaxHP()) {
+		if (Target->GetHP() != Target->GetMaxHP())
+		{
+			if ((Target->GetHP() + ChangeValue) > Target->GetMaxHP())
+			{
 				ChangeValue = Target->GetMaxHP() - Target->GetHP();
 			}
 			Target->SetHP(Target->GetHP() + ChangeValue);
@@ -80,7 +82,8 @@ void UETVCalculator::CalculateWeaponEffect(AETVShip *User, AETVWeapon *WeaponUse
 	{
 		// Add new Message to UETVActionLogWidget by calling event NewLogEntry
 		UETVActionLogWidget *LogWidget = GameMode->GetLogWidget();
-		if (ActionHP != "") {
+		if (ActionHP != "")
+		{
 			FString ShipName = User->GetShipName();
 			FString ChangeValueS = FString::FromInt(ChangeValue);
 			FString TargetName = Target->GetShipName();
@@ -88,7 +91,8 @@ void UETVCalculator::CalculateWeaponEffect(AETVShip *User, AETVWeapon *WeaponUse
 			FString Message = ShipName + ";" + ActionHP + ";" + ChangeValueS + ";" + TargetName;
 			LogWidget->NewLogEntry(Message);
 		}
-		if (ActionShields != "") {
+		if (ActionShields != "")
+		{
 			FString ShipName = User->GetShipName();
 			FString ChangeValueS = FString::FromInt(ChangeValue);
 			FString TargetName = Target->GetShipName();
@@ -97,7 +101,8 @@ void UETVCalculator::CalculateWeaponEffect(AETVShip *User, AETVWeapon *WeaponUse
 			LogWidget->NewLogEntry(Message);
 		}
 
-		if (Target->GetHP() <= 0) {
+		if (Target->GetHP() <= 0)
+		{
 			FString ShipName = User->GetShipName();
 			FString TargetName = Target->GetShipName();
 

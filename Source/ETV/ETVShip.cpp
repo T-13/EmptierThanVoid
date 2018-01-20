@@ -256,6 +256,11 @@ int32 AETVShip::GetScore()
 	return Score;
 }
 
+TArray<UETVAction*> AETVShip::GetActions()
+{
+	return Actions;
+}
+
 float AETVShip::GetMultiplier()
 {
 	// Calculate how much HealthPoints the ship has compared to its' initial HealthPoints

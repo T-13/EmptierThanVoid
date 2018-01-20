@@ -205,6 +205,10 @@ public:
 	// Multiplier of Score for certain Classes
 	const static int32 CAPITAL_SCORE_MP = 175;
 
+	// Used by AI to call ships actions
+	UFUNCTION(Category = "AI")
+	TArray<UETVAction*> GetActions();
+
 	// Returns a multiplier for the effectiveness of ship's actions depending on its status
 	UFUNCTION()
 	virtual float GetMultiplier();

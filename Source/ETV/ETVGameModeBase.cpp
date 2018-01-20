@@ -549,6 +549,22 @@ void AETVGameModeBase::SetPosition(int32 ToX, int32 ToY, int32 FromX, int32 From
 	TileMapComp->SetTile(FromX, FromY, EETVTileLayer::Ship, FPaperTileInfo());
 }
 
+void AETVGameModeBase::DestroyShip(AETVShip * DestroyedShip)
+{
+	// Remove Ship from TArray and update ShipStatus UI
+	Ships.Remove(DestroyedShip);
+	ShipStatusUI->AssignShips(Ships);
+	GetShipListWidget()->Update();
+
+	// Reset Tile
+	FPaperTileInfo TileInfo;
+	TileInfo.TileSet = nullptr;
+	TileMapComp->SetTile(DestroyedShip->GetX(), DestroyedShip->GetY(), EETVTileLayer::Ship, TileInfo);
+
+	// Remove Actor
+	DestroyedShip->Destroy();
+}
+
 void AETVGameModeBase::EndTurn()
 {
 	// Close context menu if any is open
@@ -814,7 +830,7 @@ void AETVGameModeBase::UpdateVisibleTiles(EETVShipType Side)
 
 void AETVGameModeBase::GetVisibleShips(EETVShipType Side, TArray<AETVShip*>& VisibleShips)
 {
-	VisibleShips = Ships.FilterByPredicate([](AETVShip* Ship){
+	VisibleShips = Ships.FilterByPredicate([](AETVShip* Ship) {
 		return Ship->IsVisible();
 	});
 }
@@ -848,7 +864,8 @@ void AETVGameModeBase::SetTileVisibilityEffect(int32 X, int32 Y, bool bVisible)
 	if (bVisible)
 	{
 		TileMapComp->SetTile(X, Y, EETVTileLayer::Effect, FPaperTileInfo());
-	} else
+	}
+	else
 	{
 		FPaperTileInfo TileInfo;
 		TileInfo.TileSet = TileSetHidden;

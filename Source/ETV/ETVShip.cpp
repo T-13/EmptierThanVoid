@@ -128,10 +128,6 @@ void AETVShip::RechargeShields()
 {
 }
 
-void AETVShip::GetReport()
-{
-}
-
 void AETVShip::SpawnContextMenu(AActor *Actor, FKey Key)
 {
 	AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
@@ -247,6 +243,17 @@ void AETVShip::UnconditionallyCloseContextMenu()
 		CurrentContextMenu->ShouldNotReOpen();
 		CurrentContextMenu->Close();
 	}
+}
+
+int32 AETVShip::GetScore()
+{
+	int Score = 0;
+	for(auto WeaponSlot : Weapons)
+	{
+		Score += WeaponSlot->GetWeapon()->GetDMG()*GetMultiplier();
+	}
+	Score += HealthPoints*GetMultiplier();
+	return Score;
 }
 
 float AETVShip::GetMultiplier()

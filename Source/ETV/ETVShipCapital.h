@@ -42,6 +42,9 @@ public:
 	UFUNCTION()
 	void SpawnWeapons();
 
+	UFUNCTION(Category = "AI")
+	int32 GetScore() override;
+
 	// TODO Add methods
 	// UseHyperdrive(int32 x, int32 y);
 	// RepairShipInHangar(AETVShip ship, int32 hangar);

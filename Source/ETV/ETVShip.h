@@ -151,9 +151,6 @@ public:
 	virtual void RechargeShields();
 
 	UFUNCTION()
-	virtual void GetReport();
-
-	UFUNCTION()
 	void SpawnContextMenu(AActor *Actor, FKey Key);
 
 	UFUNCTION()
@@ -201,6 +198,13 @@ public:
 	UFUNCTION()
 	void UnconditionallyCloseContextMenu();
 
+	// Score used by AI to evaluate the ship
+	UFUNCTION(Category = "AI")
+	virtual int32 GetScore();
+
+	// Multiplier of Score for certain Classes
+	const static int32 CAPITAL_SCORE_MP = 175;
+
 	// Returns a multiplier for the effectiveness of ship's actions depending on its status
 	UFUNCTION()
 	virtual float GetMultiplier();
@@ -222,7 +226,6 @@ public:
 	UFUNCTION()
 	FString GetShipType();
 
-	// Just for checking in LOG
 	UFUNCTION()
 	FString GetShipClass();
 

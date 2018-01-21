@@ -320,7 +320,7 @@ public:
 	AETVShip* GetLastClickedShip() const { return LastClickedShip; }
 
 
-	/* Get Widgets */
+	/* Widget and Ship Interaction */
 	// Get log widget
 	UFUNCTION(BlueprintCallable, Category = "ETV UI")
 	UETVActionLogWidget* GetLogWidget() const { return ActionLogClass; }
@@ -339,7 +339,7 @@ public:
 	UPaperTileSet* GetShipSprite(AETVShip* Ship);
 
 	UFUNCTION()
-	APaperTileMapActor* GetTileMapActor();
+	APaperTileMapActor* GetTileMapActor() const { return TileMapActor; }
 };
 
 

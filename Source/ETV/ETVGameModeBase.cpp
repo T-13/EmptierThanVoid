@@ -597,20 +597,20 @@ void AETVGameModeBase::EndTurn()
 		// Move control to AI
 		UETVAI* AI = NewObject<UETVAI>();
 		TArray<int32> Instructions = AI->GetMove(Ships);
-		if(Instructions.Num() == 4)
+		if (Instructions.Num() == 4)
 		{
 			UETVActionTarget* Action = Cast<UETVActionTarget>(Ships[Instructions[1]]->GetActions()[Instructions[2]]);
 			Action->SetTarget(Ships[Instructions[3]]);
 			Action->Perform();
 		}
-		else if(Instructions.Num() == 5)
+		else if (Instructions.Num() == 5)
 		{
 			UETVActionTarget* Action = Cast<UETVActionTarget>(Ships[Instructions[1]]->GetActions()[Instructions[2]]);
 			Action->SetTarget(TileMapActor, Instructions[3], Instructions[4]);
 			Action->Perform();
 		}
 		
-		// AI calls NextTurn() when done
+		// AI continue to next turn when done
 		NextTurn();
 	}
 }
@@ -915,14 +915,7 @@ bool AETVGameModeBase::TileHasShip(int32 x, int32 y)
 	return TileInfo.TileSet != nullptr;
 }
 
-
-
 UPaperTileSet* AETVGameModeBase::GetShipSprite(AETVShip* Ship)
 {
 	return TileMapComp->GetTile(Ship->GetX(), Ship->GetY(), EETVTileLayer::Ship).TileSet;
-}
-
-APaperTileMapActor* AETVGameModeBase::GetTileMapActor()
-{
-	return TileMapActor;
 }

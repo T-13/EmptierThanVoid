@@ -53,15 +53,15 @@ TArray<int32> UETVAI::GetMove(TArray<AETVShip*> Ships)
 	int32 RandomAIShip = -1;
 	// Find most important ships
 	int index = 0;
-	for(auto ShipReference : Ships)
+	for (auto ShipReference : Ships)
 	{
 		// AI Ship
-		if(ShipReference->IsEnemy())
+		if (ShipReference->IsEnemy())
 		{
-			if(MostImportantAIShip != -1)
+			if (MostImportantAIShip != -1)
 			{
 				// This will always be the capital
-				if(ShipReference->GetScore() > Ships[MostImportantAIShip]->GetScore())
+				if (ShipReference->GetScore() > Ships[MostImportantAIShip]->GetScore())
 				{
 					MostImportantAIShip = index;
 				}
@@ -72,12 +72,12 @@ TArray<int32> UETVAI::GetMove(TArray<AETVShip*> Ships)
 				RandomAIShip = index;
 			}
 			// 1/8 chance
-			if(FMath::RandBool() && FMath::RandBool() && FMath::RandBool())
+			if (FMath::RandBool() && FMath::RandBool() && FMath::RandBool())
 			{
 				RandomAIShip = index;
 			}
 		}
-		else if(GameMode->IsTileVisible(ShipReference->GetTilePosition(), EETVShipType::EnemyShip) == true)
+		else if (GameMode->IsTileVisible(ShipReference->GetTilePosition(), EETVShipType::EnemyShip) == true)
 		{
 			if (MostImportantPlayerShip != -1)
 			{
@@ -94,7 +94,7 @@ TArray<int32> UETVAI::GetMove(TArray<AETVShip*> Ships)
 		++index;
 	}
 	// Does AI see enemy ship 
-	if(MostImportantPlayerShip != -1)
+	if (MostImportantPlayerShip != -1)
 	{
 		int jndex = 0;
 		// If possible try and attack
@@ -109,7 +109,7 @@ TArray<int32> UETVAI::GetMove(TArray<AETVShip*> Ships)
 				UETVActionTarget_Fire* Laser = Cast<UETVActionTarget_Fire>(ShipReference->GetActions()[ActionIndex]);
 				// TODO - Add check if torped avaliable
 				Laser->SetTarget(Ships[MostImportantPlayerShip]);
-				if(Laser->CanPerform())
+				if (Laser->CanPerform())
 				{
 					MoveInstructions.SetNum(4);
 					MoveInstructions[0] = (Ships[MostImportantPlayerShip]->GetScore());
@@ -128,7 +128,7 @@ TArray<int32> UETVAI::GetMove(TArray<AETVShip*> Ships)
 	UETVActionTarget_Move* MoveAction = Cast<UETVActionTarget_Move>(Ships[RandomAIShip]->GetActions().Last(0));
 	int x = -1;
 	int y = -1;
-	while(!MoveAction->CanPerform())
+	while (!MoveAction->CanPerform())
 	{
 		x = Ships[RandomAIShip]->GetTilePosition().X + FMath::RandRange(1, Ships[RandomAIShip]->GetMoveRange());
 		y = Ships[RandomAIShip]->GetTilePosition().Y + FMath::RandRange(1, Ships[RandomAIShip]->GetMoveRange());
@@ -142,7 +142,3 @@ TArray<int32> UETVAI::GetMove(TArray<AETVShip*> Ships)
 	MoveInstructions[4] = (y);
 	return MoveInstructions;
 };
-
-
-
-

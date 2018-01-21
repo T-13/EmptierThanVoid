@@ -26,6 +26,9 @@ AETVGameModeBase::AETVGameModeBase()
 
 
 	/* Game Loop */
+	// Set first turn to player
+	CurrentTurnSide = EETVShipType::PlayerShip;
+
 	// Disable game time (until everything is generated)
 	ElapsedTime = -1.0f;
 	CurrentTurn = 0;
@@ -575,6 +578,7 @@ void AETVGameModeBase::EndTurn()
 		CurShip->UnconditionallyCloseContextMenu();
 	}
 
+	CurrentTurnSide = EETVShipType::EnemyShip;
 	CurrentTurnTime = 0.0f;
 
 	// Handle turn end
@@ -624,6 +628,7 @@ void AETVGameModeBase::NextTurn()
 	GetShipListWidget()->Update();
 
 	// Apply next turn
+	CurrentTurnSide = EETVShipType::PlayerShip;
 	CurrentTurn++;
 	CurrentTurnTime = static_cast<float>(TurnTime);
 

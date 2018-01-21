@@ -55,6 +55,7 @@ class ETV_API AETVGameModeBase : public AGameModeBase
 
 
 	/* Game Loop */
+	EETVShipType CurrentTurnSide;
 	TArray<UETVAction*> MultiTurnActions;
 
 
@@ -240,6 +241,10 @@ public:
 	// Get current turn time percentage until end of turn
 	UFUNCTION(BlueprintCallable, Category = "ETV Game")
 	float GetCurrentTurnPercentage();
+
+	// Returns if current turn is AI controlled
+	UFUNCTION(BlueprintCallable, Category = "ETV Game")
+	bool IsCurrentTurnAI() const { return !bDisableAI && CurrentTurnSide == EETVShipType::EnemyShip; }
 
 	// Add multi-turn action for execution in subsequent turns automatically
 	UFUNCTION(BlueprintCallable, Category = "ETV Game")

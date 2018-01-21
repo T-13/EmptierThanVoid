@@ -10,6 +10,7 @@
 #include "ETVCalculator.h"
 #include "Runtime/Engine/Classes/Engine/UserInterfaceSettings.h"
 #include "Runtime/Core/Public/Misc/FileHelper.h"
+#include "ETVAI.h"
 //#include "DrawDebugHelpers.h" // Uncomment for debug drawing
 
 // Sets default values
@@ -25,6 +26,9 @@ AETVGameModeBase::AETVGameModeBase()
 
 
 	/* Game Loop */
+	// Set first turn to player
+	CurrentTurnSide = EETVShipType::PlayerShip;
+
 	// Disable game time (until everything is generated)
 	ElapsedTime = -1.0f;
 	CurrentTurn = 0;
@@ -574,6 +578,7 @@ void AETVGameModeBase::EndTurn()
 		CurShip->UnconditionallyCloseContextMenu();
 	}
 
+	CurrentTurnSide = EETVShipType::EnemyShip;
 	CurrentTurnTime = 0.0f;
 
 	// Handle turn end
@@ -594,8 +599,23 @@ void AETVGameModeBase::EndTurn()
 		}
 
 		// Move control to AI
-		// TODO Call into AI to do its thing
-		// TODO AI calls NextTurn() when done
+		UETVAI* AI = NewObject<UETVAI>();
+		TArray<int32> Instructions = AI->GetMove(Ships);
+		if (Instructions.Num() == 4)
+		{
+			UETVActionTarget* Action = Cast<UETVActionTarget>(Ships[Instructions[1]]->GetActions()[Instructions[2]]);
+			Action->SetTarget(Ships[Instructions[3]], Ships[Instructions[3]]->GetX(), Ships[Instructions[3]]->GetY());
+			Action->Perform();
+		}
+		else if (Instructions.Num() == 5)
+		{
+			UETVActionTarget* Action = Cast<UETVActionTarget>(Ships[Instructions[1]]->GetActions()[Instructions[2]]);
+			Action->SetTarget(TileMapActor, Instructions[3], Instructions[4]);
+			Action->Perform();
+		}
+		
+		// AI continue to next turn when done
+		NextTurn();
 	}
 }
 
@@ -608,6 +628,7 @@ void AETVGameModeBase::NextTurn()
 	GetShipListWidget()->Update();
 
 	// Apply next turn
+	CurrentTurnSide = EETVShipType::PlayerShip;
 	CurrentTurn++;
 	CurrentTurnTime = static_cast<float>(TurnTime);
 
@@ -897,4 +918,9 @@ bool AETVGameModeBase::TileHasShip(int32 x, int32 y)
 {
 	FPaperTileInfo TileInfo = TileMapComp->GetTile(x, y, EETVTileLayer::Ship);
 	return TileInfo.TileSet != nullptr;
+}
+
+UPaperTileSet* AETVGameModeBase::GetShipSprite(AETVShip* Ship)
+{
+	return TileMapComp->GetTile(Ship->GetX(), Ship->GetY(), EETVTileLayer::Ship).TileSet;
 }

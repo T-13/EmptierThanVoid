@@ -25,11 +25,11 @@ void AETVWeapon::InitRandom(FName NewName, int32 PowerLvl)
 		PowerLvl = 200;
 
 	// It should take an avarage of 10 shots to kill a ship of similiar lvl
-	int32 AvgShotsToKill = 10;
+	int32 AvgShotsToKill = 7;
 
 	// The range of values we can generate
-	int32 DMGRangeMin = PowerLvl - 25;
-	int32 DMGRangeMax = PowerLvl + 25;
+	int32 DMGRangeMin = PowerLvl - 5;
+	int32 DMGRangeMax = PowerLvl + 5;
 
 	int32 ReqRangeMin = PowerLvl / 10;
 	int32 ReqRangeMax = ReqRangeMin * 2;

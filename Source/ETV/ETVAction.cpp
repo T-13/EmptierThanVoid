@@ -112,7 +112,8 @@ void UETVAction::OnEndPerform()
 	AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
 	GameMode->UpdateVisibleTiles(EETVShipType::PlayerShip);
 
-	if (bEndsTurn)
+	// End turn if action automatically ends it and turn is not AI controlled (AI automatically goes to next turn)
+	if (bEndsTurn && !GameMode->IsCurrentTurnAI())
 	{
 		// TODO Delay this until all effects are done
 		GameMode->EndTurn();

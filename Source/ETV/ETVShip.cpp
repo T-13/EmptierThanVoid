@@ -128,10 +128,6 @@ void AETVShip::RechargeShields()
 {
 }
 
-void AETVShip::GetReport()
-{
-}
-
 void AETVShip::SpawnContextMenu(AActor *Actor, FKey Key)
 {
 	AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
@@ -249,15 +245,33 @@ void AETVShip::UnconditionallyCloseContextMenu()
 	}
 }
 
+int32 AETVShip::GetScore()
+{
+	int Score = 0;
+	for (auto WeaponSlot : Weapons)
+	{
+		Score += WeaponSlot->GetWeapon()->GetDMG() * GetMultiplier();
+	}
+	Score += HealthPoints * GetMultiplier();
+	return Score;
+}
+
+TArray<UETVAction*> AETVShip::GetActions()
+{
+	return Actions;
+}
+
 float AETVShip::GetMultiplier()
 {
 	// Calculate how much HealthPoints the ship has compared to its' initial HealthPoints
-	float HpStatus = HealthPoints / MaximumHealthPoints;
+	float HpStatus = float(HealthPoints) / float(MaximumHealthPoints);
+
 	// If between 75% and 100% retrun this percentege
 	if (HpStatus >= 0.75 && HpStatus <= 1)
 		return HpStatus;
+
 	// Weaker ships loose less per HP lost - We don't want ships to become useless
-	else if (HpStatus < 0.75 && HpStatus >= 0.50)
+	if (HpStatus < 0.75 && HpStatus >= 0.50)
 	{
 		// 75 is the minimal value for the previous case
 		float Difference = 0.75 - HpStatus;
@@ -265,7 +279,8 @@ float AETVShip::GetMultiplier()
 		Difference = Difference / 2;
 		return (0.75 - Difference);
 	}
-	else if (HpStatus < 0.50 && HpStatus > 0.0)
+
+	if (HpStatus < 0.50 && HpStatus > 0.0)
 	{
 		// 0.50 is the minimal value for the previous case
 		float Difference = 0.50 - HpStatus;
@@ -274,13 +289,11 @@ float AETVShip::GetMultiplier()
 		// 0.625 is the minimum Mupltiplier returned by previous case
 		return (0.625 - Difference);
 	}
-	else
-	{
-		// If Ship is dead or MaxHP is less then Current HP
-		// We shouldn't get here!
-		UE_LOG(LogTemp, Error, TEXT("GetMultiplier(): Ship is dead or MaxHP is less then Current HP!"));
-		return 0;
-	}
+
+	// If Ship is dead or MaxHP is less then Current HP
+	// We shouldn't get here!
+	UE_LOG(LogTemp, Error, TEXT("GetMultiplier(): Ship is dead or MaxHP is less then Current HP!"));
+	return 0;
 }
 
 void AETVShip::ClosingContextMenu()

@@ -55,6 +55,7 @@ class ETV_API AETVGameModeBase : public AGameModeBase
 
 
 	/* Game Loop */
+	EETVShipType CurrentTurnSide;
 	TArray<UETVAction*> MultiTurnActions;
 
 
@@ -241,6 +242,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ETV Game")
 	float GetCurrentTurnPercentage();
 
+	// Returns if current turn is AI controlled
+	UFUNCTION(BlueprintCallable, Category = "ETV Game")
+	bool IsCurrentTurnAI() const { return !bDisableAI && CurrentTurnSide == EETVShipType::EnemyShip; }
+
 	// Add multi-turn action for execution in subsequent turns automatically
 	UFUNCTION(BlueprintCallable, Category = "ETV Game")
 	void AddMultiTurnAction(UETVAction* Action);
@@ -320,7 +325,7 @@ public:
 	AETVShip* GetLastClickedShip() const { return LastClickedShip; }
 
 
-	/* Get Widgets */
+	/* Widget and Ship Interaction */
 	// Get log widget
 	UFUNCTION(BlueprintCallable, Category = "ETV UI")
 	UETVActionLogWidget* GetLogWidget() const { return ActionLogClass; }
@@ -334,6 +339,12 @@ public:
 
 	UFUNCTION()
 	bool TileHasShip(int32 x, int32 y);
+
+	UFUNCTION()
+	UPaperTileSet* GetShipSprite(AETVShip* Ship);
+
+	UFUNCTION()
+	APaperTileMapActor* GetTileMapActor() const { return TileMapActor; }
 };
 
 

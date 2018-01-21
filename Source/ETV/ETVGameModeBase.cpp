@@ -604,7 +604,7 @@ void AETVGameModeBase::EndTurn()
 		if (Instructions.Num() == 4)
 		{
 			UETVActionTarget* Action = Cast<UETVActionTarget>(Ships[Instructions[1]]->GetActions()[Instructions[2]]);
-			Action->SetTarget(Ships[Instructions[3]]);
+			Action->SetTarget(Ships[Instructions[3]], Ships[Instructions[3]]->GetX(), Ships[Instructions[3]]->GetY());
 			Action->Perform();
 		}
 		else if (Instructions.Num() == 5)

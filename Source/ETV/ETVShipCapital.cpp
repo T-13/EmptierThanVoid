@@ -103,12 +103,7 @@ void AETVShipCapital::SpawnWeapons()
 int32 AETVShipCapital::GetScore()
 {
 	// TODO Find a way to call parent class GetScore and Multiply that
-	int Score = 0;
-	for (auto WeaponSlot : Weapons)
-	{
-		Score += WeaponSlot->GetWeapon()->GetDMG()*GetMultiplier();
-	}
-	Score += HealthPoints * GetMultiplier();
+	int Score = Super::GetScore();
 	Score = Score*(double(CAPITAL_SCORE_MP)/100.00);
 	return Score;
 }

@@ -264,7 +264,7 @@ TArray<UETVAction*> AETVShip::GetActions()
 float AETVShip::GetMultiplier()
 {
 	// Calculate how much HealthPoints the ship has compared to its' initial HealthPoints
-	float HpStatus = HealthPoints / MaximumHealthPoints;
+	float HpStatus = float(HealthPoints) / float(MaximumHealthPoints);
 
 	// If between 75% and 100% retrun this percentege
 	if (HpStatus >= 0.75 && HpStatus <= 1)

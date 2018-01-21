@@ -108,7 +108,7 @@ TArray<int32> UETVAI::GetMove(TArray<AETVShip*> Ships)
 					ActionIndex = 1;
 				UETVActionTarget_Fire* Laser = Cast<UETVActionTarget_Fire>(ShipReference->GetActions()[ActionIndex]);
 				// TODO - Add check if torped avaliable
-				Laser->SetTarget(Ships[MostImportantPlayerShip]);
+				Laser->SetTarget(Ships[MostImportantPlayerShip], Ships[MostImportantPlayerShip]->GetX(), Ships[MostImportantPlayerShip]->GetY());
 				if (Laser->CanPerform())
 				{
 					MoveInstructions.SetNum(4);

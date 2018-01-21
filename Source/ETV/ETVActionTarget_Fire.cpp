@@ -57,7 +57,7 @@ bool UETVActionTarget_Fire::CanPerform()
 
 		// Check if enemy
 		AETVShip* SelectedShip = Cast<AETVShip>(SelectedTarget); // Required type is ship (checked in parent) so casting is safe
-		return SelectedShip->IsEnemy();
+		return SelectedShip->GetType() != OwnerShip->GetType();
 	}
 
 	return false;

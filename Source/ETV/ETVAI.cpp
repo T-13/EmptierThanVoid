@@ -46,7 +46,7 @@ TArray<int32> UETVAI::GetMove(TArray<AETVShip*> Ships)
 	TArray<int32> MoveInstructions;
 
 	// Get gamemode
-	AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(GetWorld()->GetAuthGameMode());
+	AETVGameModeBase* GameMode = Cast<AETVGameModeBase>(Ships[0]->GetWorld()->GetAuthGameMode());
 
 	int32 MostImportantPlayerShip = -1;
 	int32 MostImportantAIShip = -1;
@@ -79,16 +79,16 @@ TArray<int32> UETVAI::GetMove(TArray<AETVShip*> Ships)
 		}
 		else if(GameMode->IsTileVisible(ShipReference->GetTilePosition(), EETVShipType::EnemyShip) == true)
 		{
-			if (MostImportantAIShip != -1)
+			if (MostImportantPlayerShip != -1)
 			{
-				if (ShipReference->GetScore() > Ships[MostImportantAIShip]->GetScore())
+				if (ShipReference->GetScore() > Ships[MostImportantPlayerShip]->GetScore())
 				{
-					MostImportantAIShip = index;
+					MostImportantPlayerShip = index;
 				}
 			}
 			else
 			{
-				MostImportantAIShip = index;
+				MostImportantPlayerShip = index;
 			}
 		}
 		++index;
@@ -102,16 +102,20 @@ TArray<int32> UETVAI::GetMove(TArray<AETVShip*> Ships)
 		{
 			if (ShipReference->IsEnemy())
 			{
-				// Currently fire laser is always 0
-				UETVActionTarget_Fire* Laser = Cast<UETVActionTarget_Fire>(ShipReference->GetActions()[0]);
+				// Currently fire laser is always 0 and torpedo is 1 on fighters
+				int ActionIndex = 0;
+				if(ShipReference->GetShipClass() == "Fighter" || ShipReference->GetShipClass() == "Capital")
+					ActionIndex = 1;
+				UETVActionTarget_Fire* Laser = Cast<UETVActionTarget_Fire>(ShipReference->GetActions()[ActionIndex]);
 				// TODO - Add check if torped avaliable
 				Laser->SetTarget(Ships[MostImportantPlayerShip]);
 				if(Laser->CanPerform())
 				{
-					MoveInstructions.Add(Ships[MostImportantPlayerShip]->GetScore());
-					MoveInstructions.Add(jndex);
-					MoveInstructions.Add(0);
-					MoveInstructions.Add(MostImportantPlayerShip);
+					MoveInstructions.SetNum(4);
+					MoveInstructions[0] = (Ships[MostImportantPlayerShip]->GetScore());
+					MoveInstructions[1] = (jndex);
+					MoveInstructions[2] = (ActionIndex);
+					MoveInstructions[3] = (MostImportantPlayerShip);
 					return MoveInstructions;
 				}
 			}
@@ -128,15 +132,15 @@ TArray<int32> UETVAI::GetMove(TArray<AETVShip*> Ships)
 	{
 		x = Ships[RandomAIShip]->GetTilePosition().X + FMath::RandRange(1, Ships[RandomAIShip]->GetMoveRange());
 		y = Ships[RandomAIShip]->GetTilePosition().Y + FMath::RandRange(1, Ships[RandomAIShip]->GetMoveRange());
-		MoveAction->SetTarget(nullptr, x, y);
+		MoveAction->SetTarget(GameMode->GetTileMapActor(), x, y);
 	}
-	MoveInstructions.Add(Ships[MostImportantPlayerShip]->GetScore());
-	MoveInstructions.Add(RandomAIShip);
-	MoveInstructions.Add(Ships[RandomAIShip]->GetActions().Num()-1);
-	MoveInstructions.Add(x);
-	MoveInstructions.Add(y);
+	MoveInstructions.SetNum(5);
+	MoveInstructions[0] = (Ships[RandomAIShip]->GetScore());
+	MoveInstructions[1] = (RandomAIShip);
+	MoveInstructions[2] = (Ships[RandomAIShip]->GetActions().Num()-1);
+	MoveInstructions[3] = (x);
+	MoveInstructions[4] = (y);
 	return MoveInstructions;
-
 };
 
 

@@ -334,6 +334,12 @@ public:
 
 	UFUNCTION()
 	bool TileHasShip(int32 x, int32 y);
+
+	UFUNCTION()
+	UPaperTileSet* GetShipSprite(AETVShip* Ship);
+
+	UFUNCTION()
+	APaperTileMapActor* GetTileMapActor();
 };
 
 
